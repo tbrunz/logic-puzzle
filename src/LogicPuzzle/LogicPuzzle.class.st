@@ -43,8 +43,8 @@ LogicPuzzle class >> traitSize: numberOfTags [
 
 	^ self new 
 		numberOfTraitTags: numberOfTags;
-		setOfTraits: Set new; 
-		setOfAssociations: 	Set new;
+		setOfTraits: Dictionary new; 
+		setOfAssociations: 	Dictionary new;
 		yourself
 ]
 
@@ -73,8 +73,7 @@ LogicPuzzle >> addTrait: traitName withTags: tagArray [
 		size: self numberOfTraitTags;
 		tags: tagArray .
 	
-	"TODO: Make this a dictionary, not a set."
-	setOfTraits add: trait .
+	setOfTraits add: traitName -> trait .
 	^ trait
 ]
 
