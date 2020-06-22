@@ -36,10 +36,46 @@ Class {
 
 { #category : #'instance creation' }
 LogicPuzzle class >> traitSize: numberOfTags [
-"Create a new logic puzzle with a given number of trait tags."
+	"Create a new logic puzzle with a given number of trait tags."
+
+	"Validiate the parameter: Throw an error if not an integer in the required range."
+	self validateTraitSize: numberOfTags .
 
 	^ self new 
-		numberOfTraitTags: numberOfTags .
+		numberOfTraitTags: numberOfTags;
+		setOfTraits: Set new; 
+		setOfAssociations: 	Set new;
+		yourself
+]
+
+{ #category : #'instance creation' }
+LogicPuzzle class >> validateTraitSize: numberOfTags [
+	"Validate the parameter that specifies the required number of trait tags."
+	"The number of tags must be an integer greater than 1."
+
+	(numberOfTags className = 'SmallInteger') 
+		ifFalse: [ self error: 'Argument must be an integer > 1' ] .
+	
+	(numberOfTags > 1)
+		ifFalse: [ self error: 'Traits must have at least 2 tags' ] .
+		
+	^ numberOfTags 
+]
+
+{ #category : #adding }
+LogicPuzzle >> addTrait: traitName withTags: tagArray [
+	"Create a new trait from a given symbol & array of tags."
+	
+	| trait |
+		
+	trait := LPTrait new
+		name: traitName;
+		size: self numberOfTraitTags;
+		tags: tagArray .
+	
+	"TODO: Make this a dictionary, not a set."
+	setOfTraits add: trait .
+	^ trait
 ]
 
 { #category : #accessing }
