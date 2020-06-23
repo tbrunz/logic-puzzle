@@ -30,7 +30,7 @@ LPTrait >> name: traitName [
 	"Set the trait name, but validate it first."
 	"Accept strings or symbols, else throw an error."
 	
-	name := self validateTraitName: traitName 
+	name := self validateTraitLabel: traitName 
 ]
 
 { #category : #accessing }
@@ -52,23 +52,13 @@ LPTrait >> tags: tagArray [
 	tags := Array ofSize: size .
 	
 	1 to: size do: [ :index |
-		| tag |
-		tag := tagArray at: index .
-		
-		(tag className = 'ByteString')
-			ifTrue: [ tag := tag asSymbol ] .
-		
-		(tag className = 'ByteSymbol')
-			ifFalse: [ self error: 'Trait tags must be an array of symbols' ] .
-			
-		tags at: index put: tag
-		] .
+		tags at: index put: (self validateTraitLabel: (tagArray at: index)) ] .
 	
 	^ tags
 ]
 
 { #category : #adding }
-LPTrait >> validateTraitName: traitName [ 
+LPTrait >> validateTraitLabel: traitName [ 
 	"Validate the parameter as being a symbol or a string."
 	"If a string, render it as a valid symbol."
 	
@@ -78,7 +68,7 @@ LPTrait >> validateTraitName: traitName [
 	((traitName className = 'ByteString') and: [ traitName isNotEmpty ])
 		ifTrue: [ ^ traitName asSymbol ] .
 	
-	self error: 'Symbol required for trait names'
+	self error: 'Symbol required for trait labels'
 ]
 
 { #category : #adding }
