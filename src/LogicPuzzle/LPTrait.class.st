@@ -15,7 +15,7 @@ Class {
 	#instVars : [
 		'name',
 		'size',
-		'tagSet'
+		'tags'
 	],
 	#category : #LogicPuzzle
 }
@@ -34,40 +34,37 @@ LPTrait >> name: traitName [
 ]
 
 { #category : #accessing }
-LPTrait >> size: anObject [
-	size := anObject
+LPTrait >> size: tagArraySize [
+	size := tagArraySize
 ]
 
 { #category : #accessing }
-LPTrait >> tagSet [
-	^ tagSet
-]
-
-{ #category : #accessing }
-LPTrait >> tagSet: anObject [
-	tagSet := anObject
+LPTrait >> tags [
+	^ tags
 ]
 
 { #category : #adding }
 LPTrait >> tags: tagArray [
-	"Validate and set an array of tags."
+	"Validate and set an array of tags.  Use an array so we have 'wrap' indexing."
 	
-	| trait |
+	self validateTraitTags: tagArray .
+	
+	tags := Array ofSize: size .
+	
+	1 to: size do: [ :index |
+		| tag |
+		tag := tagArray at: index .
 		
-	"Create a new trait from the parameters."	
+		(tag className = 'ByteString')
+			ifTrue: [ tag := tag asSymbol ] .
+		
+		(tag className = 'ByteSymbol')
+			ifFalse: [ self error: 'Trait tags must be an array of symbols' ] .
+			
+		tags at: index put: tag
+		] .
 	
-	(tagArray className = 'Array')
-		ifFalse: [ self error: 'Trait tags must be an array of symbols' ] .
-	
-	tagArray isEmpty 
-		ifTrue: [ self error: 'Cannot add a trait with no tags!' ] .
-	
-	(tagArray at: 1 className = 'Array')
-		ifFalse: [ self error: 'Trait tags must be an array of symbols' ] .
-	
-	"Ensure that the number of tags equals the required size."
-	(tagArray size = self numberOfTraitTags) 
-		ifFalse: [  ]
+	^ tags
 ]
 
 { #category : #adding }
@@ -82,4 +79,17 @@ LPTrait >> validateTraitName: traitName [
 		ifTrue: [ ^ traitName asSymbol ] .
 	
 	self error: 'Symbol required for trait names'
+]
+
+{ #category : #adding }
+LPTrait >> validateTraitTags: tagArray [
+	"Validate an array of tags.  We require an array because we need 'next' & 'prev' methods."
+	
+	(tagArray className = 'Array')
+		ifFalse: [ self error: 'Trait tags must be an array of symbols' ] .
+	
+	(tagArray size = size) 
+		ifFalse: [ self error: 'This puzzle requires ', size, ' trait tags' ] .
+	
+	^ tagArray 
 ]
