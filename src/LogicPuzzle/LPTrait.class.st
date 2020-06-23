@@ -17,7 +17,7 @@ Class {
 		'size',
 		'tags'
 	],
-	#category : #LogicPuzzle
+	#category : #'LogicPuzzle-Base'
 }
 
 { #category : #accessing }

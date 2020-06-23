@@ -31,7 +31,7 @@ Class {
 		'setOfTraits',
 		'setOfAssociations'
 	],
-	#category : #LogicPuzzle
+	#category : #'LogicPuzzle-Base'
 }
 
 { #category : #'instance creation' }

@@ -27,5 +27,5 @@ Class {
 		'isConsistent',
 		'isModified'
 	],
-	#category : #LogicPuzzle
+	#category : #'LogicPuzzle-Base'
 }
