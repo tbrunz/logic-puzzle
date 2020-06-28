@@ -80,6 +80,26 @@ LogicPuzzle >> addTrait: traitName withTags: tagArray [
 	^ trait
 ]
 
+{ #category : #reporting }
+LogicPuzzle >> listTraits [
+	"Create a report listing the traits."
+	
+	^ String streamContents: [ :stream |
+	
+		stream nextPutAll: 'List of puzzle traits:'; cr; cr .
+	
+		setOfTraits keysAndValuesDo: [ :name :tagArray |
+			stream print: name; nextPut: $:; cr .
+		
+			tagArray do: [ :tag |
+				stream tab; print: tag; cr .
+				] .
+		
+			stream cr .
+			]
+		] 
+]
+
 { #category : #accessing }
 LogicPuzzle >> numberOfTraitTags [
 	^ numberOfTraitTags
