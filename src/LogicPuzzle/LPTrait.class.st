@@ -68,7 +68,9 @@ LPTrait >> tags: tagArray [
 	tags := Array ofSize: size .
 	
 	1 to: size do: [ :index |
-		tags at: index put: (self class validateTraitName: (tagArray at: index)) ] .
+		tags 
+			at: index 
+			put: (self class validateTraitName: (tagArray at: index)) ] .
 	
 	^ tags
 ]
@@ -76,12 +78,13 @@ LPTrait >> tags: tagArray [
 { #category : #validation }
 LPTrait >> validateTraitTags: tagArray [
 	"Validate an array of tags."
+
+	tagArray className = 'Array'
+		ifFalse: [ self error: 'Trait tags must be an array of symbols' ].
 	
-	(tagArray className = 'Array')
-		ifFalse: [ self error: 'Trait tags must be an array of symbols' ] .
+	tagArray size = size
+		ifFalse: [ self
+				error: 'Traits for this puzzle require ' , size printString , ' tags' ].
 	
-	(tagArray size = size) 
-		ifFalse: [ self error: 'Traits for this puzzle require ', size printString, ' tags' ] .
-	
-	^ tagArray 
+	^ tagArray
 ]

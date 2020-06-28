@@ -67,41 +67,66 @@ LogicPuzzle class >> validateTraitSize: numberOfTags [
 { #category : #adding }
 LogicPuzzle >> addTrait: traitName withTags: tagArray [
 	"Create a new trait from a given symbol & array of tags."
+
 	| trait |
-		
 	"Create a new trait from the arguments; the number of tags is constrained:"
 	trait := LPTrait new
 		size: self numberOfTraitTags;
 		name: traitName;
-		tags: tagArray .
-	
+		tags: tagArray.
+
 	"We disallow duplicate trait names, but replacing an existing is okay:"
-	setOfTraits add: traitName -> trait .
+	setOfTraits add: traitName -> trait.
 	
 	^ trait
+]
+
+{ #category : #adding }
+LogicPuzzle >> createAssociations [
+	"Create the set of trait associations for the puzzle."
+
+	| keys trait1 trait2 |
+	keys = setOfTraits keys.
+	
+	1 to: numberOfTraitTags do: [ :index | trait1 := keys at: index ]
 ]
 
 { #category : #reporting }
 LogicPuzzle >> listTraits [
 	"Create a report listing the traits."
-	
-	^ String streamContents: [ :stream |
-	
-		stream nextPutAll: 'List of puzzle traits:'; cr; cr .
-		
-		stream nextPutAll: 'Primary Trait: ';  
-			nextPutAll: ( self primaryTrait ifNil: [ '*Not set*' ] ); cr; cr .
-	
-		setOfTraits keysAndValuesDo: [ :name :tagArray |
-			stream print: name; nextPut: $:; cr .
-		
-			tagArray do: [ :tag |
-				stream tab; print: tag; cr .
-				] .
-		
-			stream cr .
-			]
-		] 
+
+	^ String
+		streamContents: [ :stream | 
+			"Create a header/title for the report:"
+			stream
+				nextPutAll: 'List of puzzle traits:';
+				cr;
+				cr.
+
+			"Add the name of the primary trait:"
+			stream
+				nextPutAll: 'Primary Trait: ';
+				nextPutAll: (self primaryTrait ifNil: [ '*Not set*' ]);
+				cr;
+				cr.
+
+			"Display a list of all the traits:"
+			setOfTraits
+				keysAndValuesDo: [ :name :tagArray | 
+					"Put the trait name on one line:"
+					stream
+						print: name;
+						nextPut: $:;
+						cr.
+
+					"Then list its tags, indented, on searate lines:"
+					tagArray
+						do: [ :tag | 
+							stream
+								tab;
+								print: tag;
+								cr ].
+					stream cr ] ]
 ]
 
 { #category : #accessing }
@@ -122,22 +147,25 @@ LogicPuzzle >> primaryTrait [
 { #category : #accessing }
 LogicPuzzle >> primaryTrait: traitName [
 	"Given a trait tag name, set the primary trait."
+
 	| name traitKeys |
-	
 	"Argument must be a trait name -- string or symbol:"
-	name := LPTrait validateTraitName: traitName .
+	name := LPTrait validateTraitName: traitName.
+
+	"Get an array of traits keys that match the given name:"
+	traitKeys := setOfTraits keys select: [ :key | key = name ].
 	
-	"Get an array of the traits keys (which are the trait names):"
-	traitKeys := setOfTraits keys select: [ :key | key = name ] .
-	
+	"Three cases can result: 0, 1, or many.  Only '1' is good."
 	"Make the error messages specific to the problem encountered:"
-	traitKeys isEmpty ifTrue: [ self error: 'Unknown trait "', name, '"' ] .
-	(traitKeys size > 1) ifTrue: [ self error: 'Program failure: Found more than one trait named "', name, '"!' ] .
+	traitKeys isEmpty
+		ifTrue: [ self error: 'Unknown trait "' , name , '"' ].
+	traitKeys size > 1
+		ifTrue: [ self
+				error: 'Program failure: Found more than one trait named "' , name , '"!' ].
 	
-	primaryTrait := name .
+	"If we find exactly one instance, then we're good:"
+	primaryTrait := name.
 	^ name
-	
-	
 ]
 
 { #category : #accessing }
