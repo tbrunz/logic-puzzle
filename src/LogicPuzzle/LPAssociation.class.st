@@ -21,11 +21,123 @@ Class {
 	#name : #LPAssociation,
 	#superclass : #Object,
 	#instVars : [
-		'trait1',
-		'trait2',
+		'traitNames',
 		'isComplete',
 		'isConsistent',
-		'isModified'
+		'isModified',
+		'firstTrait',
+		'secondTrait'
+	],
+	#classInstVars : [
+		'nameSeparator'
 	],
 	#category : #'LogicPuzzle-Base'
 }
+
+{ #category : #accessing }
+LPAssociation class >> nameSeparator [
+	^ nameSeparator
+]
+
+{ #category : #accessing }
+LPAssociation class >> nameSeparator: aString [
+	nameSeparator := aString
+]
+
+{ #category : #naming }
+LPAssociation class >> nameWith: firstSymbol with: secondSymbol [
+	"Create an association name (symbol) from its trait names."
+
+	^ (String
+		streamContents: [ :stream | 
+			stream
+				nextPutAll: firstSymbol asString;
+				nextPutAll: self nameSeparator;
+				nextPutAll: secondSymbol asString ]) asSymbol
+]
+
+{ #category : #'instance creation' }
+LPAssociation class >> newWith: firstTraitAssociation with: secondTraitAssociation [
+	"Create a new association between two given traits."
+
+	^ self new
+		isComplete: false;
+		isConsistent: true;
+		isModified: false;
+		
+		"The trait arguments are given as their association pairs from 'setOfTraits'."
+		"Record these separately for efficiency in handling references later."
+		traitNames:
+			(Array
+				with: firstTraitAssociation key
+				with: secondTraitAssociation key);
+		firstTrait: firstTraitAssociation value;
+		secondTrait: secondTraitAssociation value
+]
+
+{ #category : #naming }
+LPAssociation class >> traitNamesFrom: anAssociationName [
+	"Decompose an association key into its constituent trait keys."
+	
+	^ anAssociationName splitOn: self nameSeparator 
+]
+
+{ #category : #accessing }
+LPAssociation >> firstTrait [
+	^ firstTrait
+]
+
+{ #category : #accessing }
+LPAssociation >> firstTrait: anObject [
+	firstTrait := anObject
+]
+
+{ #category : #accessing }
+LPAssociation >> isComplete [
+	^ isComplete
+]
+
+{ #category : #accessing }
+LPAssociation >> isComplete: anObject [
+	isComplete := anObject
+]
+
+{ #category : #accessing }
+LPAssociation >> isConsistent [
+	^ isConsistent
+]
+
+{ #category : #accessing }
+LPAssociation >> isConsistent: anObject [
+	isConsistent := anObject
+]
+
+{ #category : #accessing }
+LPAssociation >> isModified [
+	^ isModified
+]
+
+{ #category : #accessing }
+LPAssociation >> isModified: anObject [
+	isModified := anObject
+]
+
+{ #category : #accessing }
+LPAssociation >> secondTrait [
+	^ secondTrait
+]
+
+{ #category : #accessing }
+LPAssociation >> secondTrait: anObject [
+	secondTrait := anObject
+]
+
+{ #category : #accessing }
+LPAssociation >> traitNames [
+	^ traitNames
+]
+
+{ #category : #accessing }
+LPAssociation >> traitNames: anObject [
+	traitNames := anObject
+]

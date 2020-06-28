@@ -29,6 +29,7 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'numberOfTraitTags',
+		'nameSeparator',
 		'primaryTrait',
 		'setOfTraits',
 		'setOfAssociations'
@@ -37,16 +38,23 @@ Class {
 }
 
 { #category : #'instance creation' }
-LogicPuzzle class >> traitSize: numberOfTags [
+LogicPuzzle class >> newWithTraitSize: numberOfTags [
 	"Create a new logic puzzle with a given number of trait tags."
 
-	"Validiate the parameter: Throw an error if not an integer in the required range."
-	self validateTraitSize: numberOfTags .
+	"Validiate the parameter for type and range:"
+	self validateTraitSize: numberOfTags.
 
-	^ self new 
+	"Set a string in LPAssociation used to separate trait names:"
+	"This couples LPAssociation into this class...  
+	How best to initialize a class instance variable?  
+	Doing it here at least makes it explicit & visible..."
+	LPAssociation nameSeparator: ' =(vs)= '.
+
+	"Create a new puzzle instance & initialize it:"
+	^ self new
 		numberOfTraitTags: numberOfTags;
-		setOfTraits: Dictionary new; 
-		setOfAssociations: Dictionary new;
+		setOfTraits: Dictionary new;
+		"setOfAssociations: Dictionary new;"
 		yourself
 ]
 
@@ -85,10 +93,58 @@ LogicPuzzle >> addTrait: traitName withTags: tagArray [
 LogicPuzzle >> createAssociations [
 	"Create the set of trait associations for the puzzle."
 
-	| keys trait1 trait2 |
-	keys = setOfTraits keys.
+	| arrayOfTraitKeys firstSymbol secondSymbol name association |
+	setOfAssociations := Dictionary new .
 	
-	1 to: numberOfTraitTags do: [ :index | trait1 := keys at: index ]
+	"Create an array of trait keys so that we can step through them systematically:"
+	arrayOfTraitKeys := setOfTraits keys.
+
+	"Step through C(n,2) = every combination of traits taken 2 at a time:"
+	1 to: arrayOfTraitKeys size - 1 do: [ :outerIndex | 
+		firstSymbol := arrayOfTraitKeys at: outerIndex.
+
+		"Step through the remaining traits in the array to pair with this one:"
+		outerIndex + 1 to: arrayOfTraitKeys size do: [ :innerIndex | 
+			secondSymbol := arrayOfTraitKeys at: innerIndex.
+
+			"Form a new name & a new association using the two traits:"
+			name := LPAssociation nameWith: firstSymbol with: secondSymbol.
+			association := LPAssociation
+				newWith: (setOfTraits associationAt: firstSymbol)
+				with: (setOfTraits associationAt: secondSymbol).
+
+			"Finally, add the new association to our set:"
+			setOfAssociations add: name -> association ] ].
+	^ setOfAssociations
+]
+
+{ #category : #reporting }
+LogicPuzzle >> listAssociations [
+	"Create a report listing the associations."
+
+	^ String
+		streamContents: [ :stream | 
+			"Create a header/title for the report:"
+			stream
+				nextPutAll: 'List of puzzle associations:';
+				cr;
+				cr.
+
+			"Display a list of all the associations:"
+			setOfAssociations 
+				keysAndValuesDo: [ :name :traitAssociation | 
+					"Put the association name on one line:"
+					stream
+						print: name asString;
+						nextPut: $:;
+						cr.
+
+					"Then display its grid, indented:"
+					stream
+						tab;
+						print: '<trait association grid>';
+						cr ].
+					stream cr ] 
 ]
 
 { #category : #reporting }
@@ -119,7 +175,7 @@ LogicPuzzle >> listTraits [
 						nextPut: $:;
 						cr.
 
-					"Then list its tags, indented, on searate lines:"
+					"Then list its tags, indented, on separate lines:"
 					tagArray
 						do: [ :tag | 
 							stream
