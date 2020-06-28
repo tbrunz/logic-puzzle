@@ -18,7 +18,9 @@ Example:
 	zebraPuzzle createAssociations .
 	--> 15 associations created
 	
-	zebraPuzzle makeAssociation: #Nationality as: #Spaniard to: #Pet as: #Snails .
+	zebraPuzzle primaryTrait: #Nationality .
+	
+	zebraPuzzle makeAssociation: #Nationality being: #Spaniard matches: #Pet being: #Snails .
 	
 	zebraPuzzle printAssociation: #Nationality vs: #Pet .
 "
@@ -65,14 +67,15 @@ LogicPuzzle class >> validateTraitSize: numberOfTags [
 { #category : #adding }
 LogicPuzzle >> addTrait: traitName withTags: tagArray [
 	"Create a new trait from a given symbol & array of tags."
-	
 	| trait |
 		
+	"Create a new trait from the arguments; the number of tags is constrained:"
 	trait := LPTrait new
-		name: traitName;
 		size: self numberOfTraitTags;
+		name: traitName;
 		tags: tagArray .
 	
+	"We disallow duplicate trait names, but replacing an existing is okay:"
 	setOfTraits add: traitName -> trait .
 	^ trait
 ]
