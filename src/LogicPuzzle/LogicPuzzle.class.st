@@ -44,7 +44,7 @@ LogicPuzzle class >> traitSize: numberOfTags [
 	^ self new 
 		numberOfTraitTags: numberOfTags;
 		setOfTraits: Dictionary new; 
-		setOfAssociations: 	Dictionary new;
+		setOfAssociations: Dictionary new;
 		yourself
 ]
 
@@ -83,8 +83,8 @@ LogicPuzzle >> numberOfTraitTags [
 ]
 
 { #category : #accessing }
-LogicPuzzle >> numberOfTraitTags: anObject [
-	numberOfTraitTags := anObject
+LogicPuzzle >> numberOfTraitTags: anInteger [
+	numberOfTraitTags := anInteger
 ]
 
 { #category : #accessing }
@@ -93,8 +93,8 @@ LogicPuzzle >> primaryTrait [
 ]
 
 { #category : #accessing }
-LogicPuzzle >> primaryTrait: anObject [
-	primaryTrait := anObject
+LogicPuzzle >> primaryTrait: aTrait [
+	primaryTrait := aTrait
 ]
 
 { #category : #accessing }
@@ -103,8 +103,8 @@ LogicPuzzle >> setOfAssociations [
 ]
 
 { #category : #accessing }
-LogicPuzzle >> setOfAssociations: anObject [
-	setOfAssociations := anObject
+LogicPuzzle >> setOfAssociations: aDictionary [
+	setOfAssociations := aDictionary
 ]
 
 { #category : #accessing }
@@ -113,6 +113,6 @@ LogicPuzzle >> setOfTraits [
 ]
 
 { #category : #accessing }
-LogicPuzzle >> setOfTraits: anObject [
-	setOfTraits := anObject
+LogicPuzzle >> setOfTraits: aDictionary [
+	setOfTraits := aDictionary
 ]

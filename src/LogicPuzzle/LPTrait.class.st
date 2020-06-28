@@ -30,11 +30,13 @@ LPTrait >> name: traitName [
 	"Set the trait name, but validate it first."
 	"Accept strings or symbols, else throw an error."
 	
-	name := self validateTraitLabel: traitName 
+	name := self validateTraitName: traitName 
 ]
 
 { #category : #accessing }
 LPTrait >> size: tagArraySize [
+	"This is set internally, using the puzzle's trait size."
+	
 	size := tagArraySize
 ]
 
@@ -43,7 +45,7 @@ LPTrait >> tags [
 	^ tags
 ]
 
-{ #category : #adding }
+{ #category : #accessing }
 LPTrait >> tags: tagArray [
 	"Validate and set an array of tags.  Use an array so we have 'wrap' indexing."
 	
@@ -52,13 +54,13 @@ LPTrait >> tags: tagArray [
 	tags := Array ofSize: size .
 	
 	1 to: size do: [ :index |
-		tags at: index put: (self validateTraitLabel: (tagArray at: index)) ] .
+		tags at: index put: (self validateTraitName: (tagArray at: index)) ] .
 	
 	^ tags
 ]
 
 { #category : #adding }
-LPTrait >> validateTraitLabel: traitName [ 
+LPTrait >> validateTraitName: traitName [ 
 	"Validate the parameter as being a symbol or a string."
 	"If a string, render it as a valid symbol."
 	
@@ -73,13 +75,13 @@ LPTrait >> validateTraitLabel: traitName [
 
 { #category : #adding }
 LPTrait >> validateTraitTags: tagArray [
-	"Validate an array of tags.  We require an array because we need 'next' & 'prev' methods."
+	"Validate an array of tags."
 	
 	(tagArray className = 'Array')
 		ifFalse: [ self error: 'Trait tags must be an array of symbols' ] .
 	
 	(tagArray size = size) 
-		ifFalse: [ self error: 'This puzzle requires ', size, ' trait tags' ] .
+		ifFalse: [ self error: 'Traits for this puzzle require ', size printString, ' tags' ] .
 	
 	^ tagArray 
 ]
