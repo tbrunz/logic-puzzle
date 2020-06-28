@@ -50,6 +50,29 @@ LogicPuzzleCreationTest >> testCreateTrait [
 ]
 
 { #category : #tests }
+LogicPuzzleCreationTest >> testSetPrimaryTrait [
+	"Test setting a primary trait."
+	| puzzle |
+	
+	"Create a test puzzle with some traits:"
+	puzzle := LogicPuzzle traitSize: 5 .
+	
+	puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian #Englishman #Spaniard ) .
+	puzzle addTrait: #Pet withTags: #( #Dog #Horse #Snails #Fox #Zebra ) .
+	
+	"A provided trait name must be a string or symbol:"
+	self should: [ puzzle primaryTrait: 3 ] raise: Error .
+	self should: [ puzzle primaryTrait: #( 'abc' 'def' ) ] raise: Error .
+	
+	"A trait name that we don't recognize is an error:"
+	self should: [ puzzle primaryTrait: #JoeBob ] raise: Error .
+	
+	"A trait name matching a trait we know is good:"
+	self shouldnt: [ puzzle primaryTrait: 'Pet' ] raise: Error .
+	self shouldnt: [ puzzle primaryTrait: #Nationality ] raise: Error .
+]
+
+{ #category : #tests }
 LogicPuzzleCreationTest >> testSetTraitTags [
 
 	| trait |

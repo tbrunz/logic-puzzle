@@ -93,8 +93,24 @@ LogicPuzzle >> primaryTrait [
 ]
 
 { #category : #accessing }
-LogicPuzzle >> primaryTrait: aTrait [
-	primaryTrait := aTrait
+LogicPuzzle >> primaryTrait: traitName [
+	"Given a trait tag name, set the primary trait."
+	| name traitKeys |
+	
+	"Argument must be a trait name -- string or symbol:"
+	name := LPTrait validateTraitName: traitName .
+	
+	"Get an array of the traits keys (which are the trait names):"
+	traitKeys := setOfTraits keys select: [ :key | key = name ] .
+	
+	"Make the error messages specific to the problem encountered:"
+	traitKeys isEmpty ifTrue: [ self error: 'Unknown trait "', name, '"' ] .
+	(traitKeys size > 1) ifTrue: [ self error: 'Program failure: Found more than one trait named "', name, '"!' ] .
+	
+	primaryTrait := name .
+	^ name
+	
+	
 ]
 
 { #category : #accessing }

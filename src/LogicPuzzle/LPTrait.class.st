@@ -20,6 +20,20 @@ Class {
 	#category : #'LogicPuzzle-Base'
 }
 
+{ #category : #validation }
+LPTrait class >> validateTraitName: traitName [ 
+	"Validate the parameter as being a symbol or a string."
+	"If a string, render it as a valid symbol."
+	
+	(traitName className = 'ByteSymbol') 
+		ifTrue: [ ^ traitName ] .
+	
+	((traitName className = 'ByteString') and: [ traitName isNotEmpty ])
+		ifTrue: [ ^ traitName asSymbol ] .
+	
+	self error: 'Symbol required for trait labels'
+]
+
 { #category : #accessing }
 LPTrait >> name [
 	^ name
@@ -30,7 +44,7 @@ LPTrait >> name: traitName [
 	"Set the trait name, but validate it first."
 	"Accept strings or symbols, else throw an error."
 	
-	name := self validateTraitName: traitName 
+	name := self class validateTraitName: traitName 
 ]
 
 { #category : #accessing }
@@ -54,26 +68,12 @@ LPTrait >> tags: tagArray [
 	tags := Array ofSize: size .
 	
 	1 to: size do: [ :index |
-		tags at: index put: (self validateTraitName: (tagArray at: index)) ] .
+		tags at: index put: (self class validateTraitName: (tagArray at: index)) ] .
 	
 	^ tags
 ]
 
-{ #category : #adding }
-LPTrait >> validateTraitName: traitName [ 
-	"Validate the parameter as being a symbol or a string."
-	"If a string, render it as a valid symbol."
-	
-	(traitName className = 'ByteSymbol') 
-		ifTrue: [ ^ traitName ] .
-	
-	((traitName className = 'ByteString') and: [ traitName isNotEmpty ])
-		ifTrue: [ ^ traitName asSymbol ] .
-	
-	self error: 'Symbol required for trait labels'
-]
-
-{ #category : #adding }
+{ #category : #validation }
 LPTrait >> validateTraitTags: tagArray [
 	"Validate an array of tags."
 	
