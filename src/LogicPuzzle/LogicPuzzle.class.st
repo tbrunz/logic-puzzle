@@ -77,6 +77,7 @@ LogicPuzzle >> addTrait: traitName withTags: tagArray [
 	
 	"We disallow duplicate trait names, but replacing an existing is okay:"
 	setOfTraits add: traitName -> trait .
+	
 	^ trait
 ]
 
@@ -87,6 +88,9 @@ LogicPuzzle >> listTraits [
 	^ String streamContents: [ :stream |
 	
 		stream nextPutAll: 'List of puzzle traits:'; cr; cr .
+		
+		stream nextPutAll: 'Primary Trait: ';  
+			nextPutAll: ( self primaryTrait ifNil: [ '*Not set*' ] ); cr; cr .
 	
 		setOfTraits keysAndValuesDo: [ :name :tagArray |
 			stream print: name; nextPut: $:; cr .
