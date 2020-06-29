@@ -21,12 +21,12 @@ Class {
 	#name : #LPAssociation,
 	#superclass : #Object,
 	#instVars : [
-		'traitNames',
 		'isComplete',
 		'isConsistent',
 		'isModified',
 		'firstTrait',
-		'secondTrait'
+		'secondTrait',
+		'name'
 	],
 	#classInstVars : [
 		'nameSeparator'
@@ -57,7 +57,7 @@ LPAssociation class >> nameWith: firstSymbol with: secondSymbol [
 ]
 
 { #category : #'instance creation' }
-LPAssociation class >> newWith: firstTraitAssociation with: secondTraitAssociation [
+LPAssociation class >> newWith: firstTrait with: secondTrait [
 	"Create a new association between two given traits."
 
 	^ self new
@@ -65,14 +65,14 @@ LPAssociation class >> newWith: firstTraitAssociation with: secondTraitAssociati
 		isConsistent: true;
 		isModified: false;
 		
-		"The trait arguments are given as their association pairs from 'setOfTraits'."
-		"Record these separately for efficiency in handling references later."
-		traitNames:
-			(Array
-				with: firstTraitAssociation key
-				with: secondTraitAssociation key);
-		firstTrait: firstTraitAssociation value;
-		secondTrait: secondTraitAssociation value
+		"Register the traits, which contain the grid indices:"
+		firstTrait: firstTrait;
+		secondTrait: secondTrait;
+		
+		"Use the trait names to make a unique association name:"
+		associationName: (self nameWith: firstTrait name with: secondTrait name);
+		yourself
+		
 ]
 
 { #category : #naming }
@@ -80,6 +80,16 @@ LPAssociation class >> traitNamesFrom: anAssociationName [
 	"Decompose an association key into its constituent trait keys."
 	
 	^ anAssociationName splitOn: self nameSeparator 
+]
+
+{ #category : #accessing }
+LPAssociation >> associationName [
+	^ name
+]
+
+{ #category : #accessing }
+LPAssociation >> associationName: stringOrSymbol [
+	name := stringOrSymbol 
 ]
 
 { #category : #accessing }
@@ -130,14 +140,4 @@ LPAssociation >> secondTrait [
 { #category : #accessing }
 LPAssociation >> secondTrait: anObject [
 	secondTrait := anObject
-]
-
-{ #category : #accessing }
-LPAssociation >> traitNames [
-	^ traitNames
-]
-
-{ #category : #accessing }
-LPAssociation >> traitNames: anObject [
-	traitNames := anObject
 ]

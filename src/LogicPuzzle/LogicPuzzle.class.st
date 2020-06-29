@@ -95,7 +95,7 @@ LogicPuzzle >> addTrait: stringOrSymbol withTags: tagArray [
 LogicPuzzle >> createAssociations [
 	"Create the set of trait associations for the puzzle."
 
-	| arrayOfTraitKeys firstSymbol secondSymbol name association |
+	| arrayOfTraitKeys firstSymbol secondSymbol association |
 	setOfAssociations := Dictionary new .
 	
 	"Create an array of trait keys so that we can step through them systematically:"
@@ -110,13 +110,12 @@ LogicPuzzle >> createAssociations [
 			secondSymbol := arrayOfTraitKeys at: innerIndex.
 
 			"Form a new name & a new association using the two traits:"
-			name := LPAssociation nameWith: firstSymbol with: secondSymbol.
 			association := LPAssociation
-				newWith: (setOfTraits associationAt: firstSymbol)
-				with: (setOfTraits associationAt: secondSymbol).
+				newWith: (setOfTraits at: firstSymbol)
+				with: (setOfTraits at: secondSymbol).
 
 			"Finally, add the new association to our set:"
-			setOfAssociations add: name -> association ] ].
+			setOfAssociations add: (association associationName) -> association ] ].
 	^ setOfAssociations
 ]
 
