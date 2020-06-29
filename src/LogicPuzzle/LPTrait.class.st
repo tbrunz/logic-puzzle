@@ -14,7 +14,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'name',
-		'tags'
+		'tags',
+		'indices'
 	],
 	#category : #'LogicPuzzle-Base'
 }
@@ -44,6 +45,16 @@ LPTrait class >> validateTraitName: traitName [
 ]
 
 { #category : #accessing }
+LPTrait >> indices [
+	^ indices
+]
+
+{ #category : #accessing }
+LPTrait >> indices: indexDictionary [
+	indices := indexDictionary
+]
+
+{ #category : #accessing }
 LPTrait >> name [
 	^ name
 ]
@@ -60,14 +71,16 @@ LPTrait >> tags [
 
 { #category : #accessing }
 LPTrait >> tags: tagArray [
-	"Validate and set an array of tags.  Use an array so we have 'wrap' indexing."
+	"Validate and set an array of tags, plus a dictionary of their indices."
+
+	| index |
+	"Copy tagArray, validating/converting each tag in turn:"
+	tags := tagArray collect: [ :tag | self class validateTraitName: tag ].
 	
-	tags := Array ofSize: tagArray size .
+	"Create a dictionary mapping the tags to their corresponding index:"
+	indices := Dictionary new.
+	index := 0.
+	tags do: [ :tag | index := index + 1. indices add: tag -> index ].
 	
-	1 to: tagArray size do: [ :index |
-		tags 
-			at: index 
-			put: (self class validateTraitName: (tagArray at: index)) ] .
-	
-	^ tags .
+	^ tags
 ]
