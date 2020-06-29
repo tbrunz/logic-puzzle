@@ -58,7 +58,7 @@ LogicPuzzle class >> newWithTraitSize: numberOfTags [
 		yourself
 ]
 
-{ #category : #'instance creation' }
+{ #category : #validation }
 LogicPuzzle class >> validateTraitSize: numberOfTags [
 	"Validate the parameter that specifies the required number of trait tags."
 	"The number of tags must be an integer greater than 1."
@@ -73,15 +73,17 @@ LogicPuzzle class >> validateTraitSize: numberOfTags [
 ]
 
 { #category : #adding }
-LogicPuzzle >> addTrait: traitName withTags: tagArray [
+LogicPuzzle >> addTrait: stringOrSymbol withTags: tagArray [
 	"Create a new trait from a given symbol & array of tags."
 
-	| trait |
-	"Create a new trait from the arguments; the number of tags is constrained:"
-	trait := LPTrait new
-		size: self numberOfTraitTags;
-		name: traitName;
-		tags: tagArray.
+	| trait traitName traitTags |
+	"Accept strings or symbols for the name, convert to symbols."
+	traitName := LPTrait validateTraitName: stringOrSymbol.
+	
+	"Validate the trait tags for type and number, also converted to symbols:"
+	traitTags := self validateTraitTags: tagArray.
+	
+	trait := LPTrait newNamed: traitName with: traitTags.
 
 	"We disallow duplicate trait names, but replacing an existing is okay:"
 	setOfTraits add: traitName -> trait.
@@ -168,15 +170,15 @@ LogicPuzzle >> listTraits [
 
 			"Display a list of all the traits:"
 			setOfTraits
-				keysAndValuesDo: [ :name :tagArray | 
+				keysAndValuesDo: [ :traitName :trait | 
 					"Put the trait name on one line:"
 					stream
-						print: name;
+						print: traitName;
 						nextPut: $:;
 						cr.
 
 					"Then list its tags, indented, on separate lines:"
-					tagArray
+					trait tags 
 						do: [ :tag | 
 							stream
 								tab;
@@ -242,4 +244,19 @@ LogicPuzzle >> setOfTraits [
 { #category : #accessing }
 LogicPuzzle >> setOfTraits: aDictionary [
 	setOfTraits := aDictionary
+]
+
+{ #category : #validation }
+LogicPuzzle >> validateTraitTags: tagArray [
+	"Validate an array of tags."
+
+	tagArray className = 'Array'
+		ifFalse: [ self error: 'Trait tags must be an array of symbols' ].
+		
+	tagArray size = numberOfTraitTags
+		ifFalse: [ self
+				error:
+					'Traits for this puzzle require ' , numberOfTraitTags printString
+						, ' tags' ].
+	^ tagArray
 ]

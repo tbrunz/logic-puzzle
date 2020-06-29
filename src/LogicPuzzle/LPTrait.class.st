@@ -14,11 +14,20 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'name',
-		'size',
 		'tags'
 	],
 	#category : #'LogicPuzzle-Base'
 }
+
+{ #category : #'instance creation' }
+LPTrait class >> newNamed: traitName with: tagArray [
+	"Create a new trait with the given name and tag array."
+	
+	^ self new
+		name: traitName;
+		tags: tagArray;
+		yourself
+]
 
 { #category : #validation }
 LPTrait class >> validateTraitName: traitName [ 
@@ -41,17 +50,7 @@ LPTrait >> name [
 
 { #category : #accessing }
 LPTrait >> name: traitName [
-	"Set the trait name, but validate it first."
-	"Accept strings or symbols, else throw an error."
-	
-	name := self class validateTraitName: traitName 
-]
-
-{ #category : #accessing }
-LPTrait >> size: tagArraySize [
-	"This is set internally, using the puzzle's trait size."
-	
-	size := tagArraySize
+	name := traitName 
 ]
 
 { #category : #accessing }
@@ -63,28 +62,12 @@ LPTrait >> tags [
 LPTrait >> tags: tagArray [
 	"Validate and set an array of tags.  Use an array so we have 'wrap' indexing."
 	
-	self validateTraitTags: tagArray .
+	tags := Array ofSize: tagArray size .
 	
-	tags := Array ofSize: size .
-	
-	1 to: size do: [ :index |
+	1 to: tagArray size do: [ :index |
 		tags 
 			at: index 
 			put: (self class validateTraitName: (tagArray at: index)) ] .
 	
-	^ tags
-]
-
-{ #category : #validation }
-LPTrait >> validateTraitTags: tagArray [
-	"Validate an array of tags."
-
-	tagArray className = 'Array'
-		ifFalse: [ self error: 'Trait tags must be an array of symbols' ].
-	
-	tagArray size = size
-		ifFalse: [ self
-				error: 'Traits for this puzzle require ' , size printString , ' tags' ].
-	
-	^ tagArray
+	^ tags .
 ]

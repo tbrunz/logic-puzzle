@@ -7,8 +7,8 @@ Class {
 { #category : #tests }
 LogicPuzzleCreationTest >> testAddTraitsToPuzzle [
 	"Test adding traits to a puzzle."
-	| puzzle |
 	
+	| puzzle |
 	"Create a test puzzle with some traits:"
 	puzzle := LogicPuzzle newWithTraitSize: 3 .
 	
@@ -22,9 +22,10 @@ LogicPuzzleCreationTest >> testAddTraitsToPuzzle [
 	self should: [ puzzle addTrait: #Order withTags: #( #Left #Middle ) ] raise: Error .
 	
 	"Adding a trait with the same name as an existing one should replace, not throw an error:"
-	self assert: ((puzzle setOfTraits at: #Pet) at: 2) equals: #Fox .
+	self assert: ((puzzle setOfTraits at: #Pet) tags at: 2) equals: #Fox .
 	self shouldnt: [ puzzle addTrait: #Pet withTags: #( #Cat #Weasel #Zebra ) ] raise: Error .
-	self assert: ((puzzle setOfTraits at: #Pet) at: 2) equals: #Weasel .
+	self assert: ((puzzle setOfTraits at: #Pet) tags at: 2) equals: #Weasel .
+	
 ]
 
 { #category : #tests }
@@ -83,27 +84,6 @@ LogicPuzzleCreationTest >> testCreatePuzzleAssociations [
 ]
 
 { #category : #tests }
-LogicPuzzleCreationTest >> testCreateTrait [
-	"Test the creation of a Trait object."
-	
-	"Trait names must be either a non-empty string or a symbol:"
-	self should: [ LPTrait new name: 1 ] raise: Error .
-	self should: [ LPTrait new name: #( 1 2 3 ) ] raise: Error .
-	self should: [ LPTrait new name: '' ] raise: Error .
-	self should: [ LPTrait new name: #( 'abc' ) ] raise: Error .
-	
-	"A string or symbol is allowed (since strings are cast to symbols):"
-	self shouldnt: [ LPTrait new name: 'abc' ] raise: Error .
-	self shouldnt: [ LPTrait new name: #xyz ] raise: Error .
-	
-	"A string or symbol containing or entirely spaces, is allowed:"
-	self shouldnt: [ LPTrait new name: 'abc xyz' ] raise: Error .
-	self shouldnt: [ LPTrait new name: #'ijk lmn' ] raise: Error .
-	self shouldnt: [ LPTrait new name: '   ' ] raise: Error .
-	self shouldnt: [ LPTrait new name: #' ' ] raise: Error .
-]
-
-{ #category : #tests }
 LogicPuzzleCreationTest >> testSetPrimaryTrait [
 	"Test setting a primary trait."
 	| puzzle |
@@ -128,27 +108,51 @@ LogicPuzzleCreationTest >> testSetPrimaryTrait [
 
 { #category : #tests }
 LogicPuzzleCreationTest >> testSetTraitTags [
-
-	| trait |
-	trait := LPTrait new 
-		name: #testTrait .
-
-	"Providing a proper tags array without having set 'size' is an error:"
-	self should: [ trait tags: #( 'abc' 'def' 'ghi' ) ] raise: Error .
-
-	"Trait tag array must have the same size as the puzzle:"
-	trait size: 5 .
-	self should: [ trait tags: #( 'abc' 'def' 'ghi' ) ] raise: Error .
+	"Test validation of Trait tag arays when adding traits to a puzzle."
+	
+	| puzzle |
+	"We need to do this in the context of a puzzle; the puzzle does validation:"
+	puzzle := LogicPuzzle newWithTraitSize: 3 .
 	
 	"Trait tags argument must be an array:"
-	self should: [ trait tags: 'abc' ] raise: Error .
-	self should: [ trait tags: #abc ] raise: Error .
-	self should: [ trait tags: 1 ] raise: Error .
+	self should: [ puzzle addTrait: 'abc' withTags: 'xyz' ] raise: Error .
+	self should: [ puzzle addTrait: 'abc' withTags: #xyz ] raise: Error .
+	self should: [ puzzle addTrait: 'abc' withTags: 7 ] raise: Error .
+
+	"Trait tag array must have the same size as the puzzle:"
+	self should: [ puzzle addTrait: 'abc' withTags: #( abc def ) ] raise: Error .
+	self should: [ puzzle addTrait: 'abc' withTags: #( abc def ghi jkl ) ] raise: Error .
 	
 	"Trait tag array elements must be strings or symbols:"
-	trait size: 3 .
-	self should: [ trait tags: #( 1 2 3 ) ] raise: Error .
+	self should: [ puzzle addTrait: 'abc' withTags: #( 1 2 3 ) ] raise: Error .
 	
 	"Trait tag array with correct size and elements is good:"
-	self shouldnt: [ trait tags: #( 'abc' 'def' 'ghi' ) ] raise: Error .	
+	self shouldnt: [ puzzle addTrait: 'abc' withTags: #( abc def ghi ) ] raise: Error .
+	self shouldnt: [ puzzle addTrait: 'abc' withTags: #( #abc #def #ghi ) ] raise: Error .
+	
+]
+
+{ #category : #tests }
+LogicPuzzleCreationTest >> testTraitNaming [
+	"Test validation of Trait names when adding traits to a puzzle."
+	
+	| puzzle |
+	"We need to do this in the context of a puzzle; the puzzle does validation:"
+	puzzle := LogicPuzzle newWithTraitSize: 3 .
+	
+	"Trait names must be either a non-empty string or a symbol:"
+	self should: [ puzzle addTrait: 1 withTags: #( abc def ghi ) ] raise: Error .
+	self should: [ puzzle addTrait: #( 1 2 3 ) withTags: #( abc def ghi ) ] raise: Error .
+	self should: [ puzzle addTrait: '' withTags: #( abc def ghi ) ] raise: Error .
+	self should: [ puzzle addTrait: #( 'abc' ) withTags: #( abc def ghi ) ] raise: Error .
+	
+	"A string or symbol is allowed (since strings are cast to symbols):"
+	self shouldnt: [ puzzle addTrait: 'abc' withTags: #( abc def ghi ) ] raise: Error .
+	self shouldnt: [ puzzle addTrait: #xyz withTags: #( abc def ghi ) ] raise: Error .
+	
+	"A string or symbol containing or entirely spaces, is allowed:"
+	self shouldnt: [ puzzle addTrait: 'abc xyz' withTags: #( abc def ghi ) ] raise: Error .
+	self shouldnt: [ puzzle addTrait: #'xyz abc' withTags: #( abc def ghi ) ] raise: Error .
+	self shouldnt: [ puzzle addTrait: '   ' withTags: #( abc def ghi ) ] raise: Error .
+	self shouldnt: [ puzzle addTrait: #' ' withTags: #( abc def ghi ) ] raise: Error .
 ]
