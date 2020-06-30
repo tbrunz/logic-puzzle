@@ -63,7 +63,7 @@ LogicPuzzle class >> validateTraitSize: numberOfTags [
 	"Validate the parameter that specifies the required number of trait tags."
 	"The number of tags must be an integer greater than 1."
 
-	(numberOfTags className = 'SmallInteger') 
+	numberOfTags isInteger 
 		ifFalse: [ self error: 'Argument must be an integer > 1' ] .
 	
 	(numberOfTags > 1)
@@ -249,13 +249,13 @@ LogicPuzzle >> setOfTraits: aDictionary [
 LogicPuzzle >> validateTraitTags: tagArray [
 	"Validate an array of tags."
 
-	tagArray className = 'Array'
+	tagArray isArray 
 		ifFalse: [ self error: 'Trait tags must be an array of symbols' ].
 		
 	tagArray size = numberOfTraitTags
 		ifFalse: [ self
 				error:
-					'Traits for this puzzle require ' , numberOfTraitTags printString
-						, ' tags' ].
+					'Traits for this puzzle require ' , numberOfTraitTags printString , ' tags' ].
+					
 	^ tagArray
 ]

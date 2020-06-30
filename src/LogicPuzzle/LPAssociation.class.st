@@ -98,8 +98,8 @@ LPAssociation >> firstTrait [
 ]
 
 { #category : #accessing }
-LPAssociation >> firstTrait: anObject [
-	firstTrait := anObject
+LPAssociation >> firstTrait: aTrait [
+	firstTrait := aTrait
 ]
 
 { #category : #accessing }
@@ -108,8 +108,8 @@ LPAssociation >> isComplete [
 ]
 
 { #category : #accessing }
-LPAssociation >> isComplete: anObject [
-	isComplete := anObject
+LPAssociation >> isComplete: aBoolean [
+	isComplete := aBoolean
 ]
 
 { #category : #accessing }
@@ -118,8 +118,8 @@ LPAssociation >> isConsistent [
 ]
 
 { #category : #accessing }
-LPAssociation >> isConsistent: anObject [
-	isConsistent := anObject
+LPAssociation >> isConsistent: aBoolean [
+	isConsistent := aBoolean
 ]
 
 { #category : #accessing }
@@ -128,8 +128,8 @@ LPAssociation >> isModified [
 ]
 
 { #category : #accessing }
-LPAssociation >> isModified: anObject [
-	isModified := anObject
+LPAssociation >> isModified: aBoolean [
+	isModified := aBoolean
 ]
 
 { #category : #accessing }
@@ -138,6 +138,6 @@ LPAssociation >> secondTrait [
 ]
 
 { #category : #accessing }
-LPAssociation >> secondTrait: anObject [
-	secondTrait := anObject
+LPAssociation >> secondTrait: aTrait [
+	secondTrait := aTrait
 ]

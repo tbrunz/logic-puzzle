@@ -35,10 +35,10 @@ LPTrait class >> validateTraitName: traitName [
 	"Validate the parameter as being a symbol or a string."
 	"If a string, render it as a valid symbol."
 	
-	(traitName className = 'ByteSymbol') 
+	traitName isSymbol 
 		ifTrue: [ ^ traitName ] .
 	
-	((traitName className = 'ByteString') and: [ traitName isNotEmpty ])
+	(traitName isString and: [ traitName isNotEmpty ])
 		ifTrue: [ ^ traitName asSymbol ] .
 	
 	self error: 'Symbol required for trait labels'
@@ -50,8 +50,8 @@ LPTrait >> indices [
 ]
 
 { #category : #accessing }
-LPTrait >> indices: indexDictionary [
-	indices := indexDictionary
+LPTrait >> indices: anIndexDictionary [
+	indices := anIndexDictionary
 ]
 
 { #category : #accessing }
@@ -60,8 +60,8 @@ LPTrait >> name [
 ]
 
 { #category : #accessing }
-LPTrait >> name: traitName [
-	name := traitName 
+LPTrait >> name: aTraitName [
+	name := aTraitName 
 ]
 
 { #category : #accessing }
