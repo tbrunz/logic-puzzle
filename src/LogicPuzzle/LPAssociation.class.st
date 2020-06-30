@@ -26,7 +26,8 @@ Class {
 		'isModified',
 		'firstTrait',
 		'secondTrait',
-		'name'
+		'name',
+		'matrix'
 	],
 	#classInstVars : [
 		'nameSeparator'
@@ -71,6 +72,9 @@ LPAssociation class >> newWith: firstTrait with: secondTrait [
 		
 		"Use the trait names to make a unique association name:"
 		associationName: (self nameWith: firstTrait name with: secondTrait name);
+		
+		"Create the matrix that will hold the linked associations:"
+		matrix: (Array2D new: (firstTrait tags size));
 		yourself
 		
 ]
@@ -130,6 +134,16 @@ LPAssociation >> isModified [
 { #category : #accessing }
 LPAssociation >> isModified: aBoolean [
 	isModified := aBoolean
+]
+
+{ #category : #accessing }
+LPAssociation >> matrix [
+	^ matrix
+]
+
+{ #category : #accessing }
+LPAssociation >> matrix: anArray2D [
+	matrix := anArray2D
 ]
 
 { #category : #accessing }
