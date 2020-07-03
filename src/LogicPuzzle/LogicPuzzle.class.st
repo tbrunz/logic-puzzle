@@ -20,7 +20,7 @@ Example:
 	
 	zebraPuzzle primaryTrait: #Nationality .
 	
-	zebraPuzzle makeAssociation: #Nationality being: #Spaniard matches: #Pet being: #Snails .
+	zebraPuzzle makeAssociation: #Nationality being: #Spaniard matches: #Pet being: #Snails be: true.
 	
 	zebraPuzzle printAssociation: #Nationality vs: #Pet .
 "
@@ -131,6 +131,14 @@ LogicPuzzle >> createAssociations [
 			"Finally, add the new association to our set:"
 			setOfAssociations add: (association associationName) -> association ] ].
 	^ setOfAssociations
+]
+
+{ #category : #inferencing }
+LogicPuzzle >> deduceFalseAssociationsOf: firstTrait with: secondTrait [
+	"Given a pair of traits, deduce & set false associations."
+	
+	| association |
+	
 ]
 
 { #category : #validation }
