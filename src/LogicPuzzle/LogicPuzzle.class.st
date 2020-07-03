@@ -125,7 +125,32 @@ LogicPuzzle >> getAssociation: anAssociationName [
 
 	^ setOfAssociations
 		at: anAssociationName
-		ifAbsent: [ self error: 'Unknown assocation named "' , anAssociationName , '"' ]
+		ifAbsent: [ setOfAssociations
+				at: anAssociationName
+				ifAbsent:
+					[ self error: 'Unknown assocation named "' , anAssociationName , '"' ] ]
+]
+
+{ #category : #validation }
+LogicPuzzle >> getAssociationOf: firstTraitName with: secondTraitName [
+	"Verify that we have an associtaion with these names & return it."
+
+	| associationName |
+	associationName := LPAssociation
+		nameWith: firstTraitName
+		with: secondTraitName.
+		
+	^ setOfAssociations
+		at: associationName
+		ifAbsent: [ associationName := LPAssociation
+				nameWith: secondTraitName
+				with: firstTraitName.
+			setOfAssociations
+				at: associationName
+				ifAbsent: [ self
+						error:
+							'Unknown assocation between "' , firstTraitName , '" and "'
+								, secondTraitName , '"' ] ]
 ]
 
 { #category : #reporting }
@@ -196,22 +221,21 @@ LogicPuzzle >> listTraits [
 ]
 
 { #category : #adding }
-LogicPuzzle >> makeAssociation: firstTrait being: firstTag matches: secondTrait being: secondTag [
+LogicPuzzle >> makeAssociation: firstTrait being: firstTag matches: secondTrait being: secondTag be: aBoolean [
 	"Create and validate a new trait association."
 
-	| firstName secondName association associationName match |
-	firstName := self verify: firstTrait includes: firstTag.
-	secondName := self verify: secondTrait includes: secondTag.
+	| firstIndex secondIndex association match |
+	firstIndex := self verify: firstTrait includes: firstTag.
+	secondIndex := self verify: secondTrait includes: secondTag.
 	
-	associationName := LPAssociation nameWith: firstName with: secondName.
-	association := self getAssociation: associationName.
+	association := self getAssociationOf: firstTrait with: secondTrait.
 	
-	match := association matrix at: firstName at: secondName.
+	match := association matrix at: firstIndex at: secondIndex.
 	match
-		ifNil: [ association matrix at: firstName at: secondName put: true ]
+		ifNil: [ association matrix at: firstIndex at: secondIndex put: aBoolean ]
 		ifNotNil: [ self
 				error:
-					'Association "' , associationName , '" is already known to be '
+					'Association "' , association name , '" is already known to be '
 						, match asString ]
 ]
 
@@ -313,5 +337,5 @@ LogicPuzzle >> verify: aTrait includes: aTag [
 		ifFalse:
 			[ self error: 'Unknown tag "' , aTag , '" for trait "' , aTrait , '"' ].
 		
-	^ traitName
+	^ trait indices at: tagName
 ]

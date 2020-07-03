@@ -29,6 +29,42 @@ LogicPuzzleCreationTest >> testAddTraitsToPuzzle [
 ]
 
 { #category : #tests }
+LogicPuzzleCreationTest >> testAssignTraitAssociations [
+	"Test validating, assigning, and detecting trait associations."
+	
+	| puzzle |
+	"Create a test puzzle with some traits:"
+	puzzle := LogicPuzzle newWithTraitSize: 3 .
+	
+	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
+	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
+	self shouldnt: [ puzzle addTrait: #Pet withTags: #( #Snails #Fox #Zebra ) ] raise: Error .
+	self shouldnt: [ puzzle addTrait: #Beverage withTags: #( #Water #Tea #Coffee ) ] raise: Error .
+	self assert: (puzzle createAssociations) size equals: 3 .
+	
+	"Reject traits that aren't known, and trait tags that aren't part of a given trait:"
+	self should: [ puzzle makeAssociation: #Country being: #Norwegian matches: #Pet being: #Zebra be: true ] raise: Error .
+	self should: [ puzzle makeAssociation: #Nationality being: #Swedish matches: #Pet being: #Zebra be: true ] raise: Error .
+	self should: [ puzzle makeAssociation: #Nationality being: #Norwegian matches: #Booze being: #Zebra be: true ] raise: Error .
+	self should: [ puzzle makeAssociation: #Nationality being: #Norwegian matches: #Pet being: #Weasel be: true ] raise: Error .
+	
+	"Reject any trait or tag name that isn't a string or symbol:"
+	self should: [ puzzle makeAssociation: #(1 2) being: #Norwegian matches: #Pet being: #Zebra be: true ] raise: Error .
+	self should: [ puzzle makeAssociation: #Nationality being: 3 matches: #Pet being: #Zebra be: true ] raise: Error .
+	self should: [ puzzle makeAssociation: #Nationality being: #Norwegian matches: true being: #Zebra be: true ] raise: Error .
+	self should: [ puzzle makeAssociation: #Nationality being: #Norwegian matches: #Pet being: #('abc') be: true ] raise: Error .
+	
+	"Can refer to traits & their tags with strings or symbols:"
+	self shouldnt: [ puzzle makeAssociation: #Nationality being: #Norwegian matches: #Pet being: #Zebra be: true ] raise: Error .
+	self shouldnt: [ puzzle makeAssociation: 'Nationality' being: 'Ukrainian' matches: 'Beverage' being: 'Tea' be: true ] raise: Error .
+	
+	"Setting the same association a second time should throw an error:"
+	self should: [ puzzle makeAssociation: #Nationality being: #Norwegian matches: #Pet being: #Zebra be: true ] raise: Error .
+	self should: [ puzzle makeAssociation: #Nationality being: #Norwegian matches: #Pet being: #Zebra be: false ] raise: Error .
+	
+]
+
+{ #category : #tests }
 LogicPuzzleCreationTest >> testCreateLogicPuzzle [
 	"Test behavior of the Logic Puzzle constructor."
 	
