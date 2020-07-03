@@ -91,6 +91,20 @@ LogicPuzzle >> addTrait: stringOrSymbol withTags: tagArray [
 	^ trait
 ]
 
+{ #category : #reporting }
+LogicPuzzle >> associationValueFor: firstTrait being: firstTag with: secondTrait being: secondTag [
+	"Retrieve the association value for a pair of trait/tags."
+
+	| firstIndex secondIndex association |
+	firstIndex := self verify: firstTrait includes: firstTag.
+	secondIndex := self verify: secondTrait includes: secondTag.
+	
+	association := self getAssociationOf: firstTrait with: secondTrait.
+	
+	^ association matrix at: firstIndex at: secondIndex
+	
+]
+
 { #category : #adding }
 LogicPuzzle >> createAssociations [
 	"Create the set of trait associations for the puzzle."
@@ -235,7 +249,7 @@ LogicPuzzle >> makeAssociation: firstTrait being: firstTag matches: secondTrait 
 		ifNil: [ association matrix at: firstIndex at: secondIndex put: aBoolean ]
 		ifNotNil: [ self
 				error:
-					'Association "' , association name , '" is already known to be '
+					'Association "' , association associationName , '" is already known to be '
 						, match asString ]
 ]
 
