@@ -129,26 +129,35 @@ LogicPuzzle >> createAssociations [
 				with: (setOfTraits at: secondSymbol).
 
 			"Finally, add the new association to our set:"
-			setOfAssociations add: (association associationName) -> association ] ].
+			setOfAssociations add: (association name) -> association ] ].
 	^ setOfAssociations
 ]
 
 { #category : #inferencing }
-LogicPuzzle >> deduceFalseAssociationsOf: firstTraitName with: secondTraitName [
-	"Given a pair of traits, deduce & set false associations."
+LogicPuzzle >> deduceFalseMatchesIn: anAssociation [
+	"Given an association of traits, deduce & set false matches."
 
-	| association matrix |
+	| matrix |
+	"Walk through each cell of the association matrix, looking for 'true':"
+	matrix := anAssociation matrix.
+	matrix
+		withIndicesDo: [ :value :rowIndex :colIndex | 
+			value
+				"'true' implies all other cells in the row & column are 'false':"
+				ifTrue: [ anAssociation setRowFalse: rowIndex.
+					anAssociation setColFalse: colIndex ] ]
+]
+
+{ #category : #inferencing }
+LogicPuzzle >> deduceFalseMatchesOf: firstTraitName with: secondTraitName [
+	"Given a pair of traits, deduce & set false association matches."
+
+	| association |
 	association := self
 		getAssociationOf: (self verifyTraitExists: firstTraitName)
 		with: (self verifyTraitExists: secondTraitName).
 
-	"Walk through each cell of the association matrix, looking for 'true'."
-	matrix := association matrix.
-	matrix
-		withIndicesDo: [ :value :rowIndex :colIndex | 
-			value
-				ifTrue: [ association setRowFalse: rowIndex.
-					association setColFalse: colIndex ] ]
+	self deduceFalseMatchesIn: association 
 ]
 
 { #category : #retrieval }
@@ -267,7 +276,7 @@ LogicPuzzle >> makeAssociation: firstTrait being: firstTag matches: secondTrait 
 		ifNil: [ association matrix at: firstIndex at: secondIndex put: aBoolean ]
 		ifNotNil: [ self
 				error:
-					'Association "' , association associationName , '" is already known to be '
+					'Association "' , association name , '" is already known to be '
 						, match asString ]
 ]
 

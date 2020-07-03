@@ -27,7 +27,9 @@ Class {
 		'firstTrait',
 		'secondTrait',
 		'name',
-		'matrix'
+		'matrix',
+		'rowName',
+		'colName'
 	],
 	#classInstVars : [
 		'nameSeparator'
@@ -61,6 +63,10 @@ LPAssociation class >> nameWith: firstSymbol with: secondSymbol [
 LPAssociation class >> newWith: firstTrait with: secondTrait [
 	"Create a new association between two given traits."
 
+	| rowName colName |
+	rowName := firstTrait name.
+	colName := secondTrait name.
+	
 	^ self new
 		isComplete: false;
 		isConsistent: true;
@@ -70,8 +76,12 @@ LPAssociation class >> newWith: firstTrait with: secondTrait [
 		firstTrait: firstTrait;
 		secondTrait: secondTrait;
 		
+		"Need to assign one trait as the matrix row, the other as the column:"
+		rowName: rowName;
+		colName: colName;
+		
 		"Use the trait names to make a unique association name:"
-		associationName: (self nameWith: firstTrait name with: secondTrait name);
+		name: (self nameWith: rowName with: colName);
 		
 		"Create the matrix that will hold the linked associations:"
 		matrix: (Array2D new: (firstTrait tags size));
@@ -87,13 +97,13 @@ LPAssociation class >> traitNamesFrom: anAssociationName [
 ]
 
 { #category : #accessing }
-LPAssociation >> associationName [
-	^ name
+LPAssociation >> colName [
+	^ colName
 ]
 
 { #category : #accessing }
-LPAssociation >> associationName: stringOrSymbol [
-	name := stringOrSymbol 
+LPAssociation >> colName: aTraitName [
+	colName := aTraitName
 ]
 
 { #category : #accessing }
@@ -147,6 +157,26 @@ LPAssociation >> matrix: anArray2D [
 ]
 
 { #category : #accessing }
+LPAssociation >> name [
+	^ name
+]
+
+{ #category : #accessing }
+LPAssociation >> name: stringOrSymbol [
+	name := stringOrSymbol 
+]
+
+{ #category : #accessing }
+LPAssociation >> rowName [
+	^ rowName
+]
+
+{ #category : #accessing }
+LPAssociation >> rowName: aTraitName [
+	rowName := aTraitName
+]
+
+{ #category : #accessing }
 LPAssociation >> secondTrait [
 	^ secondTrait
 ]
@@ -170,7 +200,7 @@ LPAssociation >> setColFalse: colIndex [
 							ifFalse: [ trueFound := true ]
 							ifTrue: [ self
 									error:
-										'Inconsistency found in ' , self associationName
+										'Inconsistency found in ' , self name
 											, ': two trues in one column' ] ] ] ]
 ]
 
@@ -185,6 +215,6 @@ LPAssociation >> setRowFalse: rowIndex [
 			ifNil: [ matrix at: rowIndex at: colIndex put: false ] 
 			ifNotNil: [ (matrix at: rowIndex at: colIndex) 
 				ifTrue: [ trueFound ifFalse: [ trueFound := true ] 
-					ifTrue: [ self error: 'Inconsistency found in ', self associationName, ': two trues in one row' ] ] ]
+					ifTrue: [ self error: 'Inconsistency found in ', self name, ': two trues in one row' ] ] ]
 		]
 ]
