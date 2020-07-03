@@ -91,17 +91,17 @@ LogicPuzzle >> addTrait: stringOrSymbol withTags: tagArray [
 	^ trait
 ]
 
-{ #category : #reporting }
-LogicPuzzle >> associationValueFor: firstTrait being: firstTag with: secondTrait being: secondTag [
+{ #category : #inferencing }
+LogicPuzzle >> associationValueFor: firstTraitName being: firstTag with: secondTraitName being: secondTag [
 	"Retrieve the association value for a pair of trait/tags."
 
-	| firstIndex secondIndex association |
-	firstIndex := self verify: firstTrait includes: firstTag.
-	secondIndex := self verify: secondTrait includes: secondTag.
+	| firstTagIndex secondTagIndex association |
+	firstTagIndex := self getIndexFrom: firstTraitName forTag: firstTag.
+	secondTagIndex := self getIndexFrom: secondTraitName forTag: secondTag.
 	
-	association := self getAssociationOf: firstTrait with: secondTrait.
+	association := self getAssociationOf: firstTraitName with: secondTraitName.
 	
-	^ association matrix at: firstIndex at: secondIndex
+	^ association matrix at: firstTagIndex at: secondTagIndex
 	
 ]
 
@@ -134,26 +134,16 @@ LogicPuzzle >> createAssociations [
 ]
 
 { #category : #inferencing }
-LogicPuzzle >> deduceFalseAssociationsOf: firstTrait with: secondTrait [
+LogicPuzzle >> deduceFalseAssociationsOf: firstTraitName with: secondTraitName [
 	"Given a pair of traits, deduce & set false associations."
 	
 	| association |
+	association := self getAssociationOf: (self verifyTraitExists: firstTraitName) 	with: (self verifyTraitExists: secondTraitName).
 	
+	"Walk through each cell of the association matrix."
 ]
 
-{ #category : #validation }
-LogicPuzzle >> getAssociation: anAssociationName [
-	"Verify that we have an associtaion of this name."
-
-	^ setOfAssociations
-		at: anAssociationName
-		ifAbsent: [ setOfAssociations
-				at: anAssociationName
-				ifAbsent:
-					[ self error: 'Unknown assocation named "' , anAssociationName , '"' ] ]
-]
-
-{ #category : #validation }
+{ #category : #retrieval }
 LogicPuzzle >> getAssociationOf: firstTraitName with: secondTraitName [
 	"Verify that we have an associtaion with these names & return it."
 
@@ -161,7 +151,8 @@ LogicPuzzle >> getAssociationOf: firstTraitName with: secondTraitName [
 	associationName := LPAssociation
 		nameWith: firstTraitName
 		with: secondTraitName.
-		
+
+	"See if we have an association named with '1+2'; if not, try '2+1' instead."
 	^ setOfAssociations
 		at: associationName
 		ifAbsent: [ associationName := LPAssociation
@@ -171,8 +162,19 @@ LogicPuzzle >> getAssociationOf: firstTraitName with: secondTraitName [
 				at: associationName
 				ifAbsent: [ self
 						error:
-							'Unknown assocation between "' , firstTraitName , '" and "'
-								, secondTraitName , '"' ] ]
+							'Unknown assocation between ' , firstTraitName , ' and '
+								, secondTraitName ] ]
+]
+
+{ #category : #retrieval }
+LogicPuzzle >> getIndexFrom: aTrait forTag: aTag [
+	"Get the tag index number, given a trait and one of its tags."
+
+	| tag |
+	tag := self verifyTrait: aTrait containsTag: aTag .
+	
+	"If the above tag validation succeeds, then the trait is a valid trait, too."
+	^ (setOfTraits	at: aTrait) indices at: tag
 ]
 
 { #category : #reporting }
@@ -247,8 +249,8 @@ LogicPuzzle >> makeAssociation: firstTrait being: firstTag matches: secondTrait 
 	"Create and validate a new trait association."
 
 	| firstIndex secondIndex association match |
-	firstIndex := self verify: firstTrait includes: firstTag.
-	secondIndex := self verify: secondTrait includes: secondTag.
+	firstIndex := self getIndexFrom: firstTrait forTag: firstTag.
+	secondIndex := self getIndexFrom: secondTrait forTag: secondTag.
 	
 	association := self getAssociationOf: firstTrait with: secondTrait.
 	
@@ -336,15 +338,11 @@ LogicPuzzle >> validateTraitTags: tagArray [
 ]
 
 { #category : #validation }
-LogicPuzzle >> verify: aTrait includes: aTag [
-	"Verify that we know about a trait, and that it includes a tag."
+LogicPuzzle >> verifyTrait: aTraitName containsTag: aTag [
+	"Verify that we know about a trait, and that it includes the tag."
 
-	| trait traitName tagName |
-	traitName := aTrait.
-	traitName isString
-		ifTrue: [ traitName := aTrait asSymbol ].
-	traitName isSymbol
-		ifFalse: [ self error: 'Traits must be referred to with their names' ].
+	| traitName tagName |
+	traitName := self verifyTraitExists: aTraitName.
 		
 	tagName := aTag.
 	tagName isString
@@ -352,12 +350,29 @@ LogicPuzzle >> verify: aTrait includes: aTag [
 	tagName isSymbol
 		ifFalse: [ self error: 'Trait tags must be referred to with their names' ].
 		
-	trait := setOfTraits
-		at: traitName
-		ifAbsent: [ self error: 'Unknown trait named "' , aTrait , '"' ].
-	(trait tags includes: aTag)
+	((setOfTraits at: traitName) tags includes: aTag)
 		ifFalse:
-			[ self error: 'Unknown tag "' , aTag , '" for trait "' , aTrait , '"' ].
+			[ self error: 'Unknown tag ' , aTag , ' for trait ' , aTraitName ].
 		
-	^ trait indices at: tagName
+	^ tagName
+
+]
+
+{ #category : #validation }
+LogicPuzzle >> verifyTraitExists: aTraitName [
+	"Verify that the argument is a name of a trait we know about."
+
+	| traitName |
+	traitName := aTraitName.
+	traitName isString
+		ifTrue: [ traitName := aTraitName asSymbol ].
+	traitName isSymbol
+		ifFalse: [ self error: 'Traits must be referred to with their names' ].
+		
+	setOfTraits
+		at: traitName
+		ifAbsent: [ self error: 'Unknown trait named ' , traitName ].
+		
+	^ traitName
+
 ]
