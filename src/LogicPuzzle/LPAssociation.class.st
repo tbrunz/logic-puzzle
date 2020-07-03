@@ -116,6 +116,24 @@ LPAssociation >> firstTrait: aTrait [
 	firstTrait := aTrait
 ]
 
+{ #category : #'accessing matrices' }
+LPAssociation >> isColAllFalse: colIndex [
+	"Scan a column in the association matrix for 1 nil & N-1 falses."
+
+	| nilFound |
+	nilFound := false.
+	1 to: matrix numberOfRows do: [ :rowIndex | 
+		(matrix at: rowIndex at: colIndex)
+			ifTrue: [ ^ false ].
+		(matrix at: rowIndex at: colIndex)
+			"More than one nil in a row or column means 'cannot deduce a match':" 
+			ifNil: [ nilFound
+					ifFalse: [ nilFound := true ]
+					ifTrue: [ ^ false ] ]
+		].
+	^ true
+]
+
 { #category : #accessing }
 LPAssociation >> isComplete [
 	^ isComplete
@@ -144,6 +162,24 @@ LPAssociation >> isModified [
 { #category : #accessing }
 LPAssociation >> isModified: aBoolean [
 	isModified := aBoolean
+]
+
+{ #category : #'accessing matrices' }
+LPAssociation >> isRowAllFalse: rowIndex [
+	"Scan a row in the association matrix for 1 nil & N-1 falses."
+
+	| nilFound |
+	nilFound := false.
+	1 to: matrix numberOfColumns do: [ :colIndex | 
+		(matrix at: rowIndex at: colIndex)
+			ifTrue: [ ^ false ].
+		(matrix at: rowIndex at: colIndex)
+			"More than one nil in a row or column means 'cannot deduce a match':" 
+			ifNil: [ nilFound
+					ifFalse: [ nilFound := true ]
+					ifTrue: [ ^ false ] ]
+		].
+	^ true
 ]
 
 { #category : #accessing }

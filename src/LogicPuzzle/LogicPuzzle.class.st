@@ -135,7 +135,7 @@ LogicPuzzle >> createAssociations [
 
 { #category : #inferencing }
 LogicPuzzle >> deduceFalseMatchesIn: anAssociation [
-	"Given an association of traits, deduce & set false matches."
+	"Given an association of traits, deduce & set 'false' matches."
 
 	| matrix |
 	"Walk through each cell of the association matrix, looking for 'true':"
@@ -158,6 +158,21 @@ LogicPuzzle >> deduceFalseMatchesOf: firstTraitName with: secondTraitName [
 		with: (self verifyTraitExists: secondTraitName).
 
 	self deduceFalseMatchesIn: association 
+]
+
+{ #category : #inferencing }
+LogicPuzzle >> deduceTrueMatchesIn: anAssociation [
+	"Given an association of traits, deduce & set 'true' matches."
+
+	| matrix |
+	"Walk through each row/column of the association matrix, looking for N-1 'falses':"
+	matrix := anAssociation matrix.
+	matrix
+		withIndicesDo: [ :value :rowIndex :colIndex | 
+			value
+				ifNil: [ ((anAssociation isRowAllFalse: rowIndex)
+						and: [ anAssociation isColAllFalse: colIndex ])
+						ifTrue: [ matrix at: rowIndex at: colIndex put: true ] ] ]
 ]
 
 { #category : #retrieval }
