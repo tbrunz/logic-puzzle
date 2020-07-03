@@ -119,6 +119,15 @@ LogicPuzzle >> createAssociations [
 	^ setOfAssociations
 ]
 
+{ #category : #validation }
+LogicPuzzle >> getAssociation: anAssociationName [
+	"Verify that we have an associtaion of this name."
+
+	^ setOfAssociations
+		at: anAssociationName
+		ifAbsent: [ self error: 'Unknown assocation named "' , anAssociationName , '"' ]
+]
+
 { #category : #reporting }
 LogicPuzzle >> listAssociations [
 	"Create a report listing the associations."
@@ -184,6 +193,26 @@ LogicPuzzle >> listTraits [
 								print: tag;
 								cr ].
 					stream cr ] ]
+]
+
+{ #category : #adding }
+LogicPuzzle >> makeAssociation: firstTrait being: firstTag matches: secondTrait being: secondTag [
+	"Create and validate a new trait association."
+
+	| firstName secondName association associationName match |
+	firstName := self verify: firstTrait includes: firstTag.
+	secondName := self verify: secondTrait includes: secondTag.
+	
+	associationName := LPAssociation nameWith: firstName with: secondName.
+	association := self getAssociation: associationName.
+	
+	match := association matrix at: firstName at: secondName.
+	match
+		ifNil: [ association matrix at: firstName at: secondName put: true ]
+		ifNotNil: [ self
+				error:
+					'Association "' , associationName , '" is already known to be '
+						, match asString ]
 ]
 
 { #category : #accessing }
@@ -258,4 +287,31 @@ LogicPuzzle >> validateTraitTags: tagArray [
 					'Traits for this puzzle require ' , numberOfTraitTags printString , ' tags' ].
 					
 	^ tagArray
+]
+
+{ #category : #validation }
+LogicPuzzle >> verify: aTrait includes: aTag [
+	"Verify that we know about a trait, and that it includes a tag."
+
+	| trait traitName tagName |
+	traitName := aTrait.
+	traitName isString
+		ifTrue: [ traitName := aTrait asSymbol ].
+	traitName isSymbol
+		ifFalse: [ self error: 'Traits must be referred to with their names' ].
+		
+	tagName := aTag.
+	tagName isString
+		ifTrue: [ tagName := aTag asSymbol ].
+	tagName isSymbol
+		ifFalse: [ self error: 'Trait tags must be referred to with their names' ].
+		
+	trait := setOfTraits
+		at: traitName
+		ifAbsent: [ self error: 'Unknown trait named "' , aTrait , '"' ].
+	(trait tags includes: aTag)
+		ifFalse:
+			[ self error: 'Unknown tag "' , aTag , '" for trait "' , aTrait , '"' ].
+		
+	^ traitName
 ]
