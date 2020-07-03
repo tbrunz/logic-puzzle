@@ -136,11 +136,19 @@ LogicPuzzle >> createAssociations [
 { #category : #inferencing }
 LogicPuzzle >> deduceFalseAssociationsOf: firstTraitName with: secondTraitName [
 	"Given a pair of traits, deduce & set false associations."
-	
-	| association |
-	association := self getAssociationOf: (self verifyTraitExists: firstTraitName) 	with: (self verifyTraitExists: secondTraitName).
-	
-	"Walk through each cell of the association matrix."
+
+	| association matrix |
+	association := self
+		getAssociationOf: (self verifyTraitExists: firstTraitName)
+		with: (self verifyTraitExists: secondTraitName).
+
+	"Walk through each cell of the association matrix, looking for 'true'."
+	matrix := association matrix.
+	matrix
+		withIndicesDo: [ :value :rowIndex :colIndex | 
+			value
+				ifTrue: [ association setRowFalse: rowIndex.
+					association setColFalse: colIndex ] ]
 ]
 
 { #category : #retrieval }
