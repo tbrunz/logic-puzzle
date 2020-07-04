@@ -95,13 +95,18 @@ LogicPuzzle >> addTrait: stringOrSymbol withTags: tagArray [
 LogicPuzzle >> associationValueFor: firstTraitName being: firstTag with: secondTraitName being: secondTag [
 	"Retrieve the association value for a pair of trait/tags."
 
-	| firstTagIndex secondTagIndex association |
-	firstTagIndex := self getIndexFrom: firstTraitName forTag: firstTag.
-	secondTagIndex := self getIndexFrom: secondTraitName forTag: secondTag.
+	| firstIndex secondIndex association row col |
+	firstIndex := self getIndexFrom: firstTraitName forTag: firstTag.
+	secondIndex := self getIndexFrom: secondTraitName forTag: secondTag.
 	
 	association := self getAssociationOf: firstTraitName with: secondTraitName.
+	association rowName = firstTraitName
+		ifTrue: [ row := firstIndex.
+			col := secondIndex ]
+		ifFalse: [ row := secondIndex.
+			col := firstIndex ].
 	
-	^ association matrix at: firstTagIndex at: secondTagIndex
+	^ association matrix at: row at: col
 	
 ]
 
@@ -286,15 +291,20 @@ LogicPuzzle >> listTraits [
 LogicPuzzle >> makeAssociation: firstTrait being: firstTag matches: secondTrait being: secondTag be: aBoolean [
 	"Create and validate a new trait association."
 
-	| firstIndex secondIndex association match |
+	| firstIndex secondIndex association row col match |
 	firstIndex := self getIndexFrom: firstTrait forTag: firstTag.
 	secondIndex := self getIndexFrom: secondTrait forTag: secondTag.
 	
 	association := self getAssociationOf: firstTrait with: secondTrait.
-	
-	match := association matrix at: firstIndex at: secondIndex.
+	association rowName = firstTrait
+		ifTrue: [ row := firstIndex.
+			col := secondIndex ]
+		ifFalse: [ row := secondIndex.
+			col := firstIndex ].
+		
+	match := association matrix at: row at: col.
 	match
-		ifNil: [ association matrix at: firstIndex at: secondIndex put: aBoolean ]
+		ifNil: [ association matrix at: row at: col put: aBoolean ]
 		ifNotNil: [ self
 				error:
 					'Association "' , association name , '" is already known to be '
