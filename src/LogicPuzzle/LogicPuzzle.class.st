@@ -220,6 +220,29 @@ LogicPuzzle >> getIndexFrom: aTrait forTag: aTag [
 	^ (setOfTraits	at: aTrait) indices at: tag
 ]
 
+{ #category : #inferencing }
+LogicPuzzle >> inferThirdTraitMatchesFor: anAssociation [
+	"Find all other associations sharing the traits of this one, and match common tag states."
+
+	| thisFirstTrait thisSecondTrait setOfOtherAssociations setOfMatchingAssociations |
+	"Extract the names of my two traits, for convenience:"
+	thisFirstTrait := anAssociation firstTrait name.
+	thisSecondTrait := anAssociation secondTrait name.
+
+	"Copy the set of associations, removing me so that I don't match myself:"
+	setOfOtherAssociations := setOfAssociations
+		reject: [ :association | association name = anAssociation name ].
+
+	"Now collect all associations containing traits that match one of my traits:"
+	"Note that it is impossible for any to match both of my traits!"
+	setOfMatchingAssociations := setOfOtherAssociations
+		select: [ :association | 
+			association firstTrait name = thisFirstTrait
+				or: [ association firstTrait name = thisSecondTrait
+						or: [ association secondTrait name = thisSecondTrait
+								or: [ association secondTrait name = thisSecondTrait ] ] ] ]
+]
+
 { #category : #reporting }
 LogicPuzzle >> listAssociations [
 	"Create a report listing the associations."
@@ -490,6 +513,7 @@ LogicPuzzle >> vetSetOfAssociations [
 			setOfAssociations
 				do: [ :association | 
 					association isModified: false.
+					self inferThirdTraitMatchesFor: association.
 					self deduceFalseMatchesIn: association.
 					self deduceTrueMatchesIn: association.
 					anyIsModified := anyIsModified or: [ association isModified ] ] ]
