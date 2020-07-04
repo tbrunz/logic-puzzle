@@ -100,7 +100,7 @@ LogicPuzzle >> associationValueFor: firstTraitName being: firstTag with: secondT
 	secondIndex := self getIndexFrom: secondTraitName forTag: secondTag.
 	
 	association := self getAssociationOf: firstTraitName with: secondTraitName.
-	association rowName = firstTraitName
+	association firstTrait name = firstTraitName
 		ifTrue: [ row := firstIndex.
 			col := secondIndex ]
 		ifFalse: [ row := secondIndex.
@@ -153,7 +153,9 @@ LogicPuzzle >> deduceFalseMatchesIn: anAssociation [
 						ifTrue: [ anAssociation
 								setRowFalse: rowIndex;
 								setColFalse: colIndex
-								] ] ]
+								] ] ].
+	
+	^ anAssociation 
 ]
 
 { #category : #inferencing }
@@ -165,23 +167,29 @@ LogicPuzzle >> deduceFalseMatchesOf: firstTraitName with: secondTraitName [
 		getAssociationOf: (self verifyTraitExists: firstTraitName)
 		with: (self verifyTraitExists: secondTraitName).
 
-	self deduceFalseMatchesIn: association 
+	^ self deduceFalseMatchesIn: association 
 ]
 
 { #category : #inferencing }
 LogicPuzzle >> deduceTrueMatchesIn: anAssociation [
 	"Given an association of traits, deduce & set 'true' matches."
 
-	| matrix |
+	| matrix coords |
 	"Walk through each row/column of the association matrix, looking for N-1 'falses':"
 	matrix := anAssociation matrix.
+	coords := anAssociation matchCoords.
+	
 	matrix
 		withIndicesDo: [ :value :rowIndex :colIndex | 
 			value
 				ifNil: [ ((anAssociation isRowAllFalse: rowIndex)
 						or: [ anAssociation isColAllFalse: colIndex ])
 						ifTrue: [ matrix at: rowIndex at: colIndex put: true.
-							anAssociation isModified: true ] ] ]
+							anAssociation isModified: true.
+							coords add: (Point x: rowIndex y: colIndex)
+							 ] ] ].
+	
+	^ anAssociation 
 ]
 
 { #category : #retrieval }
@@ -225,6 +233,9 @@ LogicPuzzle >> inferThirdTraitMatchesFor: anAssociation [
 	"Find all other associations sharing the traits of this one, and match common tag states."
 
 	| thisFirstTrait thisSecondTrait setOfOtherAssociations setOfMatchingAssociations |
+	"If this association currently has no trait matches, don't bother trying to infer anything:"
+	anAssociation matchCoords isEmpty ifTrue: [ ^ anAssociation ].
+	
 	"Extract the names of my two traits, for convenience:"
 	thisFirstTrait := anAssociation firstTrait name.
 	thisSecondTrait := anAssociation secondTrait name.
@@ -240,7 +251,39 @@ LogicPuzzle >> inferThirdTraitMatchesFor: anAssociation [
 			association firstTrait name = thisFirstTrait
 				or: [ association firstTrait name = thisSecondTrait
 						or: [ association secondTrait name = thisSecondTrait
-								or: [ association secondTrait name = thisSecondTrait ] ] ] ]
+								or: [ association secondTrait name = thisSecondTrait ] ] ] ].
+					
+	"Finally, with this set of associations, infer all the common trait matches:"
+	^ self inferTraitMatchesIn: setOfMatchingAssociations impliedBy: anAssociation
+]
+
+{ #category : #inferencing }
+LogicPuzzle >> inferTraitMatchesIn: setOfMatchingAssociations impliedBy: anAssociation [
+	"Infer trait matches in the set of matching associations based on a given association."
+
+	| firstTrait secondTrait firstSet secondSet associationPairs |
+	"Extract the names of my two traits, for convenience:"
+	firstTrait := anAssociation firstTrait name.
+	secondTrait := anAssociation secondTrait name.
+	
+	"Create all sets of association pairs matching one trait each:"
+	firstSet := setOfMatchingAssociations select: [ :association |
+		association name = firstTrait ].
+	secondSet := setOfMatchingAssociations select: [ :association |
+		association name = secondTrait ].
+	
+	"These sets have to be the same size..."
+	self assert: firstSet size = secondSet size.
+	
+	"Pair up each association in the first set with one in the second set:"
+	associationPairs := nil.
+	
+	"Find the trait/tag combinations that are true in the given association:"
+	
+	
+	"For each matching association, "
+	
+	^ anAssociation 
 ]
 
 { #category : #reporting }
@@ -319,7 +362,7 @@ LogicPuzzle >> makeAssociation: firstTrait being: firstTag matches: secondTrait 
 	secondIndex := self getIndexFrom: secondTrait forTag: secondTag.
 	
 	association := self getAssociationOf: firstTrait with: secondTrait.
-	association rowName = firstTrait
+	association firstTrait name = firstTrait
 		ifTrue: [ row := firstIndex.
 			col := secondIndex ]
 		ifFalse: [ row := secondIndex.
@@ -378,8 +421,8 @@ LogicPuzzle >> renderAssociation: anAssociation [
 	"Render the matrix of an association."
 
 	| matrix rowTraitTags colTraitTags |
-	rowTraitTags := (self setOfTraits at: anAssociation rowName) tags.
-	colTraitTags := (self setOfTraits at: anAssociation colName) tags.
+	rowTraitTags := (self setOfTraits at: anAssociation firstTrait name) tags.
+	colTraitTags := (self setOfTraits at: anAssociation secondTrait name) tags.
 	
 	matrix := anAssociation matrix.
 	
@@ -508,13 +551,13 @@ LogicPuzzle >> vetSetOfAssociations [
 
 	"Loop through all associations until no modifications detected:"
 	[ anyIsModified ]
-		whileTrue: [ 
-			anyIsModified := false.
+		whileTrue: [ anyIsModified := false.
 			setOfAssociations
 				do: [ :association | 
 					association isModified: false.
-					self inferThirdTraitMatchesFor: association.
-					self deduceFalseMatchesIn: association.
-					self deduceTrueMatchesIn: association.
+					self
+						inferThirdTraitMatchesFor:
+							(self deduceFalseMatchesIn: 
+								(self deduceTrueMatchesIn: association)).
 					anyIsModified := anyIsModified or: [ association isModified ] ] ]
 ]

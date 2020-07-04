@@ -28,9 +28,8 @@ Class {
 		'secondTrait',
 		'name',
 		'matrix',
-		'rowName',
-		'colName',
-		'matrixString'
+		'matrixString',
+		'matchCoords'
 	],
 	#classInstVars : [
 		'nameSeparator'
@@ -64,10 +63,6 @@ LPAssociation class >> nameWith: firstSymbol with: secondSymbol [
 LPAssociation class >> newWith: firstTrait with: secondTrait [
 	"Create a new association between two given traits."
 
-	| rowName colName |
-	rowName := firstTrait name.
-	colName := secondTrait name.
-	
 	^ self new
 		isComplete: false;
 		isConsistent: true;
@@ -77,17 +72,16 @@ LPAssociation class >> newWith: firstTrait with: secondTrait [
 		firstTrait: firstTrait;
 		secondTrait: secondTrait;
 		
-		"Need to assign one trait as the matrix row, the other as the column:"
-		rowName: rowName;
-		colName: colName;
-		
 		"Use the trait names to make a unique association name:"
-		name: (self nameWith: rowName with: colName);
-		
+		name: (self nameWith: firstTrait name with: secondTrait name);
+			
 		"Create the matrix that will hold the linked associations:"
-		matrix: (Array2D new: (firstTrait tags size));
-		yourself
+		matrix: (Array2D new: firstTrait tags size);
+		matrixString: '';
 		
+		"There can be as many as N matched traits per association:"
+		matchCoords: OrderedCollection new;
+		yourself
 ]
 
 { #category : #naming }
@@ -95,16 +89,6 @@ LPAssociation class >> traitNamesFrom: anAssociationName [
 	"Decompose an association key into its constituent trait keys."
 	
 	^ anAssociationName splitOn: self nameSeparator 
-]
-
-{ #category : #accessing }
-LPAssociation >> colName [
-	^ colName
-]
-
-{ #category : #accessing }
-LPAssociation >> colName: aTraitName [
-	colName := aTraitName
 ]
 
 { #category : #accessing }
@@ -184,6 +168,16 @@ LPAssociation >> isRowAllFalse: rowIndex [
 ]
 
 { #category : #accessing }
+LPAssociation >> matchCoords [
+	^ matchCoords
+]
+
+{ #category : #accessing }
+LPAssociation >> matchCoords: anOrderedCollection [
+	matchCoords := anOrderedCollection
+]
+
+{ #category : #accessing }
 LPAssociation >> matrix [
 	^ matrix
 ]
@@ -211,16 +205,6 @@ LPAssociation >> name [
 { #category : #accessing }
 LPAssociation >> name: stringOrSymbol [
 	name := stringOrSymbol 
-]
-
-{ #category : #accessing }
-LPAssociation >> rowName [
-	^ rowName
-]
-
-{ #category : #accessing }
-LPAssociation >> rowName: aTraitName [
-	rowName := aTraitName
 ]
 
 { #category : #accessing }
