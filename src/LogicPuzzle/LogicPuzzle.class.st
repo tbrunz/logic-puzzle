@@ -339,6 +339,36 @@ LogicPuzzle >> primaryTrait: traitName [
 	^ name
 ]
 
+{ #category : #reporting }
+LogicPuzzle >> printMatrix: anAssociation [
+	"Render the matrix of an association."
+
+	| matrix rowTraitTags colTraitTags |
+	matrix := anAssociation matrix.
+	rowTraitTags := (self setOfTraits at: anAssociation rowName) tags .
+	colTraitTags := (self setOfTraits at: anAssociation colName) tags .
+	
+	^ String
+		streamContents: [ :stream | 
+			stream cr.
+			colTraitTags do: [ :tag |
+					stream nextPutAll: (String streamContents: [ :s | s nextPutAll: tag asString ] limitedTo: 3); space ].
+			1 to: matrix numberOfRows do: [ :row | 
+				stream cr .
+				1 to: matrix numberOfColumns do: [ :col | 
+					stream
+						nextPutAll:
+							((matrix at: row at: col)
+								ifNil: [ ' .  ' ]
+								ifNotNil: [ (matrix at: row at: col)
+										ifTrue: [ ' @  ' ]
+										ifFalse: [ ' x  ' ] ]) ]. 
+								stream space; 
+									nextPutAll: (rowTraitTags at: row) .
+								].
+			stream	cr ]
+]
+
 { #category : #accessing }
 LogicPuzzle >> setOfAssociations [
 	^ setOfAssociations

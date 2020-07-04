@@ -120,17 +120,17 @@ LPAssociation >> firstTrait: aTrait [
 LPAssociation >> isColAllFalse: colIndex [
 	"Scan a column in the association matrix for 1 nil & N-1 falses."
 
-	| nilFound |
+	| value nilFound |
 	nilFound := false.
+	
 	1 to: matrix numberOfRows do: [ :rowIndex | 
-		(matrix at: rowIndex at: colIndex)
-			ifTrue: [ ^ false ].
-		(matrix at: rowIndex at: colIndex)
-			"More than one nil in a row or column means 'cannot deduce a match':" 
+		value := matrix at: rowIndex at: colIndex.
+		value
 			ifNil: [ nilFound
 					ifFalse: [ nilFound := true ]
 					ifTrue: [ ^ false ] ]
-		].
+			ifNotNil: [ value
+					ifTrue: [ ^ false ] ] ].
 	^ true
 ]
 
@@ -168,17 +168,17 @@ LPAssociation >> isModified: aBoolean [
 LPAssociation >> isRowAllFalse: rowIndex [
 	"Scan a row in the association matrix for 1 nil & N-1 falses."
 
-	| nilFound |
+	| value nilFound |
 	nilFound := false.
+	
 	1 to: matrix numberOfColumns do: [ :colIndex | 
-		(matrix at: rowIndex at: colIndex)
-			ifTrue: [ ^ false ].
-		(matrix at: rowIndex at: colIndex)
-			"More than one nil in a row or column means 'cannot deduce a match':" 
+		value := matrix at: rowIndex at: colIndex.
+		value
 			ifNil: [ nilFound
 					ifFalse: [ nilFound := true ]
 					ifTrue: [ ^ false ] ]
-		].
+			ifNotNil: [ value
+					ifTrue: [ ^ false ] ] ].
 	^ true
 ]
 
