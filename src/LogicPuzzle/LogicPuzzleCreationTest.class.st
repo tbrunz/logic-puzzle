@@ -40,6 +40,9 @@ LogicPuzzleCreationTest >> testAssignTraitAssociations [
 	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
 	self shouldnt: [ puzzle addTrait: #Pet withTags: #( #Snails #Fox #Zebra ) ] raise: Error .
 	self shouldnt: [ puzzle addTrait: #Beverage withTags: #( #Water #Tea #Coffee ) ] raise: Error .
+	
+	"Can't make associations unless the set of associations has been created."
+	self should: [ puzzle makeAssociation: #Nationality being: #Norwegian matches: #Pet being: #Zebra be: true ] raise: Error .
 	self assert: (puzzle createAssociations) size equals: 3 .
 	
 	"Reject traits that aren't known, and trait tags that aren't part of a given trait:"

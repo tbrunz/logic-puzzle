@@ -143,9 +143,12 @@ LogicPuzzle >> deduceFalseMatchesIn: anAssociation [
 	matrix
 		withIndicesDo: [ :value :rowIndex :colIndex | 
 			value
-				"'true' implies all other cells in the row & column are 'false':"
-				ifTrue: [ anAssociation setRowFalse: rowIndex.
-					anAssociation setColFalse: colIndex ] ]
+				ifNotNil: [ "'true' implies all other cells in the row & column are 'false'."
+					value
+						ifTrue: [ anAssociation
+								setRowFalse: rowIndex;
+								setColFalse: colIndex;
+								isModified: true ] ] ]
 ]
 
 { #category : #inferencing }
@@ -171,31 +174,33 @@ LogicPuzzle >> deduceTrueMatchesIn: anAssociation [
 		withIndicesDo: [ :value :rowIndex :colIndex | 
 			value
 				ifNil: [ ((anAssociation isRowAllFalse: rowIndex)
-						and: [ anAssociation isColAllFalse: colIndex ])
-						ifTrue: [ matrix at: rowIndex at: colIndex put: true ] ] ]
+						or: [ anAssociation isColAllFalse: colIndex ])
+						ifTrue: [ matrix at: rowIndex at: colIndex put: true.
+							anAssociation isModified: true ] ] ]
 ]
 
 { #category : #retrieval }
 LogicPuzzle >> getAssociationOf: firstTraitName with: secondTraitName [
 	"Verify that we have an associtaion with these names & return it."
 
-	| associationName |
-	associationName := LPAssociation
-		nameWith: firstTraitName
-		with: secondTraitName.
+	| name |
+	"Create an association name from trait names in the order given:"
+	name := LPAssociation nameWith: firstTraitName with: secondTraitName.
+	
+	"See if we have an association with this form of the name:"
+	setOfAssociations at: name ifPresent: [ :value | ^ value ].
 
-	"See if we have an association named with '1+2'; if not, try '2+1' instead."
-	^ setOfAssociations
-		at: associationName
-		ifAbsent: [ associationName := LPAssociation
-				nameWith: secondTraitName
-				with: firstTraitName.
-			setOfAssociations
-				at: associationName
-				ifAbsent: [ self
-						error:
-							'Unknown assocation between ' , firstTraitName , ' and '
-								, secondTraitName ] ]
+	"That didn't work, so create the name using the other order:"
+	name := LPAssociation nameWith: secondTraitName with: firstTraitName.
+	
+	"Now try to retrieve the association with this form:"
+	setOfAssociations at: name ifPresent: [ :value | ^ value ].
+
+	"Neither form of the name worked, so we must not know this one:"
+	self
+		error:
+			'Unknown association between ' , firstTraitName , ' and '
+				, secondTraitName
 ]
 
 { #category : #retrieval }
@@ -205,7 +210,7 @@ LogicPuzzle >> getIndexFrom: aTrait forTag: aTag [
 	| tag |
 	tag := self verifyTrait: aTrait containsTag: aTag .
 	
-	"If the above tag validation succeeds, then the trait is a valid trait, too."
+	"If the above tag validation succeeds, then 'aTrait' is a valid trait, too."
 	^ (setOfTraits	at: aTrait) indices at: tag
 ]
 
