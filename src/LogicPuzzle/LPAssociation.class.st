@@ -241,27 +241,26 @@ LPAssociation >> setColFalse: colIndex [
 	trueFound := false.
 	1 to: matrix numberOfRows do: [ :rowIndex | 
 		(matrix at: rowIndex at: colIndex)
-			ifNil: [ matrix at: rowIndex at: colIndex put: false ]
+			ifNil: [ matrix at: rowIndex at: colIndex put: false. self isModified: true ]
 			ifNotNil: [ (matrix at: rowIndex at: colIndex)
 					ifTrue: [ trueFound
 							ifFalse: [ trueFound := true ]
 							ifTrue: [ self
-									error:
-										'Inconsistency found in ' , self name
-											, ': two trues in one column' ] ] ] ]
+									error: 'Inconsistency found in ' , self name , ': two trues in one column' ] ] ] ]
 ]
 
 { #category : #'accessing matrices' }
 LPAssociation >> setRowFalse: rowIndex [
 	"Walk the indicated row in the matrix, setting nils to 'false'."
-	
+
 	| trueFound |
 	trueFound := false.
-	1 to: matrix numberOfColumns do: [ :colIndex |
-		(matrix at: rowIndex at: colIndex) 
-			ifNil: [ matrix at: rowIndex at: colIndex put: false ] 
-			ifNotNil: [ (matrix at: rowIndex at: colIndex) 
-				ifTrue: [ trueFound ifFalse: [ trueFound := true ] 
-					ifTrue: [ self error: 'Inconsistency found in ', self name, ': two trues in one row' ] ] ]
-		]
+	1 to: matrix numberOfColumns do: [ :colIndex | 
+		(matrix at: rowIndex at: colIndex)
+			ifNil: [ matrix at: rowIndex at: colIndex put: false. self isModified: true ]
+			ifNotNil: [ (matrix at: rowIndex at: colIndex)
+					ifTrue: [ trueFound
+							ifFalse: [ trueFound := true ]
+							ifTrue: [ self
+									error: 'Inconsistency found in ' , self name , ': two trues in one row' ] ] ] ]
 ]

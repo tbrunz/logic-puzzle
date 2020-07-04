@@ -152,8 +152,8 @@ LogicPuzzle >> deduceFalseMatchesIn: anAssociation [
 					value
 						ifTrue: [ anAssociation
 								setRowFalse: rowIndex;
-								setColFalse: colIndex;
-								isModified: true ] ] ]
+								setColFalse: colIndex
+								] ] ]
 ]
 
 { #category : #inferencing }
@@ -474,4 +474,23 @@ LogicPuzzle >> verifyTraitExists: aTraitName [
 		
 	^ traitName
 
+]
+
+{ #category : #inferencing }
+LogicPuzzle >> vetSetOfAssociations [
+	"Walk the set of associations, applying each check, until no other modifications are needed."
+
+	| anyIsModified |
+	anyIsModified := true.
+
+	"Loop through all associations until no modifications detected:"
+	[ anyIsModified ]
+		whileTrue: [ 
+			anyIsModified := false.
+			setOfAssociations
+				do: [ :association | 
+					association isModified: false.
+					self deduceFalseMatchesIn: association.
+					self deduceTrueMatchesIn: association.
+					anyIsModified := anyIsModified or: [ association isModified ] ] ]
 ]
