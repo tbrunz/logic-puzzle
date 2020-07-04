@@ -188,6 +188,7 @@ LogicPuzzle >> getAssociationOf: firstTraitName with: secondTraitName [
 	name := LPAssociation nameWith: firstTraitName with: secondTraitName.
 	
 	"See if we have an association with this form of the name:"
+	setOfAssociations ifNil: [ self error: 'The set of trait associations has yet to be created' ].
 	setOfAssociations at: name ifPresent: [ :value | ^ value ].
 
 	"That didn't work, so create the name using the other order:"
@@ -340,33 +341,54 @@ LogicPuzzle >> primaryTrait: traitName [
 ]
 
 { #category : #reporting }
-LogicPuzzle >> printMatrix: anAssociation [
+LogicPuzzle >> renderAssociation: anAssociation [
 	"Render the matrix of an association."
 
 	| matrix rowTraitTags colTraitTags |
-	matrix := anAssociation matrix.
-	rowTraitTags := (self setOfTraits at: anAssociation rowName) tags .
-	colTraitTags := (self setOfTraits at: anAssociation colName) tags .
+	rowTraitTags := (self setOfTraits at: anAssociation rowName) tags.
+	colTraitTags := (self setOfTraits at: anAssociation colName) tags.
 	
-	^ String
-		streamContents: [ :stream | 
-			stream cr.
-			colTraitTags do: [ :tag |
-					stream nextPutAll: (String streamContents: [ :s | s nextPutAll: tag asString ] limitedTo: 3); space ].
-			1 to: matrix numberOfRows do: [ :row | 
-				stream cr .
-				1 to: matrix numberOfColumns do: [ :col | 
-					stream
-						nextPutAll:
-							((matrix at: row at: col)
-								ifNil: [ ' .  ' ]
-								ifNotNil: [ (matrix at: row at: col)
-										ifTrue: [ ' @  ' ]
-										ifFalse: [ ' x  ' ] ]) ]. 
-								stream space; 
-									nextPutAll: (rowTraitTags at: row) .
-								].
-			stream	cr ]
+	matrix := anAssociation matrix.
+	
+	anAssociation
+		matrixString:
+			(String
+				streamContents: [ :stream | 
+					stream cr.
+					colTraitTags
+						do: [ :tag | 
+							stream
+								nextPutAll:
+									(String
+										streamContents: [ :s | s nextPutAll: tag asString ]
+										limitedTo: 3);
+								space ].
+					1 to: matrix numberOfRows do: [ :row | 
+						stream cr.
+						1 to: matrix numberOfColumns do: [ :col | 
+							stream
+								nextPutAll:
+									((matrix at: row at: col)
+										ifNil: [ ' .  ' ]
+										ifNotNil: [ (matrix at: row at: col)
+												ifTrue: [ ' @  ' ]
+												ifFalse: [ ' x  ' ] ]) ].
+						stream
+							space;
+							nextPutAll: (rowTraitTags at: row) ].
+					stream cr ])
+]
+
+{ #category : #reporting }
+LogicPuzzle >> renderAssociationOf: firstTrait with: secondTrait [
+	"Render the matrix of an association of two traits."
+
+	| traitOne traitTwo association |
+	traitOne := self verifyTraitExists: firstTrait. 
+	traitTwo := self verifyTraitExists: secondTrait.
+	
+	association := self getAssociationOf: traitOne with: traitTwo .
+	self renderAssociation: association 
 ]
 
 { #category : #accessing }

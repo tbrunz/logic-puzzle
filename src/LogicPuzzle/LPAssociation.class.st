@@ -29,7 +29,8 @@ Class {
 		'name',
 		'matrix',
 		'rowName',
-		'colName'
+		'colName',
+		'matrixString'
 	],
 	#classInstVars : [
 		'nameSeparator'
@@ -190,6 +191,16 @@ LPAssociation >> matrix [
 { #category : #accessing }
 LPAssociation >> matrix: anArray2D [
 	matrix := anArray2D
+]
+
+{ #category : #accessing }
+LPAssociation >> matrixString [
+	^ matrixString
+]
+
+{ #category : #accessing }
+LPAssociation >> matrixString: aString [
+	matrixString := aString
 ]
 
 { #category : #accessing }
