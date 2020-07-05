@@ -91,7 +91,7 @@ LogicPuzzle >> addTrait: stringOrSymbol withTags: tagArray [
 	^ trait
 ]
 
-{ #category : #inferencing }
+{ #category : #retrieval }
 LogicPuzzle >> associationValueFor: firstTraitName being: firstTag with: secondTraitName being: secondTag [
 	"Retrieve the association value for a pair of trait/tags."
 
@@ -232,13 +232,13 @@ LogicPuzzle >> getIndexFrom: aTrait forTag: aTag [
 LogicPuzzle >> inferThirdTraitMatchesFor: anAssociation [
 	"Find all other associations sharing the traits of this one, and match common tag states."
 
-	| thisFirstTrait thisSecondTrait setOfOtherAssociations setOfMatchingAssociations |
+	| thisFirstTraitName thisSecondTraitName setOfOtherAssociations setOfMatchingAssociations |
 	"If this association currently has no trait matches, don't bother trying to infer anything:"
 	anAssociation matchCoords isEmpty ifTrue: [ ^ anAssociation ].
 	
 	"Extract the names of my two traits, for convenience:"
-	thisFirstTrait := anAssociation firstTrait name.
-	thisSecondTrait := anAssociation secondTrait name.
+	thisFirstTraitName := anAssociation firstTrait name.
+	thisSecondTraitName := anAssociation secondTrait name.
 
 	"Copy the set of associations, removing me so that I don't match myself:"
 	setOfOtherAssociations := setOfAssociations
@@ -248,10 +248,10 @@ LogicPuzzle >> inferThirdTraitMatchesFor: anAssociation [
 	"Note that it is impossible for any to match both of my traits!"
 	setOfMatchingAssociations := setOfOtherAssociations
 		select: [ :association | 
-			association firstTrait name = thisFirstTrait
-				or: [ association firstTrait name = thisSecondTrait
-						or: [ association secondTrait name = thisSecondTrait
-								or: [ association secondTrait name = thisSecondTrait ] ] ] ].
+			association firstTrait name = thisFirstTraitName
+				or: [ association firstTrait name = thisSecondTraitName
+						or: [ association secondTrait name = thisSecondTraitName
+								or: [ association secondTrait name = thisSecondTraitName ] ] ] ].
 					
 	"Finally, with this set of associations, infer all the common trait matches:"
 	^ self inferTraitMatchesIn: setOfMatchingAssociations impliedBy: anAssociation
@@ -261,29 +261,74 @@ LogicPuzzle >> inferThirdTraitMatchesFor: anAssociation [
 LogicPuzzle >> inferTraitMatchesIn: setOfMatchingAssociations impliedBy: anAssociation [
 	"Infer trait matches in the set of matching associations based on a given association."
 
-	| firstTrait secondTrait firstSet secondSet associationPairs |
-	"Extract the names of my two traits, for convenience:"
-	firstTrait := anAssociation firstTrait name.
-	secondTrait := anAssociation secondTrait name.
+	| firstTraitName secondTraitName firstSet secondSet |
+	"Extract my name & the names of my two traits, for convenience:"
+	firstTraitName := anAssociation firstTrait name.
+	secondTraitName := anAssociation secondTrait name.
 	
 	"Create all sets of association pairs matching one trait each:"
 	firstSet := setOfMatchingAssociations select: [ :association |
-		association name = firstTrait ].
+		(association name asString findString: firstTraitName asString) ~= 0 ].
 	secondSet := setOfMatchingAssociations select: [ :association |
-		association name = secondTrait ].
+		(association name asString findString: secondTraitName asString) ~= 0 ].
 	
 	"These sets have to be the same size..."
 	self assert: firstSet size = secondSet size.
 	
-	"Pair up each association in the first set with one in the second set:"
-	associationPairs := nil.
-	
-	"Find the trait/tag combinations that are true in the given association:"
-	
-	
-	"For each matching association, "
+	"Pair up each association in the first set with one in the second set."
+	"For each ordered pair, use the 'true' matches in the given association to "
+	"infer correspondence of 'true' and 'false' matches for the same trait tags."
+	firstSet do: [ :firstItem |
+		secondSet do: [ :secondItem |
+			self inferTraitMatchesIn: anAssociation with: firstItem with: secondItem ]	].
 	
 	^ anAssociation 
+]
+
+{ #category : #inferencing }
+LogicPuzzle >> inferTraitMatchesIn: anAssociation with: firstAssociation with: secondAssociation [
+	"Use the 'true' matches in the given association to infer matches in the pair."
+	
+	| thirdTraitName firstAssnTrait secondAssnTrait |
+	"The first association has two traits; this association was picked because one of 
+	its trait names matches the first trait name of the given association; find the 
+	name of its other trait -- the one not in common with the given association:"
+	firstAssnTrait := firstAssociation firstTrait.
+	thirdTraitName := firstAssnTrait name.
+	
+	"If we guessed wrong, above, the trait name matches that in the given association.
+	In this case, switch traits -- the second one is guaranteed to not match:"
+	thirdTraitName = anAssociation firstTrait name 
+		ifTrue: [ firstAssnTrait := firstAssociation secondTrait. 
+			thirdTraitName := firstAssnTrait name ].
+	
+	"Do the same to get the unmatched trait name in the second association, but with 
+	an additional constraint: this other trait name must match the one found above:"
+	secondAssnTrait := secondAssociation firstTrait.
+	thirdTraitName = secondAssnTrait name
+		ifFalse: [ secondAssnTrait := secondAssociation secondTrait.
+			thirdTraitName = secondAssnTrait name
+			ifFalse: [ ^ self ] ].
+	
+	"If we get here, we now have three associations with three traits in common, 
+	and the given association has one or more 'true' trait matches."
+	
+	"For our given association, get the 'matrix coordinates' of each of its 'true' 
+	trait matches; the 'row' tag corresponds to the first association, while the 
+	'column' tag corresponds to the second association:"
+	anAssociation matchCoords do: [ :coord |
+		| rowTag colTag |
+		rowTag := anAssociation firstTrait tags at: coord x.
+		colTag := anAssociation secondTrait tags at: coord y.
+		
+		"Each 'true' trait match in the given association implies that all the 'true' and
+		false' matches in related trait associations in the pair must be equivalent.
+		If neither is nil, verify that they match; if only one is nil, make them match; 
+		if both are nil, nothing can be inferred."
+		
+	
+	 
+		]
 ]
 
 { #category : #reporting }
