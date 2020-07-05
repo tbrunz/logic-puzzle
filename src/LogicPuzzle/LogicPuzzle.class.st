@@ -192,6 +192,23 @@ LogicPuzzle >> deduceTrueMatchesIn: anAssociation [
 	^ anAssociation 
 ]
 
+{ #category : #inferencing }
+LogicPuzzle >> findCommonTraitIn: anAssociation with: firstAssociation with: secondAssociation [
+	"Determine if the two traits not in common with the given associtaion are the same."
+	
+	| thirdTraitName fourthTraitName |
+	"Every association has two traits; the two associations were picked because one of 
+	their trait names match a trait name of the given association.  We already know one 
+	of them; find the names of their other traits, the ones not in common with the given 
+	association.  If these are the same name, return the name, as the association pair 
+	can be used; otherwise return nil, as there must be only three traits in common:"
+	thirdTraitName := firstAssociation traitOppositeOf: anAssociation firstTrait name.
+	fourthTraitName := secondAssociation traitOppositeOf: anAssociation secondTrait name.
+	
+	thirdTraitName = fourthTraitName 
+		ifTrue: [ ^ thirdTraitName ] ifFalse: [ ^ nil ]
+]
+
 { #category : #retrieval }
 LogicPuzzle >> getAssociationOf: firstTraitName with: secondTraitName [
 	"Verify that we have an associtaion with these names & return it."
@@ -265,53 +282,44 @@ LogicPuzzle >> inferTraitMatchesIn: setOfMatchingAssociations impliedBy: anAssoc
 	"Extract my name & the names of my two traits, for convenience:"
 	firstTraitName := anAssociation firstTrait name.
 	secondTraitName := anAssociation secondTrait name.
-	
+
 	"Create all sets of association pairs matching one trait each:"
-	firstSet := setOfMatchingAssociations select: [ :association |
-		(association name asString findString: firstTraitName asString) ~= 0 ].
-	secondSet := setOfMatchingAssociations select: [ :association |
-		(association name asString findString: secondTraitName asString) ~= 0 ].
-	
+	firstSet := setOfMatchingAssociations
+		select:
+			[ :association | (association name asString findString: firstTraitName asString) ~= 0 ].
+	secondSet := setOfMatchingAssociations
+		select:
+			[ :association | (association name asString findString: secondTraitName asString) ~= 0 ].
+
 	"These sets have to be the same size..."
 	self assert: firstSet size = secondSet size.
-	
-	"Pair up each association in the first set with one in the second set."
-	"For each ordered pair, use the 'true' matches in the given association to "
-	"infer correspondence of 'true' and 'false' matches for the same trait tags."
-	firstSet do: [ :firstItem |
-		secondSet do: [ :secondItem |
-			self inferTraitMatchesIn: anAssociation with: firstItem with: secondItem ]	].
-	
-	^ anAssociation 
+
+	"Pair up each association in the first set with one in the second set. 
+	We need three associations with exactly three traits in common.
+	If a pair qualifies, perform the inferences on the pair:"
+	firstSet
+		do: [ :firstAssociation | 
+			secondSet
+				do: [ :secondAssociation | 
+					(self
+						findCommonTraitIn: anAssociation
+						with: firstAssociation
+						with: secondAssociation)
+						ifNotNil: [ self
+								inferTraitMatchesIn: anAssociation
+								with: firstAssociation
+								with: secondAssociation ] ] ].
+	^ anAssociation
 ]
 
 { #category : #inferencing }
 LogicPuzzle >> inferTraitMatchesIn: anAssociation with: firstAssociation with: secondAssociation [
 	"Use the 'true' matches in the given association to infer matches in the pair."
 	
-	| thirdTraitName firstAssnTrait secondAssnTrait |
-	"The first association has two traits; this association was picked because one of 
-	its trait names matches the first trait name of the given association; find the 
-	name of its other trait -- the one not in common with the given association:"
-	firstAssnTrait := firstAssociation firstTrait.
-	thirdTraitName := firstAssnTrait name.
-	
-	"If we guessed wrong, above, the trait name matches that in the given association.
-	In this case, switch traits -- the second one is guaranteed to not match:"
-	thirdTraitName = anAssociation firstTrait name 
-		ifTrue: [ firstAssnTrait := firstAssociation secondTrait. 
-			thirdTraitName := firstAssnTrait name ].
-	
-	"Do the same to get the unmatched trait name in the second association, but with 
-	an additional constraint: this other trait name must match the one found above:"
-	secondAssnTrait := secondAssociation firstTrait.
-	thirdTraitName = secondAssnTrait name
-		ifFalse: [ secondAssnTrait := secondAssociation secondTrait.
-			thirdTraitName = secondAssnTrait name
-			ifFalse: [ ^ self ] ].
-	
-	"If we get here, we now have three associations with three traits in common, 
-	and the given association has one or more 'true' trait matches."
+	| firstTraitName secondTraitName thirdTraitName |
+	firstTraitName := anAssociation firstTrait name.
+	secondTraitName := anAssociation secondTrait name.
+	thirdTraitName := (firstAssociation traitOppositeOf: firstTraitName) name.
 	
 	"For our given association, get the 'matrix coordinates' of each of its 'true' 
 	trait matches; the 'row' tag corresponds to the first association, while the 
@@ -326,7 +334,6 @@ LogicPuzzle >> inferTraitMatchesIn: anAssociation with: firstAssociation with: s
 		If neither is nil, verify that they match; if only one is nil, make them match; 
 		if both are nil, nothing can be inferred."
 		
-	
 	 
 		]
 ]

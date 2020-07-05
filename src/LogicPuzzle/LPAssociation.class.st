@@ -248,3 +248,27 @@ LPAssociation >> setRowFalse: rowIndex [
 							ifTrue: [ self
 									error: 'Inconsistency found in ' , self name , ': two trues in one row' ] ] ] ]
 ]
+
+{ #category : #'accessing matrices' }
+LPAssociation >> traitNamed: aTraitName [
+	"Retrieve the association trait of the given name."
+	
+	firstTrait name = aTraitName 
+		ifFalse: [ secondTrait name = aTraitName
+			ifFalse: [ ^ nil ].
+			^ secondTrait ].
+	
+	^ firstTrait
+]
+
+{ #category : #'accessing matrices' }
+LPAssociation >> traitOppositeOf: aTraitName [
+	"Retrieve the association trait not of the given name."
+	
+	firstTrait name = aTraitName 
+		ifFalse: [ secondTrait name = aTraitName
+			ifFalse: [ ^ nil ].
+			^ firstTrait ].
+	
+	^ secondTrait
+]
