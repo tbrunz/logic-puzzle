@@ -29,10 +29,10 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'numberOfTraitTags',
-		'nameSeparator',
 		'primaryTrait',
 		'setOfTraits',
-		'setOfAssociations'
+		'setOfAssociations',
+		'reportLog'
 	],
 	#category : #'LogicPuzzle-Base'
 }
@@ -55,6 +55,7 @@ LogicPuzzle class >> newWithTraitSize: numberOfTags [
 		numberOfTraitTags: numberOfTags;
 		setOfTraits: Dictionary new;
 		"setOfAssociations: Dictionary new;"
+		reportLog: (WriteStream on: String new);
 		yourself
 ]
 
@@ -293,6 +294,27 @@ LogicPuzzle >> inferTraitMatchesIn: setOfMatchingAssociations impliedBy: anAssoc
 
 	"These sets have to be the same size..."
 	self assert: firstSet size = secondSet size.
+	
+	"DEBUG
+	self reportLog cr;
+		nextPutAll: 'Inferencing association ';
+		nextPutAll: anAssociation name; cr.
+	self reportLog 
+		nextPutAll: '  first set of traits:'; cr.
+	firstSet do: [ :each | self reportLog 
+		nextPutAll: '    ';
+		nextPutAll: each firstTrait name;
+		nextPutAll: '  ';
+		nextPutAll: each secondTrait name; cr
+		].
+	self reportLog 
+		nextPutAll: '  second set of traits:'; cr.
+	secondSet do: [ :each | self reportLog 
+		nextPutAll: '    ';
+		nextPutAll: each firstTrait name;
+		nextPutAll: '  ';
+		nextPutAll: each secondTrait name; cr; cr
+		]."
 
 	"Pair up each association in the first set with one in the second set. 
 	We need three associations with exactly three traits in common.
@@ -356,11 +378,15 @@ LogicPuzzle >> inferTraitMatchesIn: anAssociation with: firstAssociation with: s
 								"Copy secondMatch into first association."
 								self setValueFor: firstTraitName being: rowTag
 									with: thirdTraitName being: commonTag to: secondMatch.
+								secondMatch ifTrue: [ firstAssociation matchCoords 
+									add: (Point x: coord x y: (thirdTrait indices at: commonTag)) ].
 								firstAssociation isModified: true ] 
 							ifNil: [  
 								"Copy firstMatch into second association."
 								self setValueFor: secondTraitName being: colTag
 									with: thirdTraitName being: commonTag to: firstMatch.
+								firstMatch ifTrue: [ secondAssociation matchCoords 
+									add: (Point x: (thirdTrait indices at: commonTag) y: coord y) ].
 								secondAssociation isModified: true ] ]
 					] ]
 ]
@@ -382,15 +408,16 @@ LogicPuzzle >> listAssociations [
 				keysAndValuesDo: [ :name :traitAssociation | 
 					"Put the association name on one line:"
 					stream
-						print: name asString;
+						nextPutAll: name asString;
 						nextPut: $:;
 						cr.
 
 					"Then display its grid, indented:"
+					self renderAssociation: traitAssociation.
 					stream
 						tab;
-						print: '<trait association grid>';
-						cr ].
+						nextPutAll: traitAssociation matrixString;
+						cr; cr ].
 					stream cr ] 
 ]
 
@@ -547,6 +574,16 @@ LogicPuzzle >> renderAssociationOf: firstTrait with: secondTrait [
 ]
 
 { #category : #accessing }
+LogicPuzzle >> reportLog [
+	^ reportLog
+]
+
+{ #category : #accessing }
+LogicPuzzle >> reportLog: anObject [
+	reportLog := anObject
+]
+
+{ #category : #accessing }
 LogicPuzzle >> setOfAssociations [
 	^ setOfAssociations
 ]
@@ -659,5 +696,5 @@ LogicPuzzle >> vetSetOfAssociations [
 								(self deduceTrueMatchesIn: association)) ];
 				do: [ :association |
 					anyIsModified := anyIsModified or: [ association isModified ] ] 
-			]
+			] 
 ]

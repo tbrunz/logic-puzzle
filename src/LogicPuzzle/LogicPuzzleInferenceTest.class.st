@@ -143,6 +143,8 @@ LogicPuzzleInferenceTest >> testVettingAssociations [
 	
 	"Create the set of associations:"
 	self shouldnt: [ puzzle createAssociations ] raise: Error .
+	
+	"Retrieve associations created:"
 	assnNatBev := puzzle getAssociationOf: #Nationality with: #Beverage .
 	assnNatPet := puzzle getAssociationOf: #Nationality with: #Pet .
 	assnBevPet := puzzle getAssociationOf: #Beverage with: #Pet .
@@ -150,11 +152,13 @@ LogicPuzzleInferenceTest >> testVettingAssociations [
 	"Make some association matches to test with:"
 	self shouldnt: [ puzzle makeAssociation: 'Nationality' being: 'Ukrainian' matches: 'Beverage' being: 'Tea' be: false ] raise: Error .
 	self shouldnt: [ puzzle vetSetOfAssociations ] raise: Error .
+	Transcript show: puzzle reportLog contents .
 	self shouldnt: [ puzzle renderAssociation: assnNatBev ] raise: Error .
 	Transcript crShow: assnNatBev matrixString .
 	
 	self shouldnt: [ puzzle makeAssociation: 'Nationality' being: 'Ukrainian' matches: 'Beverage' being: 'Coffee' be: true ] raise: Error .
 	self shouldnt: [ puzzle vetSetOfAssociations ] raise: Error .
+	Transcript show: puzzle reportLog contents .
 	self shouldnt: [ puzzle renderAssociation: assnNatBev ] raise: Error .
 	Transcript crShow: assnNatBev matrixString .
 	
@@ -162,6 +166,7 @@ LogicPuzzleInferenceTest >> testVettingAssociations [
 	self shouldnt: [ puzzle makeAssociation: 'Nationality' being: 'Ukrainian' matches: 'Pet' being: 'Snails' be: true ] raise: Error .
 	
 	self shouldnt: [ puzzle vetSetOfAssociations ] raise: Error .
+	Transcript show: puzzle reportLog contents .
 	self shouldnt: [ puzzle renderAssociation: assnNatBev ] raise: Error .
 	self shouldnt: [ puzzle renderAssociation: assnNatPet ] raise: Error .
 	self shouldnt: [ puzzle renderAssociation: assnBevPet ] raise: Error .
@@ -170,8 +175,8 @@ LogicPuzzleInferenceTest >> testVettingAssociations [
 	Transcript crShow: assnBevPet matrixString .
 	
 	self shouldnt: [ puzzle makeAssociation: 'Nationality' being: 'Norwegian' matches: 'Beverage' being: 'Water' be: false ] raise: Error .
-	puzzle vetSetOfAssociations .
-	"self shouldnt: [ puzzle vetSetOfAssociations ] raise: Error ."
+	self shouldnt: [ puzzle vetSetOfAssociations ] raise: Error .
+	Transcript show: puzzle reportLog contents .
 	self shouldnt: [ puzzle renderAssociation: assnNatBev ] raise: Error .
 	self shouldnt: [ puzzle renderAssociation: assnNatPet ] raise: Error .
 	self shouldnt: [ puzzle renderAssociation: assnBevPet ] raise: Error .
