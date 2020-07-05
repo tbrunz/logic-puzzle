@@ -190,9 +190,9 @@ LogicPuzzleCreationTest >> testTraitAssociationValues [
 	self should: [ puzzle makeAssociation: #Nationality being: #Norwegian matches: #Pet being: #Zebra be: false ] raise: Error .
 	
 	"Associations should report the value they were set with; unset associations should report nil:"
-	self assert: (puzzle associationValueFor: #Nationality being: #Norwegian with: #Pet being: #Zebra) equals: true .
-	self assert: (puzzle associationValueFor: #Nationality being: #Ukrainian with: #Beverage being: #Tea) equals: false .
-	self assert: (puzzle associationValueFor: #Nationality being: #Japanese with: #Pet being: #Snails) equals: nil .
+	self assert: (puzzle getValueFor: #Nationality being: #Norwegian with: #Pet being: #Zebra) equals: true .
+	self assert: (puzzle getValueFor: #Nationality being: #Ukrainian with: #Beverage being: #Tea) equals: false .
+	self assert: (puzzle getValueFor: #Nationality being: #Japanese with: #Pet being: #Snails) equals: nil .
 	
 ]
 

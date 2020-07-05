@@ -38,11 +38,11 @@ LogicPuzzleInferenceTest >> testDeduceFalseMatches [
 	self shouldnt: [ puzzle deduceFalseMatchesOf: #Nationality with: #Beverage ] raise: Error .
 	self assert: (puzzle getAssociationOf: #Nationality with: #Beverage) isModified equals: true .
 	
-	self assert: (puzzle associationValueFor: #Nationality being: #Norwegian with: #Beverage being: #Coffee) equals: false .
-	self assert: (puzzle associationValueFor: #Nationality being: #Japanese with: #Beverage being: #Coffee) equals: false .
-	self assert: (puzzle associationValueFor: #Nationality being: #Ukrainian with: #Beverage being: #Coffee) equals: true .
-	self assert: (puzzle associationValueFor: #Nationality being: #Ukrainian with: #Beverage being: #Tea) equals: false .
-	self assert: (puzzle associationValueFor: #Nationality being: #Ukrainian with: #Beverage being: #Water) equals: false .
+	self assert: (puzzle getValueFor: #Nationality being: #Norwegian with: #Beverage being: #Coffee) equals: false .
+	self assert: (puzzle getValueFor: #Nationality being: #Japanese with: #Beverage being: #Coffee) equals: false .
+	self assert: (puzzle getValueFor: #Nationality being: #Ukrainian with: #Beverage being: #Coffee) equals: true .
+	self assert: (puzzle getValueFor: #Nationality being: #Ukrainian with: #Beverage being: #Tea) equals: false .
+	self assert: (puzzle getValueFor: #Nationality being: #Ukrainian with: #Beverage being: #Water) equals: false .
 	
 	assn := puzzle getAssociationOf: #Nationality with: #Beverage .
 	self shouldnt: [ puzzle renderAssociation: assn ] raise: Error .

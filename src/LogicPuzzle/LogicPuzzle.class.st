@@ -91,25 +91,6 @@ LogicPuzzle >> addTrait: stringOrSymbol withTags: tagArray [
 	^ trait
 ]
 
-{ #category : #retrieval }
-LogicPuzzle >> associationValueFor: firstTraitName being: firstTag with: secondTraitName being: secondTag [
-	"Retrieve the association value for a pair of trait/tags."
-
-	| firstIndex secondIndex association row col |
-	firstIndex := self getIndexFrom: firstTraitName forTag: firstTag.
-	secondIndex := self getIndexFrom: secondTraitName forTag: secondTag.
-	
-	association := self getAssociationOf: firstTraitName with: secondTraitName.
-	association firstTrait name = firstTraitName
-		ifTrue: [ row := firstIndex.
-			col := secondIndex ]
-		ifFalse: [ row := secondIndex.
-			col := firstIndex ].
-	
-	^ association matrix at: row at: col
-	
-]
-
 { #category : #adding }
 LogicPuzzle >> createAssociations [
 	"Create the set of trait associations for the puzzle."
@@ -245,6 +226,25 @@ LogicPuzzle >> getIndexFrom: aTrait forTag: aTag [
 	^ (setOfTraits	at: aTrait) indices at: tag
 ]
 
+{ #category : #retrieval }
+LogicPuzzle >> getValueFor: firstTraitName being: firstTag with: secondTraitName being: secondTag [
+	"Retrieve the association value for a pair of trait/tags."
+
+	| firstIndex secondIndex association row col |
+	firstIndex := self getIndexFrom: firstTraitName forTag: firstTag.
+	secondIndex := self getIndexFrom: secondTraitName forTag: secondTag.
+	
+	association := self getAssociationOf: firstTraitName with: secondTraitName.
+	association firstTrait name = firstTraitName
+		ifTrue: [ row := firstIndex.
+			col := secondIndex ]
+		ifFalse: [ row := secondIndex.
+			col := firstIndex ].
+	
+	^ association matrix at: row at: col
+	
+]
+
 { #category : #inferencing }
 LogicPuzzle >> inferThirdTraitMatchesFor: anAssociation [
 	"Find all other associations sharing the traits of this one, and match common tag states."
@@ -315,27 +315,52 @@ LogicPuzzle >> inferTraitMatchesIn: setOfMatchingAssociations impliedBy: anAssoc
 { #category : #inferencing }
 LogicPuzzle >> inferTraitMatchesIn: anAssociation with: firstAssociation with: secondAssociation [
 	"Use the 'true' matches in the given association to infer matches in the pair."
-	
-	| firstTraitName secondTraitName thirdTraitName |
+
+	| firstTraitName secondTraitName thirdTraitName thirdTrait thirdTraitTags |
 	firstTraitName := anAssociation firstTrait name.
 	secondTraitName := anAssociation secondTrait name.
-	thirdTraitName := (firstAssociation traitOppositeOf: firstTraitName) name.
-	
+
+	"We need the name of the third trait in common, and its tag array:"
+	thirdTrait := firstAssociation traitOppositeOf: firstTraitName.
+	thirdTraitTags := thirdTrait tags.
+	thirdTraitName := thirdTrait name.
+
 	"For our given association, get the 'matrix coordinates' of each of its 'true' 
 	trait matches; the 'row' tag corresponds to the first association, while the 
 	'column' tag corresponds to the second association:"
-	anAssociation matchCoords do: [ :coord |
-		| rowTag colTag |
-		rowTag := anAssociation firstTrait tags at: coord x.
-		colTag := anAssociation secondTrait tags at: coord y.
-		
-		"Each 'true' trait match in the given association implies that all the 'true' and
-		false' matches in related trait associations in the pair must be equivalent.
-		If neither is nil, verify that they match; if only one is nil, make them match; 
-		if both are nil, nothing can be inferred."
-		
-	 
-		]
+	anAssociation matchCoords
+		do: [ :coord | 
+			| rowTag colTag |
+			rowTag := anAssociation firstTrait tags at: coord x.
+			colTag := anAssociation secondTrait tags at: coord y.
+			
+			thirdTraitTags
+				do: [ :commonTag | 
+					"Each 'true' trait match in the given association implies that all the 'true' and
+					false' matches in related trait associations in the pair must be equivalent.
+					If neither is nil, verify that they match; if only one is nil, make them match; 
+					if both are nil, nothing can be inferred."
+					| firstMatch secondMatch |
+					firstMatch := firstAssociation
+						getValueFor: firstTraitName 	being: rowTag
+						with: thirdTraitName being: commonTag.
+						
+					secondMatch := secondAssociation
+						getValueFor: secondTraitName being: colTag
+						with: thirdTraitName being: commonTag. 
+						
+					firstMatch = secondMatch
+						ifFalse: [ secondMatch 
+							ifNotNil: [ firstMatch
+								ifNotNil: [ self error: 'Inconsistency detected!' ]. 
+								"Copy secondMatch into first association."
+								firstAssociation setValueFor: firstTraitName being: rowTag
+									with: thirdTraitName being: commonTag to: secondMatch ] 
+							ifNil: [  
+								"Copy firstMatch into second association."
+								secondAssociation setValueFor: secondTraitName being: colTag
+									with: thirdTraitName being: commonTag to: firstMatch 	] ]
+					] ]
 ]
 
 { #category : #reporting }
@@ -537,6 +562,25 @@ LogicPuzzle >> setOfTraits [
 { #category : #accessing }
 LogicPuzzle >> setOfTraits: aDictionary [
 	setOfTraits := aDictionary
+]
+
+{ #category : #retrieval }
+LogicPuzzle >> setValueFor: firstTraitName being: firstTag with: secondTraitName being: secondTag to: aBoolean [
+	"Set the association value for a pair of trait/tags to a given boolean."
+
+	| firstIndex secondIndex association row col |
+	firstIndex := self getIndexFrom: firstTraitName forTag: firstTag.
+	secondIndex := self getIndexFrom: secondTraitName forTag: secondTag.
+	
+	association := self getAssociationOf: firstTraitName with: secondTraitName.
+	association firstTrait name = firstTraitName
+		ifTrue: [ row := firstIndex.
+			col := secondIndex ]
+		ifFalse: [ row := secondIndex.
+			col := firstIndex ].
+	
+	^ association matrix at: row at: col put: aBoolean
+	
 ]
 
 { #category : #validation }
