@@ -341,11 +341,11 @@ LogicPuzzle >> inferTraitMatchesIn: anAssociation with: firstAssociation with: s
 					If neither is nil, verify that they match; if only one is nil, make them match; 
 					if both are nil, nothing can be inferred."
 					| firstMatch secondMatch |
-					firstMatch := firstAssociation
-						getValueFor: firstTraitName 	being: rowTag
+					firstMatch := self
+						getValueFor: firstTraitName being: rowTag
 						with: thirdTraitName being: commonTag.
 						
-					secondMatch := secondAssociation
+					secondMatch := self
 						getValueFor: secondTraitName being: colTag
 						with: thirdTraitName being: commonTag. 
 						
@@ -354,12 +354,14 @@ LogicPuzzle >> inferTraitMatchesIn: anAssociation with: firstAssociation with: s
 							ifNotNil: [ firstMatch
 								ifNotNil: [ self error: 'Inconsistency detected!' ]. 
 								"Copy secondMatch into first association."
-								firstAssociation setValueFor: firstTraitName being: rowTag
-									with: thirdTraitName being: commonTag to: secondMatch ] 
+								self setValueFor: firstTraitName being: rowTag
+									with: thirdTraitName being: commonTag to: secondMatch.
+								firstAssociation isModified: true ] 
 							ifNil: [  
 								"Copy firstMatch into second association."
-								secondAssociation setValueFor: secondTraitName being: colTag
-									with: thirdTraitName being: commonTag to: firstMatch 	] ]
+								self setValueFor: secondTraitName being: colTag
+									with: thirdTraitName being: commonTag to: firstMatch.
+								secondAssociation isModified: true ] ]
 					] ]
 ]
 
@@ -654,6 +656,8 @@ LogicPuzzle >> vetSetOfAssociations [
 					self
 						inferThirdTraitMatchesFor:
 							(self deduceFalseMatchesIn: 
-								(self deduceTrueMatchesIn: association)).
-					anyIsModified := anyIsModified or: [ association isModified ] ] ]
+								(self deduceTrueMatchesIn: association)) ];
+				do: [ :association |
+					anyIsModified := anyIsModified or: [ association isModified ] ] 
+			]
 ]
