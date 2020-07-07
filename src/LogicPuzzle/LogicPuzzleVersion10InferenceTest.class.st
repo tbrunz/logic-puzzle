@@ -1,16 +1,16 @@
 Class {
-	#name : #LogicPuzzleInferenceTest,
+	#name : #LogicPuzzleVersion10InferenceTest,
 	#superclass : #TestCase,
 	#category : #'LogicPuzzle-Tests'
 }
 
 { #category : #tests }
-LogicPuzzleInferenceTest >> testDeduceFalseMatches [
+LogicPuzzleVersion10InferenceTest >> testDeduceFalseMatches [
 	"Test that a 'true' match will produce row/column falses."
 	
 	| puzzle assn |
 	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzle newWithTraitSize: 3 .
+	puzzle := LogicPuzzleVersion10 newWithTraitSize: 3 .
 	
 	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
 	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
@@ -62,12 +62,12 @@ LogicPuzzleInferenceTest >> testDeduceFalseMatches [
 ]
 
 { #category : #tests }
-LogicPuzzleInferenceTest >> testDeduceTrueMatches [
+LogicPuzzleVersion10InferenceTest >> testDeduceTrueMatches [
 	"Test that row or column of N-1 'falses' will produce row/column true."
 	
 	| puzzle assn |
 	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzle newWithTraitSize: 4 .
+	puzzle := LogicPuzzleVersion10 newWithTraitSize: 4 .
 	
 	"Puzzle with 4 traits -> 4*3/2 = 6 associations:"
 	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian #Englishman ) ] raise: Error .
@@ -129,12 +129,12 @@ LogicPuzzleInferenceTest >> testDeduceTrueMatches [
 ]
 
 { #category : #tests }
-LogicPuzzleInferenceTest >> testVettingAssociations [
+LogicPuzzleVersion10InferenceTest >> testVettingAssociations [
 	"Test iterating over all associations, deducing true/false, until no modifications are made."
 	
 	| puzzle assnNatBev assnNatPet assnBevPet |
 	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzle newWithTraitSize: 4 .
+	puzzle := LogicPuzzleVersion10 newWithTraitSize: 4 .
 	
 	"Puzzle with 4 traits -> 4*3/2 = 6 associations:"
 	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian #Englishman ) ] raise: Error .

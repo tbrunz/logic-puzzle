@@ -25,30 +25,34 @@ Example:
 	zebraPuzzle printAssociation: #Nationality vs: #Pet .
 "
 Class {
-	#name : #LogicPuzzle,
+	#name : #LogicPuzzleVersion10,
 	#superclass : #Object,
 	#instVars : [
 		'numberOfTraitTags',
 		'primaryTrait',
-		'setOfTraits',
-		'setOfAssociations',
-		'reportLog'
+		'reportLog',
+		'traitDatabase',
+		'assnDatabase',
+		'matrixDatabase',
+		'tripletDatabase'
 	],
 	#category : #'LogicPuzzle-Base'
 }
 
 { #category : #'instance creation' }
-LogicPuzzle class >> newWithTraitSize: numberOfTags [
+LogicPuzzleVersion10 class >> newWithTraitSize: numberOfTags [
 	"Create a new logic puzzle with a given number of trait tags."
 
-	"Validiate the parameter for type and range:"
+	"Create a Trait database:"
+	"traitDatabase := LPTraitDatabase newWithTraitSize: numberOfTags."
+	
 	self validateTraitSize: numberOfTags.
 
 	"Set a string in LPAssociation used to separate trait names:"
 	"This couples LPAssociation into this class...  
 	How best to initialize a class instance variable?  
 	Doing it here at least makes it explicit & visible..."
-	LPAssociation nameSeparator: ' =(vs)= '.
+	LPAssociationVersion10 nameSeparator: ' =(vs)= '.
 
 	"Create a new puzzle instance & initialize it:"
 	^ self new
@@ -60,7 +64,7 @@ LogicPuzzle class >> newWithTraitSize: numberOfTags [
 ]
 
 { #category : #validation }
-LogicPuzzle class >> validateTraitSize: numberOfTags [
+LogicPuzzleVersion10 class >> validateTraitSize: numberOfTags [
 	"Validate the parameter that specifies the required number of trait tags."
 	"The number of tags must be an integer greater than 1."
 
@@ -74,33 +78,33 @@ LogicPuzzle class >> validateTraitSize: numberOfTags [
 ]
 
 { #category : #adding }
-LogicPuzzle >> addTrait: stringOrSymbol withTags: tagArray [
+LogicPuzzleVersion10 >> addTrait: stringOrSymbol withTags: tagArray [
 	"Create a new trait from a given symbol & array of tags."
 
 	| trait traitName traitTags |
 	"Accept strings or symbols for the name, convert to symbols."
-	traitName := LPTrait validateTraitName: stringOrSymbol.
+	traitName := LPTraitVersion10 validateTraitName: stringOrSymbol.
 	
 	"Validate the trait tags for type and number, also converted to symbols:"
 	traitTags := self validateTraitTags: tagArray.
 	
-	trait := LPTrait newNamed: traitName with: traitTags.
+	trait := LPTraitVersion10 newNamed: traitName with: traitTags.
 
 	"We disallow duplicate trait names, but replacing an existing is okay:"
-	setOfTraits add: traitName -> trait.
+	traitDatabase add: traitName -> trait.
 	
 	^ trait
 ]
 
 { #category : #adding }
-LogicPuzzle >> createAssociations [
+LogicPuzzleVersion10 >> createAssociations [
 	"Create the set of trait associations for the puzzle."
 
 	| arrayOfTraitKeys firstSymbol secondSymbol association |
-	setOfAssociations := Dictionary new .
+	assnDatabase := Dictionary new .
 	
 	"Create an array of trait keys so that we can step through them systematically:"
-	arrayOfTraitKeys := setOfTraits keys.
+	arrayOfTraitKeys := traitDatabase keys.
 
 	"Step through C(n,2) = every combination of traits taken 2 at a time:"
 	1 to: arrayOfTraitKeys size - 1 do: [ :outerIndex | 
@@ -111,17 +115,17 @@ LogicPuzzle >> createAssociations [
 			secondSymbol := arrayOfTraitKeys at: innerIndex.
 
 			"Form a new name & a new association using the two traits:"
-			association := LPAssociation
-				newWith: (setOfTraits at: firstSymbol)
-				with: (setOfTraits at: secondSymbol).
+			association := LPAssociationVersion10
+				newWith: (traitDatabase at: firstSymbol)
+				with: (traitDatabase at: secondSymbol).
 
 			"Finally, add the new association to our set:"
-			setOfAssociations add: (association name) -> association ] ].
-	^ setOfAssociations
+			assnDatabase add: (association name) -> association ] ].
+	^ assnDatabase
 ]
 
 { #category : #inferencing }
-LogicPuzzle >> deduceFalseMatchesIn: anAssociation [
+LogicPuzzleVersion10 >> deduceFalseMatchesIn: anAssociation [
 	"Given an association of traits, deduce & set 'false' matches."
 
 	| matrix |
@@ -141,7 +145,7 @@ LogicPuzzle >> deduceFalseMatchesIn: anAssociation [
 ]
 
 { #category : #inferencing }
-LogicPuzzle >> deduceFalseMatchesOf: firstTraitName with: secondTraitName [
+LogicPuzzleVersion10 >> deduceFalseMatchesOf: firstTraitName with: secondTraitName [
 	"Given a pair of traits, deduce & set false association matches."
 
 	| association |
@@ -153,7 +157,7 @@ LogicPuzzle >> deduceFalseMatchesOf: firstTraitName with: secondTraitName [
 ]
 
 { #category : #inferencing }
-LogicPuzzle >> deduceTrueMatchesIn: anAssociation [
+LogicPuzzleVersion10 >> deduceTrueMatchesIn: anAssociation [
 	"Given an association of traits, deduce & set 'true' matches."
 
 	| matrix coords |
@@ -175,7 +179,7 @@ LogicPuzzle >> deduceTrueMatchesIn: anAssociation [
 ]
 
 { #category : #inferencing }
-LogicPuzzle >> findCommonTraitIn: anAssociation with: firstAssociation with: secondAssociation [
+LogicPuzzleVersion10 >> findCommonTraitIn: anAssociation with: firstAssociation with: secondAssociation [
 	"Determine if the two traits not in common with the given associtaion are the same."
 	
 	| thirdTraitName fourthTraitName |
@@ -192,22 +196,22 @@ LogicPuzzle >> findCommonTraitIn: anAssociation with: firstAssociation with: sec
 ]
 
 { #category : #retrieval }
-LogicPuzzle >> getAssociationOf: firstTraitName with: secondTraitName [
+LogicPuzzleVersion10 >> getAssociationOf: firstTraitName with: secondTraitName [
 	"Verify that we have an associtaion with these names & return it."
 
 	| name |
 	"Create an association name from trait names in the order given:"
-	name := LPAssociation nameWith: firstTraitName with: secondTraitName.
+	name := LPAssociationVersion10 nameWith: firstTraitName with: secondTraitName.
 	
 	"See if we have an association with this form of the name:"
-	setOfAssociations ifNil: [ self error: 'The set of trait associations has yet to be created' ].
-	setOfAssociations at: name ifPresent: [ :value | ^ value ].
+	assnDatabase ifNil: [ self error: 'The set of trait associations has yet to be created' ].
+	assnDatabase at: name ifPresent: [ :value | ^ value ].
 
 	"That didn't work, so create the name using the other order:"
-	name := LPAssociation nameWith: secondTraitName with: firstTraitName.
+	name := LPAssociationVersion10 nameWith: secondTraitName with: firstTraitName.
 	
 	"Now try to retrieve the association with this form:"
-	setOfAssociations at: name ifPresent: [ :value | ^ value ].
+	assnDatabase at: name ifPresent: [ :value | ^ value ].
 
 	"Neither form of the name worked, so we must not know this one:"
 	self
@@ -217,18 +221,18 @@ LogicPuzzle >> getAssociationOf: firstTraitName with: secondTraitName [
 ]
 
 { #category : #retrieval }
-LogicPuzzle >> getIndexFrom: aTrait forTag: aTag [
+LogicPuzzleVersion10 >> getIndexFrom: aTrait forTag: aTag [
 	"Get the tag index number, given a trait and one of its tags."
 
 	| tag |
 	tag := self verifyTrait: aTrait containsTag: aTag .
 	
 	"If the above tag validation succeeds, then 'aTrait' is a valid trait, too."
-	^ (setOfTraits	at: aTrait) indices at: tag
+	^ (traitDatabase	at: aTrait) indices at: tag
 ]
 
 { #category : #retrieval }
-LogicPuzzle >> getValueFor: firstTraitName being: firstTag with: secondTraitName being: secondTag [
+LogicPuzzleVersion10 >> getValueFor: firstTraitName being: firstTag with: secondTraitName being: secondTag [
 	"Retrieve the association value for a pair of trait/tags."
 
 	| firstIndex secondIndex association row col |
@@ -247,7 +251,7 @@ LogicPuzzle >> getValueFor: firstTraitName being: firstTag with: secondTraitName
 ]
 
 { #category : #inferencing }
-LogicPuzzle >> inferThirdTraitMatchesFor: anAssociation [
+LogicPuzzleVersion10 >> inferThirdTraitMatchesFor: anAssociation [
 	"Find all other associations sharing the traits of this one, and match common tag states."
 
 	| thisFirstTraitName thisSecondTraitName setOfOtherAssociations setOfMatchingAssociations |
@@ -259,7 +263,7 @@ LogicPuzzle >> inferThirdTraitMatchesFor: anAssociation [
 	thisSecondTraitName := anAssociation secondTrait name.
 
 	"Copy the set of associations, removing me so that I don't match myself:"
-	setOfOtherAssociations := setOfAssociations
+	setOfOtherAssociations := assnDatabase
 		reject: [ :association | association name = anAssociation name ].
 
 	"Now collect all associations containing traits that match one of my traits:"
@@ -276,7 +280,7 @@ LogicPuzzle >> inferThirdTraitMatchesFor: anAssociation [
 ]
 
 { #category : #inferencing }
-LogicPuzzle >> inferTraitMatchesIn: setOfMatchingAssociations impliedBy: anAssociation [
+LogicPuzzleVersion10 >> inferTraitMatchesIn: setOfMatchingAssociations impliedBy: anAssociation [
 	"Infer trait matches in the set of matching associations based on a given association."
 
 	| firstTraitName secondTraitName firstSet secondSet |
@@ -335,7 +339,7 @@ LogicPuzzle >> inferTraitMatchesIn: setOfMatchingAssociations impliedBy: anAssoc
 ]
 
 { #category : #inferencing }
-LogicPuzzle >> inferTraitMatchesIn: anAssociation with: firstAssociation with: secondAssociation [
+LogicPuzzleVersion10 >> inferTraitMatchesIn: anAssociation with: firstAssociation with: secondAssociation [
 	"Use the 'true' matches in the given association to infer matches in the pair."
 
 	| firstTraitName secondTraitName thirdTraitName thirdTrait thirdTraitTags |
@@ -392,7 +396,7 @@ LogicPuzzle >> inferTraitMatchesIn: anAssociation with: firstAssociation with: s
 ]
 
 { #category : #reporting }
-LogicPuzzle >> listAssociations [
+LogicPuzzleVersion10 >> listAssociations [
 	"Create a report listing the associations."
 
 	^ String
@@ -404,7 +408,7 @@ LogicPuzzle >> listAssociations [
 				cr.
 
 			"Display a list of all the associations:"
-			setOfAssociations 
+			assnDatabase 
 				keysAndValuesDo: [ :name :traitAssociation | 
 					"Put the association name on one line:"
 					stream
@@ -422,7 +426,7 @@ LogicPuzzle >> listAssociations [
 ]
 
 { #category : #reporting }
-LogicPuzzle >> listTraits [
+LogicPuzzleVersion10 >> listTraits [
 	"Create a report listing the traits."
 
 	^ String
@@ -441,7 +445,7 @@ LogicPuzzle >> listTraits [
 				cr.
 
 			"Display a list of all the traits:"
-			setOfTraits
+			traitDatabase
 				keysAndValuesDo: [ :traitName :trait | 
 					"Put the trait name on one line:"
 					stream
@@ -460,7 +464,7 @@ LogicPuzzle >> listTraits [
 ]
 
 { #category : #adding }
-LogicPuzzle >> makeAssociation: firstTrait being: firstTag matches: secondTrait being: secondTag be: aBoolean [
+LogicPuzzleVersion10 >> makeAssociation: firstTrait being: firstTag matches: secondTrait being: secondTag be: aBoolean [
 	"Create and validate a new trait association."
 
 	| firstIndex secondIndex association row col match |
@@ -484,30 +488,30 @@ LogicPuzzle >> makeAssociation: firstTrait being: firstTag matches: secondTrait 
 ]
 
 { #category : #accessing }
-LogicPuzzle >> numberOfTraitTags [
+LogicPuzzleVersion10 >> numberOfTraitTags [
 	^ numberOfTraitTags
 ]
 
 { #category : #accessing }
-LogicPuzzle >> numberOfTraitTags: anInteger [
+LogicPuzzleVersion10 >> numberOfTraitTags: anInteger [
 	numberOfTraitTags := anInteger
 ]
 
 { #category : #accessing }
-LogicPuzzle >> primaryTrait [
+LogicPuzzleVersion10 >> primaryTrait [
 	^ primaryTrait
 ]
 
 { #category : #accessing }
-LogicPuzzle >> primaryTrait: traitName [
+LogicPuzzleVersion10 >> primaryTrait: traitName [
 	"Given a trait tag name, set the primary trait."
 
 	| name traitKeys |
 	"Argument must be a trait name -- string or symbol:"
-	name := LPTrait validateTraitName: traitName.
+	name := LPTraitVersion10 validateTraitName: traitName.
 
 	"Get an array of traits keys that match the given name:"
-	traitKeys := setOfTraits keys select: [ :key | key = name ].
+	traitKeys := traitDatabase keys select: [ :key | key = name ].
 	
 	"Three cases can result: 0, 1, or many.  Only '1' is good."
 	"Make the error messages specific to the problem encountered:"
@@ -523,7 +527,7 @@ LogicPuzzle >> primaryTrait: traitName [
 ]
 
 { #category : #reporting }
-LogicPuzzle >> renderAssociation: anAssociation [
+LogicPuzzleVersion10 >> renderAssociation: anAssociation [
 	"Render the matrix of an association."
 
 	| matrix rowTraitTags colTraitTags |
@@ -562,7 +566,7 @@ LogicPuzzle >> renderAssociation: anAssociation [
 ]
 
 { #category : #reporting }
-LogicPuzzle >> renderAssociationOf: firstTrait with: secondTrait [
+LogicPuzzleVersion10 >> renderAssociationOf: firstTrait with: secondTrait [
 	"Render the matrix of an association of two traits."
 
 	| traitOne traitTwo association |
@@ -574,37 +578,37 @@ LogicPuzzle >> renderAssociationOf: firstTrait with: secondTrait [
 ]
 
 { #category : #accessing }
-LogicPuzzle >> reportLog [
+LogicPuzzleVersion10 >> reportLog [
 	^ reportLog
 ]
 
 { #category : #accessing }
-LogicPuzzle >> reportLog: anObject [
+LogicPuzzleVersion10 >> reportLog: anObject [
 	reportLog := anObject
 ]
 
 { #category : #accessing }
-LogicPuzzle >> setOfAssociations [
-	^ setOfAssociations
+LogicPuzzleVersion10 >> setOfAssociations [
+	^ assnDatabase
 ]
 
 { #category : #accessing }
-LogicPuzzle >> setOfAssociations: aDictionary [
-	setOfAssociations := aDictionary
+LogicPuzzleVersion10 >> setOfAssociations: aDictionary [
+	assnDatabase := aDictionary
 ]
 
 { #category : #accessing }
-LogicPuzzle >> setOfTraits [
-	^ setOfTraits
+LogicPuzzleVersion10 >> setOfTraits [
+	^ traitDatabase
 ]
 
 { #category : #accessing }
-LogicPuzzle >> setOfTraits: aDictionary [
-	setOfTraits := aDictionary
+LogicPuzzleVersion10 >> setOfTraits: aDictionary [
+	traitDatabase := aDictionary
 ]
 
 { #category : #retrieval }
-LogicPuzzle >> setValueFor: firstTraitName being: firstTag with: secondTraitName being: secondTag to: aBoolean [
+LogicPuzzleVersion10 >> setValueFor: firstTraitName being: firstTag with: secondTraitName being: secondTag to: aBoolean [
 	"Set the association value for a pair of trait/tags to a given boolean."
 
 	| firstIndex secondIndex association row col |
@@ -623,7 +627,7 @@ LogicPuzzle >> setValueFor: firstTraitName being: firstTag with: secondTraitName
 ]
 
 { #category : #validation }
-LogicPuzzle >> validateTraitTags: tagArray [
+LogicPuzzleVersion10 >> validateTraitTags: tagArray [
 	"Validate an array of tags."
 
 	tagArray isArray 
@@ -638,7 +642,7 @@ LogicPuzzle >> validateTraitTags: tagArray [
 ]
 
 { #category : #validation }
-LogicPuzzle >> verifyTrait: aTraitName containsTag: aTag [
+LogicPuzzleVersion10 >> verifyTrait: aTraitName containsTag: aTag [
 	"Verify that we know about a trait, and that it includes the tag."
 
 	| traitName tagName |
@@ -650,7 +654,7 @@ LogicPuzzle >> verifyTrait: aTraitName containsTag: aTag [
 	tagName isSymbol
 		ifFalse: [ self error: 'Trait tags must be referred to with their names' ].
 		
-	((setOfTraits at: traitName) tags includes: aTag)
+	((traitDatabase at: traitName) tags includes: aTag)
 		ifFalse:
 			[ self error: 'Unknown tag ' , aTag , ' for trait ' , aTraitName ].
 		
@@ -659,7 +663,7 @@ LogicPuzzle >> verifyTrait: aTraitName containsTag: aTag [
 ]
 
 { #category : #validation }
-LogicPuzzle >> verifyTraitExists: aTraitName [
+LogicPuzzleVersion10 >> verifyTraitExists: aTraitName [
 	"Verify that the argument is a name of a trait we know about."
 
 	| traitName |
@@ -669,7 +673,7 @@ LogicPuzzle >> verifyTraitExists: aTraitName [
 	traitName isSymbol
 		ifFalse: [ self error: 'Traits must be referred to with their names' ].
 		
-	setOfTraits
+	traitDatabase
 		at: traitName
 		ifAbsent: [ self error: 'Unknown trait named ' , traitName ].
 		
@@ -678,7 +682,7 @@ LogicPuzzle >> verifyTraitExists: aTraitName [
 ]
 
 { #category : #inferencing }
-LogicPuzzle >> vetSetOfAssociations [
+LogicPuzzleVersion10 >> vetSetOfAssociations [
 	"Walk the set of associations, applying each check, until no other modifications are needed."
 
 	| anyIsModified |
@@ -687,7 +691,7 @@ LogicPuzzle >> vetSetOfAssociations [
 	"Loop through all associations until no modifications detected:"
 	[ anyIsModified ]
 		whileTrue: [ anyIsModified := false.
-			setOfAssociations
+			assnDatabase
 				do: [ :association | 
 					association isModified: false.
 					self

@@ -10,18 +10,18 @@ A logic puzzle contains a collection of all my instances, which it inspects for 
 Each Association in a puzzle is composed of two of my instances.  My tags serve as its dictionary keys. 
 "
 Class {
-	#name : #LPTrait,
+	#name : #LPTraitVersion10,
 	#superclass : #Object,
 	#instVars : [
 		'name',
 		'tags',
 		'indices'
 	],
-	#category : #'LogicPuzzle-Base'
+	#category : #'LogicPuzzle-Version10'
 }
 
 { #category : #'instance creation' }
-LPTrait class >> newNamed: traitName with: tagArray [
+LPTraitVersion10 class >> newNamed: traitName with: tagArray [
 	"Create a new trait with the given name and tag array."
 	
 	^ self new
@@ -31,7 +31,7 @@ LPTrait class >> newNamed: traitName with: tagArray [
 ]
 
 { #category : #validation }
-LPTrait class >> validateTraitName: traitName [ 
+LPTraitVersion10 class >> validateTraitName: traitName [ 
 	"Validate the parameter as being a symbol or a string."
 	"If a string, render it as a valid symbol."
 	
@@ -45,32 +45,32 @@ LPTrait class >> validateTraitName: traitName [
 ]
 
 { #category : #accessing }
-LPTrait >> indices [
+LPTraitVersion10 >> indices [
 	^ indices
 ]
 
 { #category : #accessing }
-LPTrait >> indices: anIndexDictionary [
+LPTraitVersion10 >> indices: anIndexDictionary [
 	indices := anIndexDictionary
 ]
 
 { #category : #accessing }
-LPTrait >> name [
+LPTraitVersion10 >> name [
 	^ name
 ]
 
 { #category : #accessing }
-LPTrait >> name: aTraitName [
+LPTraitVersion10 >> name: aTraitName [
 	name := aTraitName 
 ]
 
 { #category : #accessing }
-LPTrait >> tags [
+LPTraitVersion10 >> tags [
 	^ tags
 ]
 
 { #category : #accessing }
-LPTrait >> tags: tagArray [
+LPTraitVersion10 >> tags: tagArray [
 	"Validate and set an array of tags, plus a dictionary of their indices."
 
 	| index |

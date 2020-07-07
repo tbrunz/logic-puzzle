@@ -18,7 +18,7 @@ I know how to render myself as a printable string.
 I know how to render an entire row or column of myself as a printable string. 
 "
 Class {
-	#name : #LPAssociation,
+	#name : #LPAssociationVersion10,
 	#superclass : #Object,
 	#instVars : [
 		'isComplete',
@@ -34,21 +34,21 @@ Class {
 	#classInstVars : [
 		'nameSeparator'
 	],
-	#category : #'LogicPuzzle-Base'
+	#category : #'LogicPuzzle-Version10'
 }
 
 { #category : #accessing }
-LPAssociation class >> nameSeparator [
+LPAssociationVersion10 class >> nameSeparator [
 	^ nameSeparator
 ]
 
 { #category : #accessing }
-LPAssociation class >> nameSeparator: aString [
+LPAssociationVersion10 class >> nameSeparator: aString [
 	nameSeparator := aString
 ]
 
 { #category : #naming }
-LPAssociation class >> nameWith: firstSymbol with: secondSymbol [
+LPAssociationVersion10 class >> nameWith: firstSymbol with: secondSymbol [
 	"Create an association name (symbol) from its trait names."
 
 	^ (String
@@ -60,7 +60,7 @@ LPAssociation class >> nameWith: firstSymbol with: secondSymbol [
 ]
 
 { #category : #'instance creation' }
-LPAssociation class >> newWith: firstTrait with: secondTrait [
+LPAssociationVersion10 class >> newWith: firstTrait with: secondTrait [
 	"Create a new association between two given traits."
 
 	^ self new
@@ -85,24 +85,24 @@ LPAssociation class >> newWith: firstTrait with: secondTrait [
 ]
 
 { #category : #naming }
-LPAssociation class >> traitNamesFrom: anAssociationName [
+LPAssociationVersion10 class >> traitNamesFrom: anAssociationName [
 	"Decompose an association key into its constituent trait keys."
 	
 	^ anAssociationName splitOn: self nameSeparator 
 ]
 
 { #category : #accessing }
-LPAssociation >> firstTrait [
+LPAssociationVersion10 >> firstTrait [
 	^ firstTrait
 ]
 
 { #category : #accessing }
-LPAssociation >> firstTrait: aTrait [
+LPAssociationVersion10 >> firstTrait: aTrait [
 	firstTrait := aTrait
 ]
 
 { #category : #'accessing matrices' }
-LPAssociation >> isColAllFalse: colIndex [
+LPAssociationVersion10 >> isColAllFalse: colIndex [
 	"Scan a column in the association matrix for 1 nil & N-1 falses."
 
 	| value nilFound |
@@ -120,37 +120,37 @@ LPAssociation >> isColAllFalse: colIndex [
 ]
 
 { #category : #accessing }
-LPAssociation >> isComplete [
+LPAssociationVersion10 >> isComplete [
 	^ isComplete
 ]
 
 { #category : #accessing }
-LPAssociation >> isComplete: aBoolean [
+LPAssociationVersion10 >> isComplete: aBoolean [
 	isComplete := aBoolean
 ]
 
 { #category : #accessing }
-LPAssociation >> isConsistent [
+LPAssociationVersion10 >> isConsistent [
 	^ isConsistent
 ]
 
 { #category : #accessing }
-LPAssociation >> isConsistent: aBoolean [
+LPAssociationVersion10 >> isConsistent: aBoolean [
 	isConsistent := aBoolean
 ]
 
 { #category : #accessing }
-LPAssociation >> isModified [
+LPAssociationVersion10 >> isModified [
 	^ isModified
 ]
 
 { #category : #accessing }
-LPAssociation >> isModified: aBoolean [
+LPAssociationVersion10 >> isModified: aBoolean [
 	isModified := aBoolean
 ]
 
 { #category : #'accessing matrices' }
-LPAssociation >> isRowAllFalse: rowIndex [
+LPAssociationVersion10 >> isRowAllFalse: rowIndex [
 	"Scan a row in the association matrix for 1 nil & N-1 falses."
 
 	| value nilFound |
@@ -168,57 +168,57 @@ LPAssociation >> isRowAllFalse: rowIndex [
 ]
 
 { #category : #accessing }
-LPAssociation >> matchCoords [
+LPAssociationVersion10 >> matchCoords [
 	^ matchCoords
 ]
 
 { #category : #accessing }
-LPAssociation >> matchCoords: anOrderedCollection [
+LPAssociationVersion10 >> matchCoords: anOrderedCollection [
 	matchCoords := anOrderedCollection
 ]
 
 { #category : #accessing }
-LPAssociation >> matrix [
+LPAssociationVersion10 >> matrix [
 	^ matrix
 ]
 
 { #category : #accessing }
-LPAssociation >> matrix: anArray2D [
+LPAssociationVersion10 >> matrix: anArray2D [
 	matrix := anArray2D
 ]
 
 { #category : #accessing }
-LPAssociation >> matrixString [
+LPAssociationVersion10 >> matrixString [
 	^ matrixString
 ]
 
 { #category : #accessing }
-LPAssociation >> matrixString: aString [
+LPAssociationVersion10 >> matrixString: aString [
 	matrixString := aString
 ]
 
 { #category : #accessing }
-LPAssociation >> name [
+LPAssociationVersion10 >> name [
 	^ name
 ]
 
 { #category : #accessing }
-LPAssociation >> name: stringOrSymbol [
+LPAssociationVersion10 >> name: stringOrSymbol [
 	name := stringOrSymbol 
 ]
 
 { #category : #accessing }
-LPAssociation >> secondTrait [
+LPAssociationVersion10 >> secondTrait [
 	^ secondTrait
 ]
 
 { #category : #accessing }
-LPAssociation >> secondTrait: aTrait [
+LPAssociationVersion10 >> secondTrait: aTrait [
 	secondTrait := aTrait
 ]
 
 { #category : #'accessing matrices' }
-LPAssociation >> setColFalse: colIndex [
+LPAssociationVersion10 >> setColFalse: colIndex [
 	"Walk the indicated column in the matrix, setting nils to 'false'."
 
 	| trueFound |
@@ -234,7 +234,7 @@ LPAssociation >> setColFalse: colIndex [
 ]
 
 { #category : #'accessing matrices' }
-LPAssociation >> setRowFalse: rowIndex [
+LPAssociationVersion10 >> setRowFalse: rowIndex [
 	"Walk the indicated row in the matrix, setting nils to 'false'."
 
 	| trueFound |
@@ -250,7 +250,7 @@ LPAssociation >> setRowFalse: rowIndex [
 ]
 
 { #category : #'accessing matrices' }
-LPAssociation >> traitNamed: aTraitName [
+LPAssociationVersion10 >> traitNamed: aTraitName [
 	"Retrieve the association trait of the given name."
 	
 	firstTrait name = aTraitName 
@@ -262,7 +262,7 @@ LPAssociation >> traitNamed: aTraitName [
 ]
 
 { #category : #'accessing matrices' }
-LPAssociation >> traitOppositeOf: aTraitName [
+LPAssociationVersion10 >> traitOppositeOf: aTraitName [
 	"Retrieve the association trait not of the given name."
 	
 	firstTrait name = aTraitName 
