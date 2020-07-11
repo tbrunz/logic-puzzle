@@ -12,12 +12,11 @@ Given one of my tags, I can return the name of the trait it belongs to.
 As the above implies, every tag must be distinct, independent of trait.
 
 Every trait must have the same number of tags.
-The object that owns me tells me what this number is when I'm created.
 
 A logic puzzle contains an instance of me, and uses me to relate tags & traits.
 "
 Class {
-	#name : #LPTraitDatabase,
+	#name : #LPTraits,
 	#superclass : #Object,
 	#instVars : [
 		'tags',
@@ -32,48 +31,20 @@ Class {
 }
 
 { #category : #'class initialization' }
-LPTraitDatabase class >> initialize [
+LPTraits class >> initialize [
 	"Set universal size constraints."
 
 	MinimumNumberOfTraits := 3.
 	MinimumNumberOfTags := 2
 ]
 
-{ #category : #'instance creation' }
-LPTraitDatabase class >> newWithTraitSize: numberOfTags [
-	"Create a new trait database with the given number of trait tags."
-
-	"Validiate the parameter for type and range:"
-	self validateTraitSize: numberOfTags.
-
-	"Create a new database instance & initialize it:"
-	^ self new
-		numberOfTraitTags: numberOfTags;
-		yourself
-]
-
-{ #category : #validation }
-LPTraitDatabase class >> validateTraitSize: numberOfTags [
-	"Validate the parameter that specifies the required number of trait tags."
-
-	numberOfTags isInteger
-		ifFalse: [ self error: 'Argument must be an integer' ].
-
-	numberOfTags >= MinimumNumberOfTags
-		ifFalse: [ self
-				error:
-					'Traits must have at least ' , MinimumNumberOfTags printString
-						, ' tags' ].
-	^ numberOfTags
-]
-
 { #category : #adding }
-LPTraitDatabase >> addTrait: stringOrSymbol withTags: tagArray [
+LPTraits >> addTrait: stringOrSymbol withTags: tagArray [
 	"Create a new trait from a given symbol & array of tags."
 
 	| traitName traitTags |
 	"Accept strings or symbols for the name; convert strings to symbols."
-	traitName := LPTraitVersion10 validateTraitName: stringOrSymbol.
+	traitName := self validateTraitName: stringOrSymbol.
 
 	"Validate the trait tags for type and number; convert all to symbols:"
 	traitTags := self validateTraitTags: tagArray.
@@ -92,7 +63,7 @@ LPTraitDatabase >> addTrait: stringOrSymbol withTags: tagArray [
 ]
 
 { #category : #initialization }
-LPTraitDatabase >> initialize [
+LPTraits >> initialize [
 	"I need a pair of complementary dictionaries, so that 
 	I can refer to my data symbolically (as my user does)."
 
@@ -106,17 +77,8 @@ LPTraitDatabase >> initialize [
 	width := -1
 ]
 
-{ #category : #initialization }
-LPTraitDatabase >> numberOfTraitTags: numberOfTags [
-	"Initialize myself, creating new empty collections."
-
-	width := numberOfTags.
-	traits := Dictionary new.
-	tags := Dictionary new.
-]
-
 { #category : #accessing }
-LPTraitDatabase >> tags [
+LPTraits >> tags [
 	"The 'traits' collection is a dictionary; 
 	Its values are trait names; therefore, 
 	its keys are the tag names.  Return them."
@@ -124,21 +86,21 @@ LPTraitDatabase >> tags [
 ]
 
 { #category : #accessing }
-LPTraitDatabase >> tags: aTraitName [
+LPTraits >> tags: aTraitName [
 	"Respond with the array of tags of the given trait."
 	
 	^ tags at: aTraitName ifAbsent: [ Array ofSize: 0 ]
 ]
 
 { #category : #accessing }
-LPTraitDatabase >> trait: aTag [
+LPTraits >> trait: aTag [
 	"Respond with the trait that the given tag belongs to."
 	
 	^ traits at: aTag ifAbsent: [ #'' ]
 ]
 
 { #category : #accessing }
-LPTraitDatabase >> traits [
+LPTraits >> traits [
 	"The 'tags' collection is a dictionary; 
 	Its values are trait tags; therefore, 
 	its keys are the trait names.  Return them."
@@ -146,7 +108,7 @@ LPTraitDatabase >> traits [
 ]
 
 { #category : #validation }
-LPTraitDatabase >> validateTraitName: traitName [ 
+LPTraits >> validateTraitName: traitName [ 
 	"Validate the parameter as being a symbol or a string."
 	"If a string, render it as a valid symbol."
 	
@@ -156,12 +118,14 @@ LPTraitDatabase >> validateTraitName: traitName [
 	(traitName isString and: [ traitName isNotEmpty ])
 		ifTrue: [ ^ traitName asSymbol ] .
 	
-	self error: 'Symbol required for trait tags'
+	self error: 'Symbol required for trait identifiers'
 ]
 
 { #category : #validation }
-LPTraitDatabase >> validateTraitTags: tagArray [
+LPTraits >> validateTraitTags: tagArray [
 	"Validate an array of trait tags."
+	
+	"TODO: When 'width' is set, make sure it's large enough."
 
 	tagArray isArray
 		ifFalse: [ self error: 'Trait tags must be an array of symbols' ].
@@ -173,8 +137,9 @@ LPTraitDatabase >> validateTraitTags: tagArray [
 			
 	^ tagArray
 		collect: [ :tag | 
-			tag isSymbol ifTrue: [ tag ] ifFalse: [ 
-			(tag isString and: [ tag isNotEmpty ])
-				ifTrue: [ tag asSymbol ]
-				ifFalse: [ self error: 'Trait tags must be strings or symbols' ] ] ]
+			tag isSymbol
+				ifTrue: [ tag ]
+				ifFalse: [ (tag isString and: [ tag isNotEmpty ])
+						ifTrue: [ tag asSymbol ]
+						ifFalse: [ self error: 'Trait tags must be strings or symbols' ] ] ]
 ]

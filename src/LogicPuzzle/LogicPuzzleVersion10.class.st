@@ -36,7 +36,7 @@ Class {
 		'matrixDatabase',
 		'tripletDatabase'
 	],
-	#category : #'LogicPuzzle-Base'
+	#category : #'LogicPuzzle-Version10'
 }
 
 { #category : #'instance creation' }

@@ -10,7 +10,7 @@ LogicPuzzleVersion10CreationTest >> testAddTraitsToPuzzle [
 	
 	| puzzle |
 	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzleVersion10 newWithTraitSize: 3 .
+	puzzle := LogicPuzzle new .
 	
 	"Adding traits with 3 tags should be accepted:"
 	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
@@ -34,7 +34,7 @@ LogicPuzzleVersion10CreationTest >> testAssignTraitAssociations [
 	
 	| puzzle |
 	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzleVersion10 newWithTraitSize: 3 .
+	puzzle := LogicPuzzle new .
 	
 	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
 	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
@@ -67,24 +67,7 @@ LogicPuzzleVersion10CreationTest >> testAssignTraitAssociations [
 LogicPuzzleVersion10CreationTest >> testCreateLogicPuzzle [
 	"Test behavior of the Logic Puzzle constructor."
 	
-	"Providing a non-integer for 'traitSize' is an error:"
-	self should: [ LogicPuzzleVersion10 newWithTraitSize: 'abc' ] raise: Error .
-	self should: [ LogicPuzzleVersion10 newWithTraitSize: #( 'abc' 'xyz' ) ] raise: Error .
-	self should: [ LogicPuzzleVersion10 newWithTraitSize: #( 1 2 3 ) ] raise: Error . 
-	
-	"Floats and rationals are also no good:"
-	self should: [ LogicPuzzleVersion10 newWithTraitSize: 3.1416 ] raise: Error .
-	self should: [ LogicPuzzleVersion10 newWithTraitSize: 11/3 ] raise: Error .
-	
-	"Integers are required, but less than 2 is an error:"
-	self should: [ LogicPuzzleVersion10 newWithTraitSize: -1 ] raise: Error .
-	self should: [ LogicPuzzleVersion10 newWithTraitSize: 0 ] raise: Error .
-	self should: [ LogicPuzzleVersion10 newWithTraitSize: 1] raise: Error .
-	
-	"An integer of 2 or greater is good:"
-	self shouldnt: [ LogicPuzzleVersion10 newWithTraitSize: 2 ] raise: Error .
-	self shouldnt: [ LogicPuzzleVersion10 newWithTraitSize: 5 ] raise: Error .
-	self shouldnt: [ LogicPuzzleVersion10 newWithTraitSize: 15 ] raise: Error .
+	self shouldnt: [ LogicPuzzle new ] raise: Error .
 ]
 
 { #category : #tests }
@@ -93,7 +76,7 @@ LogicPuzzleVersion10CreationTest >> testCreatePuzzleAssociations [
 	
 	| puzzle |
 	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzleVersion10 newWithTraitSize: 3 .
+	puzzle := LogicPuzzle new .
 	
 	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
 	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
@@ -124,7 +107,7 @@ LogicPuzzleVersion10CreationTest >> testSetPrimaryTrait [
 	| puzzle |
 	
 	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzleVersion10 newWithTraitSize: 5 .
+	puzzle := LogicPuzzle new .
 	
 	puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian #Englishman #Spaniard ) .
 	puzzle addTrait: #Pet withTags: #( #Dog #Horse #Snails #Fox #Zebra ) .
@@ -147,7 +130,7 @@ LogicPuzzleVersion10CreationTest >> testSetTraitTags [
 	
 	| puzzle |
 	"We need to do this in the context of a puzzle; the puzzle does validation:"
-	puzzle := LogicPuzzleVersion10 newWithTraitSize: 3 .
+	puzzle := LogicPuzzle new .
 	
 	"Trait tags argument must be an array:"
 	self should: [ puzzle addTrait: 'abc' withTags: 'xyz' ] raise: Error .
@@ -173,7 +156,7 @@ LogicPuzzleVersion10CreationTest >> testTraitAssociationValues [
 	
 	| puzzle |
 	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzleVersion10 newWithTraitSize: 3 .
+	puzzle := LogicPuzzle new .
 	
 	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
 	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
@@ -202,7 +185,7 @@ LogicPuzzleVersion10CreationTest >> testTraitNaming [
 	
 	| puzzle |
 	"We need to do this in the context of a puzzle; the puzzle does validation:"
-	puzzle := LogicPuzzleVersion10 newWithTraitSize: 3 .
+	puzzle := LogicPuzzle new .
 	
 	"Trait names must be either a non-empty string or a symbol:"
 	self should: [ puzzle addTrait: 1 withTags: #( abc def ghi ) ] raise: Error .
