@@ -23,8 +23,8 @@ LPTraitPair >> traitOne [
 ]
 
 { #category : #accessing }
-LPTraitPair >> traitOne: anObject [
-	traitOne := anObject
+LPTraitPair >> traitOne: aTrait [
+	traitOne := aTrait
 ]
 
 { #category : #accessing }
@@ -33,6 +33,6 @@ LPTraitPair >> traitTwo [
 ]
 
 { #category : #accessing }
-LPTraitPair >> traitTwo: anObject [
-	traitTwo := anObject
+LPTraitPair >> traitTwo: aTrait [
+	traitTwo := aTrait
 ]

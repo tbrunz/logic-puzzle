@@ -32,8 +32,58 @@ Class {
 		'primaryTrait',
 		'reportLog',
 		'traitsDB',
-		'traitAssnDB',
-		'truthTableDB'
+		'traitTablesDB',
+		'tableTripletsDB'
 	],
 	#category : #'LogicPuzzle-Base'
 }
+
+{ #category : #accessing }
+LogicPuzzle >> primaryTrait [
+	^ primaryTrait
+]
+
+{ #category : #accessing }
+LogicPuzzle >> primaryTrait: aTrait [
+	primaryTrait := aTrait
+]
+
+{ #category : #accessing }
+LogicPuzzle >> reportLog [
+	^ reportLog
+]
+
+{ #category : #accessing }
+LogicPuzzle >> reportLog: aString [
+	reportLog := aString
+]
+
+{ #category : #accessing }
+LogicPuzzle >> tableTripletsDB [
+	^ tableTripletsDB
+]
+
+{ #category : #accessing }
+LogicPuzzle >> tableTripletsDB: aTripletsDB [
+	tableTripletsDB := aTripletsDB
+]
+
+{ #category : #accessing }
+LogicPuzzle >> traitTablesDB [
+	^ traitTablesDB
+]
+
+{ #category : #accessing }
+LogicPuzzle >> traitTablesDB: aTablesDB [
+	traitTablesDB := aTablesDB
+]
+
+{ #category : #accessing }
+LogicPuzzle >> traitsDB [
+	^ traitsDB
+]
+
+{ #category : #accessing }
+LogicPuzzle >> traitsDB: aTraitsDB [
+	traitsDB := aTraitsDB
+]

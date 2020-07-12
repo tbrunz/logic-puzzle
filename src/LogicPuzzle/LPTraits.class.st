@@ -24,6 +24,7 @@ Class {
 	#instVars : [
 		'tags',
 		'traits',
+		'triplets',
 		'width',
 		'minNumberOfTraits',
 		'minNumberOfTags'
@@ -163,6 +164,16 @@ LPTraits >> traitOfTag: aTagOrTagName [
 { #category : #accessing }
 LPTraits >> traits [
 	^ traits asArray 
+]
+
+{ #category : #accessing }
+LPTraits >> triplets [
+	^ triplets
+]
+
+{ #category : #accessing }
+LPTraits >> triplets: aTableTriplet [
+	triplets := aTableTriplet
 ]
 
 { #category : #validation }

@@ -1,15 +1,15 @@
 Class {
-	#name : #LPTraitAssn,
+	#name : #LPTraitTable,
 	#superclass : #Object,
 	#instVars : [
 		'traitPair',
-		'triplets'
+		'truthTable'
 	],
 	#category : #'LogicPuzzle-Base'
 }
 
 { #category : #'instance creation' }
-LPTraitAssn class >> newWith: traitOne with: traitTwo [
+LPTraitTable class >> newWith: traitOne with: traitTwo [
 	"Create a new trait association, with the given ordering."
 
 	^ self new
@@ -21,21 +21,21 @@ LPTraitAssn class >> newWith: traitOne with: traitTwo [
 ]
 
 { #category : #accessing }
-LPTraitAssn >> traitPair [
+LPTraitTable >> traitPair [
 	^ traitPair
 ]
 
 { #category : #accessing }
-LPTraitAssn >> traitPair: anObject [
-	traitPair := anObject
+LPTraitTable >> traitPair: aTraitPair [
+	traitPair := aTraitPair
 ]
 
 { #category : #accessing }
-LPTraitAssn >> triplets [
-	^ triplets
+LPTraitTable >> truthTable [
+	^ truthTable
 ]
 
 { #category : #accessing }
-LPTraitAssn >> triplets: anObject [
-	triplets := anObject
+LPTraitTable >> truthTable: aTruthTable [
+	truthTable := aTruthTable
 ]
