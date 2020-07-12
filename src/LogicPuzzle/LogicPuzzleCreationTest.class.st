@@ -35,6 +35,60 @@ LogicPuzzleCreationTest >> testCreateLogicPuzzle [
 ]
 
 { #category : #tests }
+LogicPuzzleCreationTest >> testCreatePuzzleAssociations [
+	"Test creating trait associations for a puzzle."
+	
+	| puzzle |
+	"Create a test puzzle with some traits:"
+	puzzle := LogicPuzzle new .
+	
+	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
+	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
+	self shouldnt: [ puzzle addTrait: #Pet withTags: #( #Snails #Fox #Zebra ) ] raise: Error .
+	self shouldnt: [ puzzle addTrait: #Beverage withTags: #( #Water #Tea #Coffee ) ] raise: Error .
+	self assert: (puzzle createTables) size equals: 3 .
+	
+	"Puzzle with 4 traits -> 4*3/2 = 6 associations:"
+	self shouldnt: [ puzzle addTrait: #Smokes withTags: #( #Kools #Parliaments #Chesterfields ) ] raise: Error .
+	self assert: (puzzle createTables) size equals: 6 .
+	
+	"Puzzle with 5 traits -> 5*4/2 = 10 associations:"
+	self shouldnt: [ puzzle addTrait: #House withTags: #( #Yellow #Blue #Green ) ] raise: Error .
+	self assert: (puzzle createTables) size equals: 10 .
+	
+	"Puzzle with 6 traits -> 6*5/2 = 15 associations:"
+	self shouldnt: [ puzzle addTrait: #Order withTags: #( #Left #Middle #Right ) ] raise: Error .
+	self assert: (puzzle createTables) size equals: 15 .
+	
+	"Puzzle with 7 traits --> 7*6/2 = 21 associations:"
+	self shouldnt: [ puzzle addTrait: #Food withTags: #( #Beef #Pork #Chicken ) ] raise: Error .
+	self assert: (puzzle createTables) size equals: 21 .
+]
+
+{ #category : #tests }
+LogicPuzzleCreationTest >> testSetPrimaryTrait [
+	"Test setting a primary trait."
+	| puzzle |
+	
+	"Create a test puzzle with some traits:"
+	puzzle := LogicPuzzle new .
+	
+	puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian #Englishman #Spaniard ) .
+	puzzle addTrait: #Pet withTags: #( #Dog #Horse #Snails #Fox #Zebra ) .
+	
+	"A provided trait name must be a string or symbol:"
+	self should: [ puzzle primaryTrait: 3 ] raise: Error .
+	self should: [ puzzle primaryTrait: #( 'abc' 'def' ) ] raise: Error .
+	
+	"A trait name that we don't recognize is an error:"
+	self should: [ puzzle primaryTrait: #JoeBob ] raise: Error .
+	
+	"A trait name matching a trait we know is good:"
+	self shouldnt: [ puzzle primaryTrait: 'Pet' ] raise: Error .
+	self shouldnt: [ puzzle primaryTrait: #Nationality ] raise: Error .
+]
+
+{ #category : #tests }
 LogicPuzzleCreationTest >> testSetTraitTags [
 	"Test validation of Trait tag arays when adding traits to a puzzle."
 	

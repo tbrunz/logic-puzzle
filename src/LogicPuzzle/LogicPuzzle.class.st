@@ -45,6 +45,13 @@ LogicPuzzle >> addTrait: aTraitName withTags: aTagArray [
 	traitsDB addTrait: aTraitName withTags: aTagArray
 ]
 
+{ #category : #adding }
+LogicPuzzle >> createTables [
+	"Create the set of trait tables for the puzzle."
+	
+	^ traitTablesDB 
+]
+
 { #category : #initialization }
 LogicPuzzle >> initialize [ 
 
@@ -64,8 +71,14 @@ LogicPuzzle >> primaryTrait [
 ]
 
 { #category : #accessing }
-LogicPuzzle >> primaryTrait: aTrait [
-	primaryTrait := aTrait
+LogicPuzzle >> primaryTrait: aTraitName [
+	"Can only specify a trait that we know about to be a primary."
+	
+	(traitsDB traitNames anySatisfy: [ :name | name = aTraitName ])
+		ifTrue: [ primaryTrait := aTraitName ]
+		ifFalse: [ self error: 'Unknown trait "' , aTraitName printString , '"' ].
+	
+	^ aTraitName 
 ]
 
 { #category : #accessing }
