@@ -28,6 +28,36 @@ LogicPuzzleCreationTest >> testAddTraitsToPuzzle [
 ]
 
 { #category : #tests }
+LogicPuzzleCreationTest >> testAssociateTraits [
+	"Test validating, assigning, and detecting trait associations."
+	
+	| puzzle |
+	"Create a test puzzle with some traits:"
+	puzzle := LogicPuzzle new .
+	
+	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
+	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
+	self shouldnt: [ puzzle addTrait: #Pet withTags: #( #Snails #Fox #Zebra ) ] raise: Error .
+	self shouldnt: [ puzzle addTrait: #Beverage withTags: #( #Water #Tea #Coffee ) ] raise: Error .
+	
+	"Can't make associations unless the set of associations has been created."
+	self should: [ puzzle associationOf: #Norwegian with: #Zebra is: true ] raise: Error .
+	self assert: (puzzle createAssociations) size equals: 3 .
+	
+	"Reject traits that aren't known, and trait tags that aren't part of a given trait:"
+	self should: [ puzzle associationOf: #Swedish with: #Zebra is: true ] raise: Error .
+	self should: [ puzzle associationOf: #Norwegian with: #Weasel is: true ] raise: Error .
+	
+	"Reject any trait or tag name that isn't a string or symbol:"
+	self should: [ puzzle associationOf: 3 with: #Zebra is: true ] raise: Error .
+	self should: [ puzzle associationOf: #Norwegian with: #('abc') is: true ] raise: Error .
+	
+	"Can refer to traits & their tags with strings or symbols:"
+	self shouldnt: [ puzzle associationOf: #Norwegian with: #Zebra is: true ] raise: Error .
+	self shouldnt: [ puzzle associationOf: 'Ukrainian' with: 'Tea' is: true ] raise: Error .
+]
+
+{ #category : #tests }
 LogicPuzzleCreationTest >> testCreateLogicPuzzle [
 	"Test behavior of the Logic Puzzle constructor."
 	
@@ -35,7 +65,7 @@ LogicPuzzleCreationTest >> testCreateLogicPuzzle [
 ]
 
 { #category : #tests }
-LogicPuzzleCreationTest >> testCreatePuzzleAssociations [
+LogicPuzzleCreationTest >> testCreateTraitTables [
 	"Test creating trait associations for a puzzle."
 	
 	| puzzle |
@@ -112,6 +142,34 @@ LogicPuzzleCreationTest >> testSetTraitTags [
 	"Trait tag array with correct size and elements is good:"
 	self shouldnt: [ puzzle addTrait: 'vwx' withTags: #( mn no op pq ) ] raise: Error .
 	self shouldnt: [ puzzle addTrait: 'yza' withTags: #( #qr #rs #st #tu ) ] raise: Error .
+]
+
+{ #category : #tests }
+LogicPuzzleCreationTest >> testTraitAssociations [
+	"Test that associating traits results in expected matrix values."
+	
+	| puzzle |
+	"Create a test puzzle with some traits:"
+	puzzle := LogicPuzzle new .
+	
+	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
+	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
+	self shouldnt: [ puzzle addTrait: #Pet withTags: #( #Snails #Fox #Zebra ) ] raise: Error .
+	self shouldnt: [ puzzle addTrait: #Beverage withTags: #( #Water #Tea #Coffee ) ] raise: Error .
+	self assert: (puzzle createTraitTables) size equals: 3 .
+	
+	"Can refer to traits & their tags with strings or symbols:"
+	self shouldnt: [ puzzle associationOf: #Norwegian with: #Zebra is: true ] raise: Error .
+	self shouldnt: [ puzzle associationOf: 'Ukrainian' with: 'Tea' is: false ] raise: Error .
+	
+	"Setting the same association a second time should throw an error:"
+	self should: [ puzzle associationOf: #Norwegian with: #Zebra is: true ] raise: Error .
+	self should: [ puzzle associationOf: #Norwegian with: #Zebra is: false ] raise: Error .
+	
+	"Associations should report the value they were set with; unset associations should report nil:"
+	self assert: (puzzle associationOf: #Norwegian with: #Zebra) equals: true .
+	self assert: (puzzle associationOf: #Ukrainian with: #Tea) equals: false .
+	self assert: (puzzle associationOf: #Japanese with: #Snails) equals: nil .
 ]
 
 { #category : #tests }
