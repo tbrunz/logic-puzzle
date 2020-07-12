@@ -46,23 +46,23 @@ LogicPuzzleCreationTest >> testCreatePuzzleAssociations [
 	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
 	self shouldnt: [ puzzle addTrait: #Pet withTags: #( #Snails #Fox #Zebra ) ] raise: Error .
 	self shouldnt: [ puzzle addTrait: #Beverage withTags: #( #Water #Tea #Coffee ) ] raise: Error .
-	self assert: (puzzle createTables) size equals: 3 .
+	self assert: (puzzle createTraitTables) size equals: 3 .
 	
 	"Puzzle with 4 traits -> 4*3/2 = 6 associations:"
 	self shouldnt: [ puzzle addTrait: #Smokes withTags: #( #Kools #Parliaments #Chesterfields ) ] raise: Error .
-	self assert: (puzzle createTables) size equals: 6 .
+	self assert: (puzzle createTraitTables) size equals: 6 .
 	
 	"Puzzle with 5 traits -> 5*4/2 = 10 associations:"
 	self shouldnt: [ puzzle addTrait: #House withTags: #( #Yellow #Blue #Green ) ] raise: Error .
-	self assert: (puzzle createTables) size equals: 10 .
+	self assert: (puzzle createTraitTables) size equals: 10 .
 	
 	"Puzzle with 6 traits -> 6*5/2 = 15 associations:"
 	self shouldnt: [ puzzle addTrait: #Order withTags: #( #Left #Middle #Right ) ] raise: Error .
-	self assert: (puzzle createTables) size equals: 15 .
+	self assert: (puzzle createTraitTables) size equals: 15 .
 	
 	"Puzzle with 7 traits --> 7*6/2 = 21 associations:"
 	self shouldnt: [ puzzle addTrait: #Food withTags: #( #Beef #Pork #Chicken ) ] raise: Error .
-	self assert: (puzzle createTables) size equals: 21 .
+	self assert: (puzzle createTraitTables) size equals: 21 .
 ]
 
 { #category : #tests }

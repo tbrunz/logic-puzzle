@@ -46,10 +46,31 @@ LogicPuzzle >> addTrait: aTraitName withTags: aTagArray [
 ]
 
 { #category : #adding }
-LogicPuzzle >> createTables [
+LogicPuzzle >> createTraitTables [
 	"Create the set of trait tables for the puzzle."
-	
-	^ traitTablesDB 
+
+	| allTraits traitOne traitTwo traitPair traitTable |
+	traitTablesDB := Dictionary new.
+
+	"Get the array of traits to step through systematically:"
+	allTraits := traitsDB traits.
+
+	"Step through C(n,2) = every combination of traits taken 2 at a time:"
+	1 to: allTraits size - 1 do: [ :outerIndex | 
+		traitOne := allTraits at: outerIndex.
+
+		"Step through the remaining traits in the array to pair with this one:"
+		outerIndex + 1 to: allTraits size do: [ :innerIndex | 
+			traitTwo := allTraits at: innerIndex.
+
+			"Form a table 'name' & make a new table using the two traits:"
+			traitPair := LPTraitPair newWith: traitOne with: traitTwo.
+			traitTable := LPTraitTable newWith: traitPair.
+
+			"Finally, add the new trait table to our collection:"
+			traitTablesDB add: traitPair -> traitTable ] ].
+
+	^ traitTablesDB
 ]
 
 { #category : #initialization }

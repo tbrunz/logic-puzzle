@@ -22,50 +22,55 @@ Class {
 	#name : #LPTraits,
 	#superclass : #Object,
 	#instVars : [
-		'tags',
-		'traits',
 		'triplets',
 		'width',
 		'minNumberOfTraits',
-		'minNumberOfTags'
+		'minNumberOfTags',
+		'traitsOfTags',
+		'tagsOfTraits',
+		'traits'
 	],
 	#category : #'LogicPuzzle-Base'
 }
 
 { #category : #adding }
-LPTraits >> addTrait: stringOrSymbol withTags: tagArray [
+LPTraits >> addTrait: stringOrSymbol withTags: tagNameArray [
 	"Create a new trait from a given symbol & array of tags."
 
-	| traitName traitTagNames traitTags |
-	"Accept strings or symbols for the name; convert strings to symbols."
+	| traitName trait traitTagNames traitTags |
+	"Accept strings or symbols for the name, but convert strings to symbols."
 	traitName := self validateName: stringOrSymbol.
 
-	"Validate the trait tags for type and number; convert all to symbols:"
-	traitTagNames := self validateTagArray: tagArray.
+	"Validate the trait tags for type and number; convert strings to symbols:"
+	traitTagNames := self validateTagArray: tagNameArray.
 
-	"Verify that none of the tags in the array duplicates any we already know:"
+	"Verify that none of the tags in the array duplicate any that we already know:"
 	self tagNames
 		do: [ :tagName | 
 			| tagTraitName |
 			tagTraitName := self traitOfTag: tagName.
-			(traitTagNames anySatisfy: [ :each | each = tagName and: [ traitName ~= tagTraitName ] ])
-				ifTrue: [ 
-					self
+			(traitTagNames
+				anySatisfy: [ :each | each = tagName and: [ traitName ~= tagTraitName ] ])
+				ifTrue: [ self
 						error:
 							'Duplicate tags not allowed (' , tagName , ' belongs to trait '
 								, tagTraitName , ')' ] ].
 
-	"We want the array of tags that the trait holds to be tag objects, not just names:"
-	traitTags := tagArray
-		collect: [ :each | LPTag newNamed: each ofTrait: traitName ].
+	"We want the array of tags that the trait holds to be tag objects, not just their names:"
+	traitTags := traitTagNames
+		collect: [ :tagName | LPTag newNamed: tagName ofTrait: traitName ].
 
-	"We disallow duplicate trait names, but replacing an existing trait is okay."
-	tags add: traitName -> traitTags.
+	"Create the trait, name it, and insert its tag array:"
+	trait := LPTrait newNamed: traitName withTags: traitTags.
 
-	"Add each of its tags to the traits dictionary, but pointing to a trait name, not an object:"
-	traitTagNames do: [ :tagName | traits add: tagName -> traitName ].
+	"Add the tag array to the tags dictionary, keyed by the name of their trait; 
+	Reusing an existing trait name is okay -- it just will overwrite the previous:"
+	tagsOfTraits add: traitName -> traitTags.
+
+	"For each tag, create an entry in the traits dictionary, pointing to the trait:"
+	traitTagNames do: [ :tagName | traitsOfTags add: tagName -> trait ].
 	
-	^ traitName
+	^ traits add: trait
 ]
 
 { #category : #initialization }
@@ -77,8 +82,9 @@ LPTraits >> initialize [
 
 	"Create the dictionaries for the traits and tags of this puzzle.
 	Their elements will be provided later by the user."
-	traits := Dictionary new.
-	tags := Dictionary new.
+	traits := OrderedCollection new.
+	traitsOfTags := Dictionary new.
+	tagsOfTraits := Dictionary new.
 
 	"I don't know yet what my width (number of tags per trait) will be.
 	As traits and tags are provided to me, I need to compare their number 
@@ -111,43 +117,59 @@ LPTraits >> minNumberOfTraits: anInteger [
 	minNumberOfTraits := anInteger
 ]
 
-{ #category : #accessing }
+{ #category : #lookup }
 LPTraits >> tagNames [
 	"The 'traits' collection is a dictionary; 
 	Its values are trait objects; therefore, 
 	its keys are the tag names.  Return them."
-	^ traits keys
+	^ traitsOfTags keys
+]
+
+{ #category : #lookup }
+LPTraits >> tagNamesOfTrait: aTraitOrTraitName [
+	"Respond with an array of the names of the tags of the given trait."
+
+	^ (self tagsOfTrait: aTraitOrTraitName) collect: [ :tag | tag name ]
 ]
 
 { #category : #accessing }
 LPTraits >> tags [
-	^ tags asArray 
+	^ tagsOfTraits asArray 
 ]
 
-{ #category : #accessing }
+{ #category : #lookup }
 LPTraits >> tagsOfTrait: aTraitOrTraitName [
 	"Respond with the array of tags of the given trait."
-	
+
 	| traitName |
 	"You could just ask the trait itself for its tags..."
 	aTraitOrTraitName class = LPTrait
 		ifTrue: [ ^ aTraitOrTraitName tags ].
-	
+
 	"Otherwise, all we have is a name, so we do a lookup:"
 	traitName := self validateName: aTraitOrTraitName.
 	
-	^ tags at: traitName ifAbsent: [ Array ofSize: 0 ]
+	^ tagsOfTraits
+		at: traitName
+		ifAbsent: [ self error: 'Unknown trait (' , traitName , ')' ]
 ]
 
-{ #category : #accessing }
+{ #category : #lookup }
+LPTraits >> traitNameOfTag: aTagOrTagName [
+	"Respond with the name of the trait that the given tag belongs to."
+	
+	^ (self traitOfTag: aTagOrTagName) name
+]
+
+{ #category : #lookup }
 LPTraits >> traitNames [
 	"The 'tags' collection is a dictionary; 
 	Its values are tag objects; therefore, 
 	its keys are the trait names.  Return them."
-	^ tags keys
+	^ tagsOfTraits keys
 ]
 
-{ #category : #accessing }
+{ #category : #lookup }
 LPTraits >> traitOfTag: aTagOrTagName [
 	"Respond with the trait that the given tag belongs to."
 
@@ -158,13 +180,15 @@ LPTraits >> traitOfTag: aTagOrTagName [
 	tagName := aTagOrTagName class = LPTag
 		ifTrue: [ aTagOrTagName name ]
 		ifFalse: [ self validateName: aTagOrTagName ].
-		
-	^ traits at: tagName ifAbsent: [ #'' ]
+
+	^ traitsOfTags
+		at: tagName
+		ifAbsent: [ self error: 'Unknown trait tag (' , tagName , ')' ]
 ]
 
 { #category : #accessing }
 LPTraits >> traits [
-	^ traits asArray 
+	^ traits
 ]
 
 { #category : #accessing }
