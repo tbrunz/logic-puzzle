@@ -49,7 +49,21 @@ LogicPuzzle >> addTrait: aTraitName withTags: aTagArray [
 LogicPuzzle >> associationOf: tagOne with: tagTwo [
 	"Return the association between two trait tags: either true, false, or nil."
 	
-	^ nil
+	| traitOne traitTwo traitPair traitTable |
+	"Validate and convert the tags to their traits, which determine the table:"
+	traitOne := traitsDB traitOfTag: tagOne.
+	traitTwo := traitsDB traitOfTag: tagTwo.
+	
+	"A trait pair is needed as the key to the trait tables collection:"
+	traitPair := LPTraitPair newWith: traitOne with: traitTwo.
+	
+	"We don't know if the order of the traits is correct; fix as needed:"
+	traitPair := traitPair canonicalizeFor: self traitPair.
+	
+	"Retrieve the corresponding trait table:"
+	traitTable := traitTablesDB at: traitPair.
+	
+	^ traitTable associationOf: tagOne with: tagTwo
 ]
 
 { #category : #associating }

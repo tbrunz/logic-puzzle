@@ -32,6 +32,27 @@ LPTraitTable class >> newWith: traitOne with: traitTwo [
 	^ self newWith: traitPair
 ]
 
+{ #category : #associating }
+LPTraitTable >> associationOf: aTagPair [
+	"Look up the truth table value for a tag pair: true, false, or nil."
+	
+	| tagPair |
+	"We don't know if the order of the tags is correct; fix as needed:"
+	tagPair := aTagPair canonicalizeFor: self traitPair.
+	
+	^ nil
+]
+
+{ #category : #associating }
+LPTraitTable >> associationOf: tagOne with: tagTwo [
+	"Look up the truth table value for a pair of tags: true, false, or nil."
+	
+	| tagPair |
+	tagPair := LPTagPair newWith: tagOne with: tagTwo.
+	
+	^ self associationOf: tagPair
+]
+
 { #category : #accessing }
 LPTraitTable >> hasTruesAdded [
 	^ hasTruesAdded

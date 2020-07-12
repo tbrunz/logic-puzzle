@@ -28,7 +28,7 @@ LogicPuzzleCreationTest >> testAddTraitsToPuzzle [
 ]
 
 { #category : #tests }
-LogicPuzzleCreationTest >> testAssociateTraits [
+LogicPuzzleCreationTest >> testAssociatingTraits [
 	"Test validating, assigning, and detecting trait associations."
 	
 	| puzzle |
