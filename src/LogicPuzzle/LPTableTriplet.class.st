@@ -40,6 +40,15 @@ LPTableTriplet >> leftTable: anObject [
 	leftTable := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+LPTableTriplet >> makeTriplet [
+
+		"triplets: 
+			(LPTraits traits
+				reject: [ :each | 
+					each = traitPair traitOne or: [ each = traitPair traitTwo ] ]);"
+]
+
 { #category : #accessing }
 LPTableTriplet >> rightTable [
 	^ rightTable

@@ -3,7 +3,9 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'traitPair',
-		'truthTable'
+		'truthTable',
+		'isModified',
+		'hasTruesAdded'
 	],
 	#category : #'LogicPuzzle-Base'
 }
@@ -14,11 +16,9 @@ LPTraitTable class >> newWith: traitPair [
 
 	^ self new
 		traitPair: traitPair;
-		truthTable: LPTruthTable new;
-		"triplets: 
-			(LPTraits traits
-				reject: [ :each | 
-					each = traitPair traitOne or: [ each = traitPair traitTwo ] ]);"
+		truthTable: (Array2D new: traitPair traitOne tags size);
+		isModified: false;
+		hasTruesAdded: false;
 		yourself
 ]
 
@@ -30,6 +30,26 @@ LPTraitTable class >> newWith: traitOne with: traitTwo [
 	traitPair := LPTraitPair newWith: traitOne with: traitTwo.
 	
 	^ self newWith: traitPair
+]
+
+{ #category : #accessing }
+LPTraitTable >> hasTruesAdded [
+	^ hasTruesAdded
+]
+
+{ #category : #accessing }
+LPTraitTable >> hasTruesAdded: aBoolean [
+	hasTruesAdded := aBoolean
+]
+
+{ #category : #accessing }
+LPTraitTable >> isModified [
+	^ isModified
+]
+
+{ #category : #accessing }
+LPTraitTable >> isModified: aBoolean [
+	isModified := aBoolean
 ]
 
 { #category : #accessing }

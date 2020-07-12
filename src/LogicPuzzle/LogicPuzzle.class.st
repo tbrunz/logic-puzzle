@@ -45,21 +45,21 @@ LogicPuzzle >> addTrait: aTraitName withTags: aTagArray [
 	traitsDB addTrait: aTraitName withTags: aTagArray
 ]
 
-{ #category : #adding }
+{ #category : #associating }
 LogicPuzzle >> associationOf: tagOne with: tagTwo [
 	"Return the association between two trait tags: either true, false, or nil."
 	
 	^ nil
 ]
 
-{ #category : #adding }
+{ #category : #associating }
 LogicPuzzle >> associationOf: tagOne with: tagTwo is: aBoolean [
 	"Set the association between two trait tags to either true or false."
 	
 	^ self
 ]
 
-{ #category : #adding }
+{ #category : #creating }
 LogicPuzzle >> createTraitTables [
 	"Create the set of trait tables for the puzzle."
 
