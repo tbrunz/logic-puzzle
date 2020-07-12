@@ -1,19 +1,22 @@
 "
-I represent a database of traits that describe the subjects of a logic puzzle. 
+I represent a database of traits and tags that describe the subjects 
+of a logic puzzle. 
 
 The traits I keep track of have a name, 
 e.g., #Nationality, #Color, #Sequence. 
 
-For each of my traits, I define its set of tags. 
+So do the tags I keep track of, 
 e.g., #( #Yellow, #Blue, #Red ), or #( #1, #2, #3 ). 
 
-I can also return the array of tags for one of my traits, given its name.
-Given one of my tags, I can return the name of the trait it belongs to. 
+Given a trait or trait name, I can return the array of its tags.
+Given a tag or tag name, I can return the trait that it belongs to.
+
 As the above implies, every tag must be distinct, independent of trait.
 
 Every trait must have the same number of tags.
 
-A logic puzzle contains an instance of me, and uses me to relate tags & traits.
+A logic puzzle contains one instance of me, and uses me to relate 
+tags & traits.
 "
 Class {
 	#name : #LPTraits,
@@ -21,43 +24,44 @@ Class {
 	#instVars : [
 		'tags',
 		'traits',
-		'width'
-	],
-	#classVars : [
-		'MinimumNumberOfTags',
-		'MinimumNumberOfTraits'
+		'width',
+		'minNumberOfTraits',
+		'minNumberOfTags'
 	],
 	#category : #'LogicPuzzle-Base'
 }
-
-{ #category : #'class initialization' }
-LPTraits class >> initialize [
-	"Set universal size constraints."
-
-	MinimumNumberOfTraits := 3.
-	MinimumNumberOfTags := 2
-]
 
 { #category : #adding }
 LPTraits >> addTrait: stringOrSymbol withTags: tagArray [
 	"Create a new trait from a given symbol & array of tags."
 
-	| traitName traitTags |
+	| traitName traitTagNames traitTags |
 	"Accept strings or symbols for the name; convert strings to symbols."
-	traitName := self validateTraitName: stringOrSymbol.
+	traitName := self validateName: stringOrSymbol.
 
 	"Validate the trait tags for type and number; convert all to symbols:"
-	traitTags := self validateTraitTags: tagArray.
+	traitTagNames := self validateTagArray: tagArray.
 
 	"Verify that none of the tags in the array duplicates any we already know:"
-	tags
-		do: [ :tag | 
-			(traitTags anySatisfy: [ :each | each = tag ])
-				ifTrue: [ self error: 'Duplicate tags not allowed (' , tag , ')' ] ].
+	self tagNames
+		do: [ :tagName | 
+			(traitTagNames anySatisfy: [ :each | each = tagName ])
+				ifTrue: [ | tagTraitName |
+					tagTraitName := (self traitOfTag: tagName) name.
+					self
+						error:
+							'Duplicate tags not allowed (' , tagName , ' belongs to trait '
+								, tagTraitName , ')' ] ].
 
-	"We disallow duplicate trait names, but replacing an existing trait is okay:"
-	tags add: traitName -> tagArray.
-	traitTags do: [ :tag | traits add: tag -> traitName ].
+	"We want the array of tags that the trait holds to be tag objects, not just names:"
+	traitTags := tagArray
+		collect: [ :each | LPTag newNamed: each ofTrait: traitName ].
+
+	"We disallow duplicate trait names, but replacing an existing trait is okay."
+	tags add: traitName -> traitTags.
+
+	"Add each of its tags to the traits dictionary, but pointing to a trait name, not an object:"
+	traitTagNames do: [ :tagName | traits add: tagName -> traitName ].
 	
 	^ traitName
 ]
@@ -67,79 +71,131 @@ LPTraits >> initialize [
 	"I need a pair of complementary dictionaries, so that 
 	I can refer to my data symbolically (as my user does)."
 
+	super initialize.
+
+	"Create the dictionaries for the traits and tags of this puzzle.
+	Their elements will be provided later by the user."
 	traits := Dictionary new.
 	tags := Dictionary new.
-	
+
 	"I don't know yet what my width (number of tags per trait) will be.
 	As traits and tags are provided to me, I need to compare their number 
 	to something, so start with a value that is obviously too low.
 	The first set of tags will replace my value with its size."
-	width := -1
+	width := -1.
+
+	"Set constraints for this puzzle that apply universally."
+	minNumberOfTraits := 3.
+	minNumberOfTags := 2
 ]
 
 { #category : #accessing }
-LPTraits >> tags [
+LPTraits >> minNumberOfTags [
+	^ minNumberOfTags
+]
+
+{ #category : #accessing }
+LPTraits >> minNumberOfTags: anInteger [
+	minNumberOfTags := anInteger
+]
+
+{ #category : #accessing }
+LPTraits >> minNumberOfTraits [
+	^ minNumberOfTraits
+]
+
+{ #category : #accessing }
+LPTraits >> minNumberOfTraits: anInteger [
+	minNumberOfTraits := anInteger
+]
+
+{ #category : #accessing }
+LPTraits >> tagNames [
 	"The 'traits' collection is a dictionary; 
-	Its values are trait names; therefore, 
+	Its values are trait objects; therefore, 
 	its keys are the tag names.  Return them."
 	^ traits keys
 ]
 
 { #category : #accessing }
-LPTraits >> tags: aTraitName [
+LPTraits >> tags [
+	^ tags asArray 
+]
+
+{ #category : #accessing }
+LPTraits >> tagsOfTrait: aTraitOrTraitName [
 	"Respond with the array of tags of the given trait."
 	
-	^ tags at: aTraitName ifAbsent: [ Array ofSize: 0 ]
-]
-
-{ #category : #accessing }
-LPTraits >> trait: aTag [
-	"Respond with the trait that the given tag belongs to."
+	| traitName |
+	"You could just ask the trait itself for its tags..."
+	aTraitOrTraitName class = LPTrait
+		ifTrue: [ ^ aTraitOrTraitName tags ].
 	
-	^ traits at: aTag ifAbsent: [ #'' ]
+	"Otherwise, all we have is a name, so we do a lookup:"
+	traitName := self validateName: aTraitOrTraitName.
+	
+	^ tags at: traitName ifAbsent: [ Array ofSize: 0 ]
 ]
 
 { #category : #accessing }
-LPTraits >> traits [
+LPTraits >> traitNames [
 	"The 'tags' collection is a dictionary; 
-	Its values are trait tags; therefore, 
+	Its values are tag objects; therefore, 
 	its keys are the trait names.  Return them."
 	^ tags keys
 ]
 
-{ #category : #validation }
-LPTraits >> validateTraitName: traitName [ 
-	"Validate the parameter as being a symbol or a string."
-	"If a string, render it as a valid symbol."
-	
-	traitName isSymbol 
-		ifTrue: [ ^ traitName ] .
-	
-	(traitName isString and: [ traitName isNotEmpty ])
-		ifTrue: [ ^ traitName asSymbol ] .
-	
-	self error: 'Symbol required for trait identifiers'
+{ #category : #accessing }
+LPTraits >> traitOfTag: aTagOrTagName [
+	"Respond with the trait that the given tag belongs to."
+
+	| tagName |
+	"A tag object does *not* store its trait object, only its name.
+	Therefore, we will have to do a lookup whether we're given a 
+	tag object or a tag name.  Tag objects store both names."
+	tagName := aTagOrTagName class = LPTag
+		ifTrue: [ aTagOrTagName name ]
+		ifFalse: [ self validateName: aTagOrTagName ].
+		
+	^ traits at: tagName ifAbsent: [ #'' ]
+]
+
+{ #category : #accessing }
+LPTraits >> traits [
+	^ traits asArray 
 ]
 
 { #category : #validation }
-LPTraits >> validateTraitTags: tagArray [
-	"Validate an array of trait tags."
+LPTraits >> validateName: tokenName [ 
+	"Validate the parameter as being a symbol or a string."
+	"If a string, render it as a valid symbol."
 	
-	"TODO: When 'width' is set, make sure it's large enough."
+	tokenName isSymbol 
+		ifTrue: [ ^ tokenName ] .
+	
+	(tokenName isString and: [ tokenName isNotEmpty ])
+		ifTrue: [ ^ tokenName asSymbol ] .
+	
+	self error: 'Symbol required for identifiers'
+]
 
+{ #category : #validation }
+LPTraits >> validateTagArray: tagArray [
+	"Validate an array of trait tags."
+
+	| size |
 	tagArray isArray
 		ifFalse: [ self error: 'Trait tags must be an array of symbols' ].
-		
-	tagArray size = width
-		ifFalse: [ width < 0
-				ifTrue: [ width := tagArray size ]
+	size := tagArray size.
+	
+	width < 0
+		ifTrue: [ size < minNumberOfTags
+				ifTrue: [ self
+						error: 'Traits must have at least ' , minNumberOfTags printString , ' tags' ]
+				ifFalse: [ width := size ] ]
+			
+		ifFalse: [ size = width
 				ifFalse: [ self error: 'Traits must have ' , width printString , ' tags' ] ].
 			
-	^ tagArray
-		collect: [ :tag | 
-			tag isSymbol
-				ifTrue: [ tag ]
-				ifFalse: [ (tag isString and: [ tag isNotEmpty ])
-						ifTrue: [ tag asSymbol ]
-						ifFalse: [ self error: 'Trait tags must be strings or symbols' ] ] ]
+	^ tagArray collect: [ :tag | self validateName: tag ]
 ]
