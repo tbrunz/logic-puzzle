@@ -48,7 +48,7 @@ LPTraits >> addTrait: stringOrSymbol withTags: tagArray [
 		do: [ :tagName | 
 			(traitTagNames anySatisfy: [ :each | each = tagName ])
 				ifTrue: [ | tagTraitName |
-					tagTraitName := (self traitOfTag: tagName) name.
+					tagTraitName := self traitOfTag: tagName.
 					self
 						error:
 							'Duplicate tags not allowed (' , tagName , ' belongs to trait '

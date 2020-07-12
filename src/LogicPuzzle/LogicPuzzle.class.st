@@ -38,6 +38,26 @@ Class {
 	#category : #'LogicPuzzle-Base'
 }
 
+{ #category : #adding }
+LogicPuzzle >> addTrait: aTraitName withTags: aTagArray [
+	"Create a new trait for the puzzle.  The database will do validation."
+	
+	traitsDB addTrait: aTraitName withTags: aTagArray
+]
+
+{ #category : #initialization }
+LogicPuzzle >> initialize [ 
+
+	super initialize.
+	
+	"Create the object that manages collections of traits & tags:"
+	traitsDB := LPTraits new.
+	
+	"Create a set of dictionaries to be filled in as the user adds traits:" 
+	traitTablesDB := Dictionary new.
+	tableTripletsDB := OrderedCollection new
+]
+
 { #category : #accessing }
 LogicPuzzle >> primaryTrait [
 	^ primaryTrait
