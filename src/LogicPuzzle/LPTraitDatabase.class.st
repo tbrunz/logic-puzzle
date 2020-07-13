@@ -147,7 +147,9 @@ LPTraitDatabase >> normalizeTagPair: aTagPair [
 	"Validate & check the order of the trait pair elements.
 	Swap the order of the elements as necessary."
 	
-	^ self normalizeTagPairWith: aTagPair tagOne with: aTagPair tagTwo
+	^ self 
+		normalizeTagPairWith: aTagPair tagOne 
+		with: aTagPair tagTwo
 ]
 
 { #category : #normalization }
@@ -189,15 +191,11 @@ LPTraitDatabase >> normalizeTraitPair: aTraitPair [
 ]
 
 { #category : #normalization }
-LPTraitDatabase >> normalizeTraitPairWith: nameOne with: nameTwo [
+LPTraitDatabase >> normalizeTraitPairWith: traitOne with: traitTwo [
 	"Validate & check the names, form a trait pair from them,
 	verify the trait pair exists, and return it normalized."
 
-	| traitOne traitTwo traitPairs |
-	"Extract the elements, validate them, and convert to symbols:"
-	traitOne := self validateName: nameOne.
-	traitTwo := self validateName: nameTwo.
-
+	| traitPairs |
 	"Make a set of candidate trait pairs to evaluate:"
 	traitPairs := Array
 		with: (LPTraitPair newWith: traitOne with: traitTwo)
@@ -230,10 +228,16 @@ LPTraitDatabase >> tagNamesOfTrait: aTraitOrTraitName [
 ]
 
 { #category : #creating }
-LPTraitDatabase >> tagPairWith: tagOne with: tagTwo [
+LPTraitDatabase >> tagPairWith: nameOne with: nameTwo [
 	"Create a normalized tag pair object from the given tags."
 	
-	^ self normalizeTagPairWith: tagOne with: tagTwo
+	| traitNameOne traitNameTwo |
+	traitNameOne := self validateTraitName: nameOne.
+	traitNameTwo := self validateTraitName: nameTwo.
+		
+	^ self
+		normalizeTraitPairWith: traitNameOne
+		with: traitNameTwo
 ]
 
 { #category : #lookup }
@@ -304,10 +308,17 @@ LPTraitDatabase >> traitPairFrom: aTagPair [
 ]
 
 { #category : #creating }
-LPTraitDatabase >> traitPairWith: traitOne with: traitTwo [
-	"Create a normalized trait pair object from the given traits."
+LPTraitDatabase >> traitPairWith: nameOne with: nameTwo [
+	"Create a normalized trait pair object.  Interpret the arguments 
+	as either trait objects or trait names (string or symbol)."
 	
-	^ self normalizeTraitPairWith: traitOne with: traitTwo
+	| traitNameOne traitNameTwo |
+	traitNameOne := self validateTraitName: nameOne.
+	traitNameTwo := self validateTraitName: nameTwo.
+		
+	^ self
+		normalizeTraitPairWith: traitNameOne
+		with: traitNameTwo
 ]
 
 { #category : #validation }
@@ -343,4 +354,34 @@ LPTraitDatabase >> validateTagArray: tagArray [
 				ifFalse: [ self error: 'Traits must have ' , numberOfTags printString , ' tags' ] ].
 			
 	^ tagArray collect: [ :tag | self validateName: tag ]
+]
+
+{ #category : #validation }
+LPTraitDatabase >> validateTagName: name [
+	"Validate the argument as being a symbol or a string.
+	If a string, render it as a valid symbol."
+
+	| tagName |
+	tagName := self validateName: name.
+	
+	"Verify that it's the name of a tag we know about."
+	(traitsOfTags keys includes: tagName)
+		ifTrue: [ ^ tagName ].
+	
+	self error: 'Unknown tag name (' , tagName , ')'
+]
+
+{ #category : #validation }
+LPTraitDatabase >> validateTraitName: name [
+	"Validate the argument as being a symbol or a string.
+	If a string, render it as a valid symbol."
+
+	| traitName |
+	traitName := self validateName: name.
+	
+	"Verify that it's the name of a trait we know about."
+	(tagsOfTraits keys includes: traitName)
+		ifTrue: [ ^ traitName ].
+	
+	self error: 'Unknown trait name (' , traitName , ')'
 ]
