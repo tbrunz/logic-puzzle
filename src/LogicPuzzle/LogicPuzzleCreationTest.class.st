@@ -23,7 +23,7 @@ LogicPuzzleCreationTest >> testAddTraitsToPuzzle [
 	
 	"Adding a trait with the same name as an existing one should replace, not throw an error:"
 	self assert: ((puzzle traitsDB tagsOfTrait: #Pet) at: 2) name equals: #Fox .
-	self shouldnt: [ puzzle addTrait: #Pet withTags: #( #Cat #Weasel #Zebra ) ] raise: Error .
+	self shouldnt: [ puzzle addTrait: #Pet withTags: #( #Cat #Weasel #Horse ) ] raise: Error .
 	self assert: ((puzzle traitsDB tagsOfTrait: #Pet) at: 2) name equals: #Weasel .
 ]
 
