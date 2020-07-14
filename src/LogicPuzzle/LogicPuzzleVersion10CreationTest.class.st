@@ -10,7 +10,7 @@ LogicPuzzleVersion10CreationTest >> testAddTraitsToPuzzle [
 	
 	| puzzle |
 	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzle new .
+	puzzle := LogicPuzzleVersion20 new .
 	
 	"Adding traits with 3 tags should be accepted:"
 	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
@@ -34,7 +34,7 @@ LogicPuzzleVersion10CreationTest >> testAssignTraitAssociations [
 	
 	| puzzle |
 	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzle new .
+	puzzle := LogicPuzzleVersion20 new .
 	
 	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
 	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
@@ -67,7 +67,7 @@ LogicPuzzleVersion10CreationTest >> testAssignTraitAssociations [
 LogicPuzzleVersion10CreationTest >> testCreateLogicPuzzle [
 	"Test behavior of the Logic Puzzle constructor."
 	
-	self shouldnt: [ LogicPuzzle new ] raise: Error .
+	self shouldnt: [ LogicPuzzleVersion20 new ] raise: Error .
 ]
 
 { #category : #tests }
@@ -76,7 +76,7 @@ LogicPuzzleVersion10CreationTest >> testCreatePuzzleAssociations [
 	
 	| puzzle |
 	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzle new .
+	puzzle := LogicPuzzleVersion20 new .
 	
 	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
 	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
@@ -107,7 +107,7 @@ LogicPuzzleVersion10CreationTest >> testSetPrimaryTrait [
 	| puzzle |
 	
 	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzle new .
+	puzzle := LogicPuzzleVersion20 new .
 	
 	puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian #Englishman #Spaniard ) .
 	puzzle addTrait: #Pet withTags: #( #Dog #Horse #Snails #Fox #Zebra ) .
@@ -130,7 +130,7 @@ LogicPuzzleVersion10CreationTest >> testSetTraitTags [
 	
 	| puzzle |
 	"We need to do this in the context of a puzzle; the puzzle does validation:"
-	puzzle := LogicPuzzle new .
+	puzzle := LogicPuzzleVersion20 new .
 	
 	"Trait tags argument must be an array:"
 	self should: [ puzzle addTrait: 'abc' withTags: 'xyz' ] raise: Error .
@@ -156,7 +156,7 @@ LogicPuzzleVersion10CreationTest >> testTraitAssociationValues [
 	
 	| puzzle |
 	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzle new .
+	puzzle := LogicPuzzleVersion20 new .
 	
 	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
 	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
@@ -185,7 +185,7 @@ LogicPuzzleVersion10CreationTest >> testTraitNaming [
 	
 	| puzzle |
 	"We need to do this in the context of a puzzle; the puzzle does validation:"
-	puzzle := LogicPuzzle new .
+	puzzle := LogicPuzzleVersion20 new .
 	
 	"Trait names must be either a non-empty string or a symbol:"
 	self should: [ puzzle addTrait: 1 withTags: #( abc def ghi ) ] raise: Error .

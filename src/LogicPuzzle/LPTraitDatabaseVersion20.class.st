@@ -19,7 +19,7 @@ A logic puzzle contains one instance of me, and uses me to relate
 tags & traits.
 "
 Class {
-	#name : #LPTraitDatabase,
+	#name : #LPTraitDatabaseVersion20,
 	#superclass : #Object,
 	#instVars : [
 		'minNumberOfTraits',
@@ -30,11 +30,11 @@ Class {
 		'allTraits',
 		'allTraitPairs'
 	],
-	#category : #'LogicPuzzle-Base'
+	#category : #'LogicPuzzle-Version20'
 }
 
 { #category : #creating }
-LPTraitDatabase >> addTrait: stringOrSymbol withTags: stringOrSymbolArray [
+LPTraitDatabaseVersion20 >> addTrait: stringOrSymbol withTags: stringOrSymbolArray [
 	"Create a new trait from a given symbol & array of tags."
 
 	| traitName thisTrait traitTagNames traitTags |
@@ -60,7 +60,7 @@ LPTraitDatabase >> addTrait: stringOrSymbol withTags: stringOrSymbolArray [
 		collect: [ :tagName | LPTag newNamed: tagName ofTrait: traitName ].
 
 	"Create the trait, name it, and insert its tag array:"
-	thisTrait := LPTrait newNamed: traitName withTags: traitTags.
+	thisTrait := LPAttribute newNamed: traitName withTags: traitTags.
 
 	"Add the tag array to the tags dictionary, keyed by the name of their trait; 
 	Reusing an existing trait name is okay -- it just will overwrite the previous:"
@@ -73,22 +73,22 @@ LPTraitDatabase >> addTrait: stringOrSymbol withTags: stringOrSymbolArray [
 ]
 
 { #category : #accessing }
-LPTraitDatabase >> allTags [
+LPTraitDatabaseVersion20 >> allTags [
 	^ tagsOfTraits asArray 
 ]
 
 { #category : #accessing }
-LPTraitDatabase >> allTraitPairs [
+LPTraitDatabaseVersion20 >> allTraitPairs [
 	^ allTraitPairs
 ]
 
 { #category : #accessing }
-LPTraitDatabase >> allTraits [
+LPTraitDatabaseVersion20 >> allTraits [
 	^ allTraits
 ]
 
 { #category : #initialization }
-LPTraitDatabase >> initialize [
+LPTraitDatabaseVersion20 >> initialize [
 	"I need a pair of complementary dictionaries, so that 
 	I can refer to my data symbolically (as my user does)."
 
@@ -123,27 +123,27 @@ LPTraitDatabase >> initialize [
 ]
 
 { #category : #accessing }
-LPTraitDatabase >> minNumberOfTags [
+LPTraitDatabaseVersion20 >> minNumberOfTags [
 	^ minNumberOfTags
 ]
 
 { #category : #accessing }
-LPTraitDatabase >> minNumberOfTags: anInteger [
+LPTraitDatabaseVersion20 >> minNumberOfTags: anInteger [
 	minNumberOfTags := anInteger
 ]
 
 { #category : #accessing }
-LPTraitDatabase >> minNumberOfTraits [
+LPTraitDatabaseVersion20 >> minNumberOfTraits [
 	^ minNumberOfTraits
 ]
 
 { #category : #accessing }
-LPTraitDatabase >> minNumberOfTraits: anInteger [
+LPTraitDatabaseVersion20 >> minNumberOfTraits: anInteger [
 	minNumberOfTraits := anInteger
 ]
 
 { #category : #normalization }
-LPTraitDatabase >> normalizeTagPair: aTagPair [
+LPTraitDatabaseVersion20 >> normalizeTagPair: aTagPair [
 	"Validate & check the order of the trait pair elements.
 	Swap the order of the elements as necessary."
 	
@@ -153,7 +153,7 @@ LPTraitDatabase >> normalizeTagPair: aTagPair [
 ]
 
 { #category : #normalization }
-LPTraitDatabase >> normalizeTagPairWith: nameOne with: nameTwo [
+LPTraitDatabaseVersion20 >> normalizeTagPairWith: nameOne with: nameTwo [
 	"Validate & check the names, form a corresponding normalized 
 	trait 	pair, then return the corresponding 	normalized tag pair."
 
@@ -181,7 +181,7 @@ LPTraitDatabase >> normalizeTagPairWith: nameOne with: nameTwo [
 ]
 
 { #category : #normalization }
-LPTraitDatabase >> normalizeTraitPair: aTraitPair [
+LPTraitDatabaseVersion20 >> normalizeTraitPair: aTraitPair [
 	"Validate & check the order of the trait pair elements.
 	Swap the order of the elements as necessary."
 
@@ -191,15 +191,15 @@ LPTraitDatabase >> normalizeTraitPair: aTraitPair [
 ]
 
 { #category : #normalization }
-LPTraitDatabase >> normalizeTraitPairWith: traitOne with: traitTwo [
+LPTraitDatabaseVersion20 >> normalizeTraitPairWith: traitOne with: traitTwo [
 	"Validate & check the names, form a trait pair from them,
 	verify the trait pair exists, and return it normalized."
 
 	| traitPairs |
 	"Make a set of candidate trait pairs to evaluate:"
 	traitPairs := Array
-		with: (LPTraitPair newWith: traitOne with: traitTwo)
-		with: (LPTraitPair newWith: traitTwo with: traitOne).
+		with: (LPAttributePair newWith: traitOne with: traitTwo)
+		with: (LPAttributePair newWith: traitTwo with: traitOne).
 
 	"Loop through the candidate trait pairs; if the trait pair 
 	is in the trait pairs list, return it:"
@@ -213,7 +213,7 @@ LPTraitDatabase >> normalizeTraitPairWith: traitOne with: traitTwo [
 ]
 
 { #category : #lookup }
-LPTraitDatabase >> tagNames [
+LPTraitDatabaseVersion20 >> tagNames [
 	"The 'traits' collection is a dictionary; 
 	Its values are trait objects; therefore, 
 	its keys are the tag names.  Return them."
@@ -221,14 +221,14 @@ LPTraitDatabase >> tagNames [
 ]
 
 { #category : #lookup }
-LPTraitDatabase >> tagNamesOfTrait: aTraitOrTraitName [
+LPTraitDatabaseVersion20 >> tagNamesOfTrait: aTraitOrTraitName [
 	"Respond with an array of the names of the tags of the given trait."
 
 	^ (self tagsOfTrait: aTraitOrTraitName) collect: [ :tag | tag name ]
 ]
 
 { #category : #creating }
-LPTraitDatabase >> tagPairWith: nameOne with: nameTwo [
+LPTraitDatabaseVersion20 >> tagPairWith: nameOne with: nameTwo [
 	"Create a normalized tag pair object from the given tags."
 	
 	| traitNameOne traitNameTwo |
@@ -241,12 +241,12 @@ LPTraitDatabase >> tagPairWith: nameOne with: nameTwo [
 ]
 
 { #category : #lookup }
-LPTraitDatabase >> tagsOfTrait: aTraitOrTraitName [
+LPTraitDatabaseVersion20 >> tagsOfTrait: aTraitOrTraitName [
 	"Respond with the array of tags of the given trait."
 
 	| traitName |
 	"You could just ask the trait itself for its tags..."
-	aTraitOrTraitName class = LPTrait
+	aTraitOrTraitName class = LPAttribute
 		ifTrue: [ ^ aTraitOrTraitName tags ].
 
 	"Otherwise, all we have is a name, so we do a lookup:"
@@ -258,14 +258,14 @@ LPTraitDatabase >> tagsOfTrait: aTraitOrTraitName [
 ]
 
 { #category : #lookup }
-LPTraitDatabase >> traitNameOfTag: aTagOrTagName [
+LPTraitDatabaseVersion20 >> traitNameOfTag: aTagOrTagName [
 	"Respond with the name of the trait that the given tag belongs to."
 	
 	^ (self traitOfTag: aTagOrTagName) name
 ]
 
 { #category : #lookup }
-LPTraitDatabase >> traitNames [
+LPTraitDatabaseVersion20 >> traitNames [
 	"The 'tags' collection is a dictionary; 
 	Its values are tag objects; therefore, 
 	its keys are the trait names.  Return them."
@@ -273,7 +273,7 @@ LPTraitDatabase >> traitNames [
 ]
 
 { #category : #lookup }
-LPTraitDatabase >> traitOfTag: aTagOrTagName [
+LPTraitDatabaseVersion20 >> traitOfTag: aTagOrTagName [
 	"Respond with the trait that the given tag belongs to."
 
 	| tagName |
@@ -290,7 +290,7 @@ LPTraitDatabase >> traitOfTag: aTagOrTagName [
 ]
 
 { #category : #creating }
-LPTraitDatabase >> traitPairFrom: aTagPair [
+LPTraitDatabaseVersion20 >> traitPairFrom: aTagPair [
 	"Promote the tags in a tag pair to traits & return the trait pair."
 	
 	| tagOne tagTwo traitOne traitTwo |
@@ -308,7 +308,7 @@ LPTraitDatabase >> traitPairFrom: aTagPair [
 ]
 
 { #category : #creating }
-LPTraitDatabase >> traitPairWith: nameOne with: nameTwo [
+LPTraitDatabaseVersion20 >> traitPairWith: nameOne with: nameTwo [
 	"Create a normalized trait pair object.  Interpret the arguments 
 	as either trait objects or trait names (string or symbol)."
 	
@@ -322,7 +322,7 @@ LPTraitDatabase >> traitPairWith: nameOne with: nameTwo [
 ]
 
 { #category : #validation }
-LPTraitDatabase >> validateName: tokenName [ 
+LPTraitDatabaseVersion20 >> validateName: tokenName [ 
 	"Validate the parameter as being a symbol or a string."
 	"If a string, render it as a valid symbol."
 	
@@ -336,7 +336,7 @@ LPTraitDatabase >> validateName: tokenName [
 ]
 
 { #category : #validation }
-LPTraitDatabase >> validateTagArray: tagArray [
+LPTraitDatabaseVersion20 >> validateTagArray: tagArray [
 	"Validate an array of trait tags."
 
 	| size |
@@ -357,7 +357,7 @@ LPTraitDatabase >> validateTagArray: tagArray [
 ]
 
 { #category : #validation }
-LPTraitDatabase >> validateTagName: name [
+LPTraitDatabaseVersion20 >> validateTagName: name [
 	"Validate the argument as being a symbol or a string.
 	If a string, render it as a valid symbol."
 
@@ -372,7 +372,7 @@ LPTraitDatabase >> validateTagName: name [
 ]
 
 { #category : #validation }
-LPTraitDatabase >> validateTraitName: name [
+LPTraitDatabaseVersion20 >> validateTraitName: name [
 	"Validate the argument as being a symbol or a string.
 	If a string, render it as a valid symbol."
 

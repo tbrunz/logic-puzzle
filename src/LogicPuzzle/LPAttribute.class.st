@@ -15,7 +15,7 @@ A logic puzzle contains many instances of me, as I am the focus
 of all elements of a puzzle.
 "
 Class {
-	#name : #LPTrait,
+	#name : #LPAttribute,
 	#superclass : #Object,
 	#instVars : [
 		'name',
@@ -25,31 +25,31 @@ Class {
 }
 
 { #category : #'instance creation' }
-LPTrait class >> newNamed: aTraitName withTags: aTagArray [
-	"Create a new trait object; the names must already be validated."
+LPAttribute class >> newNamed: anAttributeName withTags: aTagArray [
+	"Create a new attribute object; the name must already be validated."
 
 	^ self new 
-		name: aTraitName;
+		name: anAttributeName;
 		tags: aTagArray;
 		yourself
 ]
 
 { #category : #accessing }
-LPTrait >> name [
+LPAttribute >> name [
 	^ name
 ]
 
 { #category : #accessing }
-LPTrait >> name: aStringOrSymbol [
+LPAttribute >> name: aStringOrSymbol [
 	name := aStringOrSymbol asSymbol
 ]
 
 { #category : #accessing }
-LPTrait >> tags [
+LPAttribute >> tags [
 	^ tags
 ]
 
 { #category : #accessing }
-LPTrait >> tags: aTagArray [
+LPAttribute >> tags: aTagArray [
 	tags := aTagArray
 ]

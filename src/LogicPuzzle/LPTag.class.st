@@ -23,19 +23,29 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'name',
-		'traitName'
+		'attribute'
 	],
 	#category : #'LogicPuzzle-Base'
 }
 
 { #category : #'instance creation' }
-LPTag class >> newNamed: aTagName ofTrait: aTraitName [
-	"Create a new tag object; the names must already be validated."
+LPTag class >> newNamed: aTagName ofAttribute: anAttribute [
+	"Create a new tag object; the name must already be validated."
 
 	^ self new 
 		name: aTagName;
-		traitName: aTraitName;
+		traitName: anAttribute;
 		yourself
+]
+
+{ #category : #accessing }
+LPTag >> attribute [
+	^ attribute
+]
+
+{ #category : #accessing }
+LPTag >> attribute: anAttribute [
+	attribute := anAttribute 
 ]
 
 { #category : #accessing }
@@ -46,14 +56,4 @@ LPTag >> name [
 { #category : #accessing }
 LPTag >> name: aStringOrSymbol [
 	name := aStringOrSymbol asSymbol
-]
-
-{ #category : #accessing }
-LPTag >> traitName [
-	^ traitName
-]
-
-{ #category : #accessing }
-LPTag >> traitName: aTraitName [
-	traitName := aTraitName
 ]

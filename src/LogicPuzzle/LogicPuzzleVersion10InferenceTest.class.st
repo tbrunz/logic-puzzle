@@ -10,7 +10,7 @@ LogicPuzzleVersion10InferenceTest >> testDeduceFalseMatches [
 	
 	| puzzle assn |
 	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzle new .
+	puzzle := LogicPuzzleVersion20 new .
 	
 	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
 	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
@@ -67,7 +67,7 @@ LogicPuzzleVersion10InferenceTest >> testDeduceTrueMatches [
 	
 	| puzzle assn |
 	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzle new .
+	puzzle := LogicPuzzleVersion20 new .
 	
 	"Puzzle with 4 traits -> 4*3/2 = 6 associations:"
 	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian #Englishman ) ] raise: Error .
@@ -134,7 +134,7 @@ LogicPuzzleVersion10InferenceTest >> testVettingAssociations [
 	
 	| puzzle assnNatBev assnNatPet assnBevPet |
 	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzle new .
+	puzzle := LogicPuzzleVersion20 new .
 	
 	"Puzzle with 4 traits -> 4*3/2 = 6 associations:"
 	self shouldnt: [ puzzle addTrait: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian #Englishman ) ] raise: Error .

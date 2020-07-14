@@ -26,7 +26,7 @@ Example:
 	zebraPuzzle printAssociation: #Nationality vs: #Pet .
 "
 Class {
-	#name : #LogicPuzzle,
+	#name : #LogicPuzzleVersion20,
 	#superclass : #Object,
 	#instVars : [
 		'primaryTrait',
@@ -35,25 +35,25 @@ Class {
 		'tableTripletsDB',
 		'traitDatabase'
 	],
-	#category : #'LogicPuzzle-Base'
+	#category : #'LogicPuzzle-Version20'
 }
 
 { #category : #adding }
-LogicPuzzle >> addTrait: aTraitName withTags: aTagArray [
+LogicPuzzleVersion20 >> addTrait: aTraitName withTags: aTagArray [
 	"Create a new trait for the puzzle.  The database will do validation."
 	
 	traitDatabase addTrait: aTraitName withTags: aTagArray
 ]
 
 { #category : #associating }
-LogicPuzzle >> associationOf: aTagPair [
+LogicPuzzleVersion20 >> associationOf: aTagPair [
 	"Look up the truth table value for a tag pair: true, false, or nil."
 	
 	^ self associationOf: aTagPair tagOne with: aTagPair tagTwo
 ]
 
 { #category : #associating }
-LogicPuzzle >> associationOf: tagOne with: tagTwo [
+LogicPuzzleVersion20 >> associationOf: tagOne with: tagTwo [
 	"Return the association between two trait tags: either true, false, or nil."
 
 	| traitPair tagPair traitTable |
@@ -69,7 +69,7 @@ LogicPuzzle >> associationOf: tagOne with: tagTwo [
 ]
 
 { #category : #associating }
-LogicPuzzle >> associationOf: tagOne with: tagTwo is: aBoolean [
+LogicPuzzleVersion20 >> associationOf: tagOne with: tagTwo is: aBoolean [
 	"Set the association between two trait tags to either true or false."
 
 	| traitPair tagPair traitTable |
@@ -85,7 +85,7 @@ LogicPuzzle >> associationOf: tagOne with: tagTwo is: aBoolean [
 ]
 
 { #category : #creating }
-LogicPuzzle >> createTraitTables [
+LogicPuzzleVersion20 >> createTraitTables [
 	"Create the set of trait tables for the puzzle."
 
 	| allTraits traitOne traitTwo traitPair traitTable |
@@ -104,7 +104,7 @@ LogicPuzzle >> createTraitTables [
 
 			"Form a table 'name' & make a new table using the two traits:"
 			traitPair := traitDatabase traitPairWith: traitOne with: traitTwo.
-			traitTable := LPTraitTable newWith: traitPair.
+			traitTable := LPRelationship newWith: traitPair.
 
 			"Finally, add the new trait table to our collection:"
 			traitTablesDB add: traitPair -> traitTable ] ].
@@ -113,12 +113,12 @@ LogicPuzzle >> createTraitTables [
 ]
 
 { #category : #initialization }
-LogicPuzzle >> initialize [ 
+LogicPuzzleVersion20 >> initialize [ 
 
 	super initialize.
 	
 	"Create the object that manages collections of traits & tags:"
-	traitDatabase := LPTraitDatabase new.
+	traitDatabase := LPTraitDatabaseVersion20 new.
 	
 	"Create a set of dictionaries to be filled in as the user adds traits:" 
 	traitTablesDB := Dictionary new.
@@ -126,12 +126,12 @@ LogicPuzzle >> initialize [
 ]
 
 { #category : #accessing }
-LogicPuzzle >> primaryTrait [
+LogicPuzzleVersion20 >> primaryTrait [
 	^ primaryTrait
 ]
 
 { #category : #accessing }
-LogicPuzzle >> primaryTrait: aTraitName [
+LogicPuzzleVersion20 >> primaryTrait: aTraitName [
 	"Can only specify a trait that we know about to be a primary."
 	
 	(traitDatabase traitNames anySatisfy: [ :name | name = aTraitName ])
@@ -142,41 +142,41 @@ LogicPuzzle >> primaryTrait: aTraitName [
 ]
 
 { #category : #accessing }
-LogicPuzzle >> reportLog [
+LogicPuzzleVersion20 >> reportLog [
 	^ reportLog
 ]
 
 { #category : #accessing }
-LogicPuzzle >> reportLog: aString [
+LogicPuzzleVersion20 >> reportLog: aString [
 	reportLog := aString
 ]
 
 { #category : #accessing }
-LogicPuzzle >> tableTripletsDB [
+LogicPuzzleVersion20 >> tableTripletsDB [
 	^ tableTripletsDB
 ]
 
 { #category : #accessing }
-LogicPuzzle >> tableTripletsDB: aTripletsDB [
+LogicPuzzleVersion20 >> tableTripletsDB: aTripletsDB [
 	tableTripletsDB := aTripletsDB
 ]
 
 { #category : #accessing }
-LogicPuzzle >> traitTablesDB [
+LogicPuzzleVersion20 >> traitTablesDB [
 	^ traitTablesDB
 ]
 
 { #category : #accessing }
-LogicPuzzle >> traitTablesDB: aTablesDB [
+LogicPuzzleVersion20 >> traitTablesDB: aTablesDB [
 	traitTablesDB := aTablesDB
 ]
 
 { #category : #accessing }
-LogicPuzzle >> traitsDB [
+LogicPuzzleVersion20 >> traitsDB [
 	^ traitDatabase
 ]
 
 { #category : #accessing }
-LogicPuzzle >> traitsDB: aTraitsDB [
+LogicPuzzleVersion20 >> traitsDB: aTraitsDB [
 	traitDatabase := aTraitsDB
 ]
