@@ -23,8 +23,8 @@ LPTagPair >> tagOne [
 ]
 
 { #category : #accessing }
-LPTagPair >> tagOne: anObject [
-	tagOne := anObject
+LPTagPair >> tagOne: aTag [
+	tagOne := aTag
 ]
 
 { #category : #accessing }
@@ -33,6 +33,6 @@ LPTagPair >> tagTwo [
 ]
 
 { #category : #accessing }
-LPTagPair >> tagTwo: anObject [
-	tagTwo := anObject
+LPTagPair >> tagTwo: aTag [
+	tagTwo := aTag
 ]

@@ -16,23 +16,38 @@ Class {
 LPRelationship class >> newWith: attributePair [
 	"Create a new trait table instance for the given trait pair."
 	
-	"TODO: create the tagIndices array from the attribute pair tag arrays"
-
-	^ self new
-		attributePair: attributePair;
-		truthTable: (Array2D new: attributePair attributeOne tags size);
-		tagIndices: OrderedCollection new;
-		truePairs: OrderedCollection new;
-		isModified: false;
-		hasTruesAdded: false;
-		yourself
+	^ self 
+		newWith: attributePair attributeOne with: attributePair attributeTwo 
 ]
 
 { #category : #'instance creation' }
 LPRelationship class >> newWith: attributeOne with: attributeTwo [
 	"Create a new relationship instance for the given attributes."
 
-	^ self newWith: (LPAttributePair newWith: attributeOne with: attributeTwo)
+	| count indices |
+	"Make a dictionary to map tags to their corresponding matrix indices:"
+	count := attributeOne tags size.
+	indices := Dictionary new.
+	
+	"Note that tags are unique, even between attributes; matrix indices aren't.
+	This is because the truth table is 2D, so the index ranges are the same.
+	We'll need to address the truth table with a pair of tags.  There's a 
+	1D Dictionary, but not a 2D dictionary, so we'll need the combination 
+	of a Dictionary and an Array2D to make the mapping."
+	1 to: count do: [ :i | 
+		indices add: (attributeOne tags at: i) -> i.
+		indices add: (attributeTwo tags at: i) -> i ].
+	
+	^ self new
+		truthTable: (Array2D new: count);
+		
+		tagIndices: indices;
+		truePairs: OrderedCollection new;
+		
+		isModified: false;
+		hasTruesAdded: false;
+		
+		yourself
 ]
 
 { #category : #accessing }
@@ -65,21 +80,21 @@ LPRelationship >> isModified: aBoolean [
 	isModified := aBoolean
 ]
 
-{ #category : #associating }
+{ #category : #relationship }
 LPRelationship >> relationOf: aTagPair [
 	"Look up the truth table value for a tag pair: true, false, or nil."
 	
 	^ self relationOf: aTagPair tagOne with: aTagPair tagTwo
 ]
 
-{ #category : #associating }
+{ #category : #relationship }
 LPRelationship >> relationOf: aTagPair is: aBoolean [
 	"Set the truth table value for a tag pair: true, false, or nil."
 	
 	^ self relationOf: aTagPair tagOne with: aTagPair tagTwo
 ]
 
-{ #category : #associating }
+{ #category : #relationship }
 LPRelationship >> relationOf: tagOne with: tagTwo [
 	"Look up the truth table value for a pair of tags: true, false, or nil."
 	
