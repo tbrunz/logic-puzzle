@@ -79,6 +79,19 @@ LPRelationship >> attributePair: anObject [
 ]
 
 { #category : #deductions }
+LPRelationship >> deduceFalseRelations [
+	"Walk each tag of each attribute in the truth table, looking for a single 'true'."
+
+	| indexOne indexTwo |
+	truePairs do: [ :pair |
+		indexOne := pair at: 1.
+		indexTwo := pair at: 2.
+		
+		self ruleOutRelationAt: indexOne at: indexTwo.
+		]
+]
+
+{ #category : #deductions }
 LPRelationship >> deduceTrueRelations [
 	"Walk each tag of each attribute in the truth table, looking for N-1 'falses'."
 
@@ -87,7 +100,8 @@ LPRelationship >> deduceTrueRelations [
 		indexOne := self indexOfNilInOneAt: index.
 		indexTwo := self indexOfNilInTwoAt: index.
 		
-		self relateTagsAt: indexOne at: indexTwo
+		self relateTagsAt: indexOne at: index.
+		self relateTagsAt: index at: indexTwo
 		]
 ]
 
@@ -184,7 +198,7 @@ LPRelationship >> relateTagsAt: indexOne at: indexTwo [
 	truthTable at: indexOne at: indexTwo put: true.
 	self isModified: true.
 	self hasTruesAdded: true.
-	truePairs add: (Point x: indexOne y: indexTwo)
+	truePairs add: (Array with: indexOne with: indexTwo)
 ]
 
 { #category : #relationship }
