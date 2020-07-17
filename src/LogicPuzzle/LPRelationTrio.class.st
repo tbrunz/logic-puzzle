@@ -29,6 +29,36 @@ Class {
 	#category : #'LogicPuzzle-Base'
 }
 
+{ #category : #'instance creation' }
+LPRelationTrio class >> newFrom: attributeTrio for: commonAttribute using: relationDictionary [
+	"Form an relationship trio from the given attributes."
+
+	| centerPair leftPair rightPair |
+	"Which attributes in the trio are not the common attribute?"
+	centerPair := attributeTrio
+		reject: [ :attribute | attribute = commonAttribute ].
+
+	"Form the other two possible attribute pairings as AttributePairs:"
+	leftPair := LPAttributePair
+		newWith: (centerPair at: 1)
+		with: commonAttribute.
+	rightPair := LPAttributePair
+		newWith: commonAttribute
+		with: (centerPair at: 2).
+
+	"And then turn the center pair into a AttributePair as well; 
+	the AttributePairs are keys into the Relationship dictionary."
+	centerPair := LPAttributePair newWith: centerPair.
+
+	"Now create an instance and fill in its instance variables:"
+	^ self new
+		commonAttribute: commonAttribute;
+		leftRelation: (relationDictionary at: leftPair);
+		rightRelation: (relationDictionary at: rightPair);
+		centerRelation: (relationDictionary at: centerPair);
+		yourself
+]
+
 { #category : #accessing }
 LPRelationTrio >> centerRelation [
 	^ centerRelation

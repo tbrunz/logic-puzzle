@@ -92,7 +92,7 @@ LPRelationship class >> newWith: attributeOne with: attributeTwo [
 		tagsTwo: tagsTwo;
 		
 		tagIndices: indices;
-		truePairs: OrderedCollection new;
+		matchPairs: OrderedCollection new;
 		
 		isModified: false;
 		hasTruesAdded: false;
@@ -235,6 +235,16 @@ LPRelationship >> isModified [
 { #category : #accessing }
 LPRelationship >> isModified: aBoolean [
 	isModified := aBoolean
+]
+
+{ #category : #accessing }
+LPRelationship >> matchPairs [
+	^ matchPairs
+]
+
+{ #category : #accessing }
+LPRelationship >> matchPairs: anObject [
+	matchPairs := anObject
 ]
 
 { #category : #indexing }
@@ -403,16 +413,6 @@ LPRelationship >> trueIndexOfTwoAt: indexOne [
 		trueIndex := self nextTrueAfter: trueIndex for: truth at: indexTwo ].
 	
 	^ trueIndex
-]
-
-{ #category : #accessing }
-LPRelationship >> truePairs [
-	^ matchPairs
-]
-
-{ #category : #accessing }
-LPRelationship >> truePairs: anObject [
-	matchPairs := anObject
 ]
 
 { #category : #accessing }
