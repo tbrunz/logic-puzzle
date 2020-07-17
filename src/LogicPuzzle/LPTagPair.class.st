@@ -1,3 +1,10 @@
+"
+I represent an ordered pair of tags that represent a relationship 
+between two attributes values for the subjects of a logic puzzle. 
+
+I can be used to refer to truth table cell in a Relationship.
+See the comment for 'LPTag' for more information about me.
+"
 Class {
 	#name : #LPTagPair,
 	#superclass : #Object,

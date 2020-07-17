@@ -1,3 +1,35 @@
+"
+I represent a relationship between two attributes of subjects 
+of a logic puzzle. 
+
+The attributes in a logic puzzle have names, 
+e.g., #Nationality, #Color, #Sequence. 
+
+Each of these attributes defines a set of tags, its values. 
+e.g., #( #Yellow, #Blue, #Red ), or #( #1, #2, #3 ). 
+
+I manage a 'truth table' that matches up the tags of one attribute 
+against those of the second attribute.  Each truth table value 
+can be 'nil', 'true', or 'false'.  ('nil' means the relationship 
+between the two tags is indeterminate.)
+
+I can get or set a truth table cell value, or the entire truth 
+table.  I can also return an array of all the 'true' cell 
+coordinates.
+
+I know how to peform deductive analyses on my truth table, to 
+deduce 'true' relations and 'excluded' relations.  I can update 
+my truth table accordingly, and track when I make modifications 
+and when I detect inconsistencies.
+
+A logic puzzle contains C(m,2) instances of me (where 'm' is the 
+number of attributes in the puzzle), in the form of a dictionary 
+keyed by an AttributePair.  And since the ordering of attributes 
+is important for how my truth table is stored, my dictionary has 
+P(m,2) elements; half its elements are for (a,b) ordering, and 
+half are for (b,a) ordering, but both point to the single (a,b) 
+Relationship.
+"
 Class {
 	#name : #LPRelationship,
 	#superclass : #Object,

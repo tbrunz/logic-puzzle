@@ -1,10 +1,10 @@
 "
-I represent a trait that describes the subjects of a logic puzzle. 
+I represent an attribute used to describe the subjects of a logic puzzle. 
 
-The traits I keep track of have a name, 
+The attributes I keep track of have a name, 
 e.g., #Nationality, #Color, #Sequence. 
 
-For each of my traits, I define its set of tags. 
+Each attribute has a set of tags defined for it. 
 e.g., #( #Yellow, #Blue, #Red ), or #( #1, #2, #3 ). 
 
 I can return my array of tags, or one of my tags, given its name.
