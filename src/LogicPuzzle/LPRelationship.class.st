@@ -7,10 +7,10 @@ Class {
 		'hasTruesAdded',
 		'isInconsistent',
 		'tagIndices',
-		'truePairs',
 		'attributePair',
 		'tagsOne',
-		'tagsTwo'
+		'tagsTwo',
+		'matchPairs'
 	],
 	#category : #'LogicPuzzle-Base'
 }
@@ -68,21 +68,21 @@ LPRelationship class >> newWith: attributeOne with: attributeTwo [
 		yourself
 ]
 
-{ #category : #deductions }
-LPRelationship >> addTruePairAt: indexOne at: indexTwo [
+{ #category : #indexing }
+LPRelationship >> addMatchPairAt: indexOne at: indexTwo [
 	"If the indices are valid, add this pair to the true pairs collection."
 
-	"A 'nil' index means this relationship is currently indeterminate."
+	"A 'nil' index means this relationship is currently indeterminate,
+	so return without doing anything in this case."
 	indexOne ifNil: [ ^ self ].
 	indexTwo ifNil: [ ^ self ].
-
-	"An index of zero means multiple tags of an attribute were 'true'."
-	(indexOne < 1 or: [ indexTwo < 1 ])
-		ifTrue: [ isInconsistent := true.
-			^ truePairs ].
-
-	"Otherwise, we have the table entry of a 'true' by deduction."
-	truePairs add: (Array with: indexOne with: indexTwo)
+	
+	"If both indices are non-zero, then we have the table cell of a 'true'.
+	If even one index was zero, then multiple tags of that 	attribute were 
+	found to be 'true'; this is an inconsistency."
+	(indexOne > 0 and: [ indexTwo > 0 ])
+		ifTrue: [ matchPairs add: (Array with: indexOne with: indexTwo) ]
+		ifFalse: [ isInconsistent := true ]
 ]
 
 { #category : #accessing }
@@ -96,45 +96,82 @@ LPRelationship >> attributePair: anObject [
 ]
 
 { #category : #deductions }
-LPRelationship >> deduceFalseRelations [
-	"For each true tag pairing, make all others in each attribute 'false'."
+LPRelationship >> deduceExcludedRelations [
+	"For each 'true' tag pairing, make all others in each attribute 'false'."
 
 	| indexOne indexTwo |
-	self findTrueRelations.
+	self findMatchedRelations.
 
-	"Now that we have a list of all 'trues', walk their attributes:"
-	truePairs
+	"Now that we have a list of all 'trues', walk their attributes, 
+	and set each pair that isn't the 'true' coordinates to 'false'."
+	matchPairs
 		do: [ :pair | 
 			indexOne := pair at: 1.
 			indexTwo := pair at: 2.
-			self unRelateTagsAt: indexOne at: indexTwo ]
+			self excludeRelationAround: indexOne at: indexTwo ]
 ]
 
 { #category : #deductions }
-LPRelationship >> deduceTrueRelations [
+LPRelationship >> deduceMatchedRelations [
 	"Walk each tag of each attribute in the truth table, looking for N-1 'falses'."
 
 	| indexOne indexTwo |
 	1 to: truthTable numberOfRows do: [ :index |
-		indexOne := self indexOfNilInOneAt: index.
-		indexTwo := self indexOfNilInTwoAt: index.
+		indexOne := self nilIndexOfOneAt: index.
+		indexTwo := self nilIndexOfTwoAt: index.
 		
-		self relateTagsAt: indexOne at: index.
-		self relateTagsAt: index at: indexTwo
+		self matchRelationOf: indexOne at: index.
+		self matchRelationOf: index at: indexTwo
 		]
 ]
 
+{ #category : #indexing }
+LPRelationship >> excludeAttributeOneAt: indexTwo [
+	"Hold indexTwo constant and walk attributeOne to set 'nil' cells 'false'."
+
+	"If we change a cell from 'nil' to 'false', mark this table 'modified'."
+	1 to: truthTable numberOfRows do: [ :indexOne | 
+		(truthTable at: indexOne at: indexTwo)
+			ifNil: [ truthTable at: indexOne at: indexTwo put: false.
+				self isModified: true ] ]
+]
+
+{ #category : #indexing }
+LPRelationship >> excludeAttributeTwoAt: indexOne [
+	"Hold indexTwo constant and walk attributeOne to set 'nil' cells 'false'."
+
+	"If we change a cell from 'nil' to 'false', mark this table 'modified'."
+	1 to: truthTable numberOfRows do: [ :indexTwo | 
+		(truthTable at: indexOne at: indexTwo)
+			ifNil: [ truthTable at: indexOne at: indexTwo put: false.
+				self isModified: true ] ]
+]
+
+{ #category : #indexing }
+LPRelationship >> excludeRelationAround: indexOne at: indexTwo [
+	"Walk each of the attributes for the indices, making each 'false'."
+
+	"Hold indexOne constant and walk attributeTwo, setting all 'nil' cells  
+	'false'.  Then hold indexTwo constant and repeat for attributeOne."
+	self excludeAttributeOneAt: indexTwo.
+	self excludeAttributeTwoAt: indexOne.
+	
+	"Otherwise, we have the table entry of a 'true' by deduction; set it."
+	truthTable at: indexOne at: indexTwo put: false.
+	self isModified: true
+]
+
 { #category : #deductions }
-LPRelationship >> findTrueRelations [
+LPRelationship >> findMatchedRelations [
 	"Scan the truth table to find all the 'true' relationships."
 	
 	| indexOne indexTwo |
 	1 to: truthTable numberOfRows do: [ :index |
-		indexOne := self indexOfTrueInOneAt: index.
-		indexTwo := self indexOfTrueInTwoAt: index.
+		indexOne := self trueIndexOfOneAt: index.
+		indexTwo := self trueIndexOfTwoAt: index.
 		
-		self addTruePairAt: indexOne at: index.
-		self addTruePairAt: index at: indexTwo
+		self addMatchPairAt: indexOne at: index.
+		self addMatchPairAt: index at: indexTwo
 		]
 ]
 
@@ -146,66 +183,6 @@ LPRelationship >> hasTruesAdded [
 { #category : #accessing }
 LPRelationship >> hasTruesAdded: aBoolean [
 	hasTruesAdded := aBoolean
-]
-
-{ #category : #deductions }
-LPRelationship >> indexOfNilInOneAt: indexTwo [
-	"Scan attributeOne x indexTwo in the truth table for 1 nil + N-1 falses."
-
-	| truth nilIndex |
-	nilIndex := 0.
-
-	"Return indexOne of a lone nil, or nil if not found."
-	1 to: truthTable numberOfRows do: [ :indexOne | 
-		truth := truthTable at: indexOne at: indexTwo.
-		nilIndex := self nextNilAfter: nilIndex for: truth at: indexOne ].
-	
-	^ nilIndex
-]
-
-{ #category : #deductions }
-LPRelationship >> indexOfNilInTwoAt: indexOne [
-	"Scan indexOne x attributeTwo in the truth table for 1 nil + N-1 falses."
-
-	| truth nilIndex |
-	nilIndex := 0.
-
-	"Return indexTwo of a lone nil, or nil if not found."
-	1 to: truthTable numberOfColumns do: [ :indexTwo | 
-		truth := truthTable at: indexOne at: indexTwo.
-		nilIndex := self nextNilAfter: nilIndex for: truth at: indexTwo ].
-	
-	^ nilIndex
-]
-
-{ #category : #deductions }
-LPRelationship >> indexOfTrueInOneAt: indexTwo [
-	"Scan attributeOne x indexTwo in the truth table for 1 'true'."
-
-	| truth trueIndex |
-	trueIndex := nil.
-
-	"Return indexOne of a lone nil, or nil if not found."
-	1 to: truthTable numberOfRows do: [ :indexOne | 
-		truth := truthTable at: indexOne at: indexTwo.
-		trueIndex := self nextTrueAfter: trueIndex for: truth at: indexOne ].
-	
-	^ trueIndex
-]
-
-{ #category : #deductions }
-LPRelationship >> indexOfTrueInTwoAt: indexOne [
-	"Scan indexOne x attributeTwo in the truth table for 1 'true'."
-
-	| truth trueIndex |
-	trueIndex := nil.
-
-	"Return indexOne of a lone nil, or nil if not found."
-	1 to: truthTable numberOfColumns do: [ :indexTwo | 
-		truth := truthTable at: indexOne at: indexTwo.
-		trueIndex := self nextTrueAfter: trueIndex for: truth at: indexTwo ].
-	
-	^ trueIndex
 ]
 
 { #category : #accessing }
@@ -228,39 +205,8 @@ LPRelationship >> isModified: aBoolean [
 	isModified := aBoolean
 ]
 
-{ #category : #deductions }
-LPRelationship >> nextNilAfter: nilIndex for: truth at: index [
-	"Compare a value in the truth table, looking for 1 nil + N-1 falses."
-
-	"if an earlier failure occurred, propogate the failure."
-	nilIndex ifNil: [ ^ nil ].
-
-	"Check this cell in the truth table to decide what to propagate."
-	truth
-		ifNil: [ nilIndex > 0
-				ifTrue: [ ^ nil ]
-				ifFalse: [ ^ index ] ]
-		ifNotNil: [ truth
-				ifTrue: [ ^ nil ] ]
-]
-
-{ #category : #deductions }
-LPRelationship >> nextTrueAfter: trueIndex for: truth at: index [
-	"Compare a value in the truth table, looking for 1 'true'."
-
-	"if an earlier failure occurred, propogate the failure."
-	trueIndex = 0
-		ifTrue: [ ^ 0 ].
-
-	"Check this cell in the truth table to decide what to propagate."
-	truth
-		ifTrue: [ trueIndex ifNil: [ ^ index ] ifNotNil: [ ^ 0 ] ].
-
-	^ trueIndex
-]
-
-{ #category : #deductions }
-LPRelationship >> relateTagsAt: indexOne at: indexTwo [
+{ #category : #indexing }
+LPRelationship >> matchRelationOf: indexOne at: indexTwo [
 	"If the indices are valid, make a 'true' relationship in the truth table."
 
 	"A 'nil' index means this relationship is currently indeterminate."
@@ -276,6 +222,67 @@ LPRelationship >> relateTagsAt: indexOne at: indexTwo [
 	truthTable at: indexOne at: indexTwo put: true.
 	self isModified: true.
 	self hasTruesAdded: true.
+]
+
+{ #category : #indexing }
+LPRelationship >> nextNilAfter: nilIndex for: truth at: index [
+	"Compare a value in the truth table, looking for 1 nil + N-1 falses."
+
+	"if an earlier failure occurred, propogate the failure."
+	nilIndex ifNil: [ ^ nil ].
+
+	"Check this cell in the truth table to decide what to propagate."
+	truth
+		ifNil: [ nilIndex > 0
+				ifTrue: [ ^ nil ]
+				ifFalse: [ ^ index ] ]
+		ifNotNil: [ truth
+				ifTrue: [ ^ nil ] ]
+]
+
+{ #category : #indexing }
+LPRelationship >> nextTrueAfter: trueIndex for: truth at: index [
+	"Compare a value in the truth table, looking for 1 'true'."
+
+	"if an earlier failure occurred, propogate the failure."
+	trueIndex = 0
+		ifTrue: [ ^ 0 ].
+
+	"Check this cell in the truth table to decide what to propagate."
+	truth
+		ifTrue: [ trueIndex ifNil: [ ^ index ] ifNotNil: [ ^ 0 ] ].
+
+	^ trueIndex
+]
+
+{ #category : #indexing }
+LPRelationship >> nilIndexOfOneAt: indexTwo [
+	"Scan attributeOne x indexTwo in the truth table for 1 nil + N-1 falses."
+
+	| truth nilIndex |
+	nilIndex := 0.
+
+	"Return indexOne of a lone nil, or nil if not found."
+	1 to: truthTable numberOfRows do: [ :indexOne | 
+		truth := truthTable at: indexOne at: indexTwo.
+		nilIndex := self nextNilAfter: nilIndex for: truth at: indexOne ].
+	
+	^ nilIndex
+]
+
+{ #category : #indexing }
+LPRelationship >> nilIndexOfTwoAt: indexOne [
+	"Scan indexOne x attributeTwo in the truth table for 1 nil + N-1 falses."
+
+	| truth nilIndex |
+	nilIndex := 0.
+
+	"Return indexTwo of a lone nil, or nil if not found."
+	1 to: truthTable numberOfColumns do: [ :indexTwo | 
+		truth := truthTable at: indexOne at: indexTwo.
+		nilIndex := self nextNilAfter: nilIndex for: truth at: indexTwo ].
+	
+	^ nilIndex
 ]
 
 { #category : #relationship }
@@ -336,14 +343,44 @@ LPRelationship >> tagsTwo: anIndex [
 	tagsTwo := anIndex
 ]
 
+{ #category : #indexing }
+LPRelationship >> trueIndexOfOneAt: indexTwo [
+	"Scan attributeOne x indexTwo in the truth table for 1 'true'."
+
+	| truth trueIndex |
+	trueIndex := nil.
+
+	"Return indexOne of a lone nil, or nil if not found."
+	1 to: truthTable numberOfRows do: [ :indexOne | 
+		truth := truthTable at: indexOne at: indexTwo.
+		trueIndex := self nextTrueAfter: trueIndex for: truth at: indexOne ].
+	
+	^ trueIndex
+]
+
+{ #category : #indexing }
+LPRelationship >> trueIndexOfTwoAt: indexOne [
+	"Scan indexOne x attributeTwo in the truth table for 1 'true'."
+
+	| truth trueIndex |
+	trueIndex := nil.
+
+	"Return indexOne of a lone nil, or nil if not found."
+	1 to: truthTable numberOfColumns do: [ :indexTwo | 
+		truth := truthTable at: indexOne at: indexTwo.
+		trueIndex := self nextTrueAfter: trueIndex for: truth at: indexTwo ].
+	
+	^ trueIndex
+]
+
 { #category : #accessing }
 LPRelationship >> truePairs [
-	^ truePairs
+	^ matchPairs
 ]
 
 { #category : #accessing }
 LPRelationship >> truePairs: anObject [
-	truePairs := anObject
+	matchPairs := anObject
 ]
 
 { #category : #accessing }
@@ -354,17 +391,4 @@ LPRelationship >> truthTable [
 { #category : #accessing }
 LPRelationship >> truthTable: aTruthTable [
 	truthTable := aTruthTable
-]
-
-{ #category : #deductions }
-LPRelationship >> unRelateTagsAt: indexOne at: indexTwo [
-	"If the indices are valid, make a 'true' relationship in the truth table."
-
-	"Hold indexOne constant and walk attributeTwo:"
-	self unRelateAttributeOneAt: indexTwo.
-	self unRelateAttributeTwoAt: indexOne.
-	
-	"Otherwise, we have the table entry of a 'true' by deduction; set it."
-	truthTable at: indexOne at: indexTwo put: false.
-	self isModified: true
 ]
