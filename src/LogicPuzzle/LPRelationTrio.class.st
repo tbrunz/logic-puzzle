@@ -40,11 +40,12 @@ LPRelationTrio class >> newFrom: attributeTrio for: commonAttribute using: relat
 
 	"Form the other two possible attribute pairings as AttributePairs:"
 	leftPair := LPAttributePair
-		newWith: (centerPair at: 1)
+		newWith: centerPair first
 		with: commonAttribute.
+		
 	rightPair := LPAttributePair
 		newWith: commonAttribute
-		with: (centerPair at: 2).
+		with: centerPair second.
 
 	"And then turn the center pair into a AttributePair as well; 
 	the AttributePairs are keys into the Relationship dictionary."
@@ -79,12 +80,19 @@ LPRelationTrio >> commonAttribute: anAttribute [
 	commonAttribute := anAttribute
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #deductions }
 LPRelationTrio >> duplicateTruthTableState: tagPairOne with: tagPairTwo [
 	"One tag pair relation is nil, one is non-nil; 
 	Make the nil state relationship mirror the non-nil state."
-	
-	
+
+	| stateOne stateTwo |
+	stateOne := tagPairOne relationship.
+	stateTwo := tagPairTwo relationship.
+
+	"Test either state to decide which direction to copy."
+	stateOne
+		ifNil: [ tagPairOne relationshipIs: stateTwo ]
+		ifNotNil: [ tagPairTwo relationshipIs: stateOne ]
 ]
 
 { #category : #deductions }
@@ -92,31 +100,22 @@ LPRelationTrio >> inferRelations [
 	"Use the matches in the center attribute relation to infer 
 	relations between the other two attribute relationships."
 
-	| leftTagPair rightTagPair leftState rightState leftIsNil rightIsNil |
+	| leftTagPair rightTagPair |
+	"We can only infer associated relationship for matched pairs."
 	centerRelation matchPairs
 		do: [ :pair | 
+			"Walk the tags for the attribute common to left & right:"
 			commonAttribute tags
 				do: [ :tag | 
-					leftTagPair := LPTagPair newFor: leftRelation with: pair tagOne with: tag.
-					rightTagPair := LPTagPair newFor: rightRelation with: tag with: pair tagTwo.
-					
-					self syncTruthTablesWith: leftTagPair with: rightTagPair.
-					
-					leftState := leftRelation relationOf: leftTagPair.
-					rightState := rightRelation relationOf: rightTagPair.
-					
-					"check ifNil, then Xor; if true, copy non-nil to nil."
-					"if false, and either is non-nil, then check consistency."
-					"To check, xor the two states; if false, ok; else error."
-					
-					"If only one state is 'nil', replace with the other state."
-					leftIsNil := leftState isNil.
-					rightIsNil := rightState isNil.
-					
-					(leftIsNil xor: rightIsNil) 
-						ifTrue: [  ]
-						ifFalse: [  ]
-					] ]
+					leftTagPair := LPTagPair
+						newFor: leftRelation
+						with: pair tagOne
+						with: tag.
+					rightTagPair := LPTagPair
+						newFor: rightRelation
+						with: tag
+						with: pair tagTwo.
+					self syncTruthTablesWith: leftTagPair with: rightTagPair ] ]
 ]
 
 { #category : #accessing }

@@ -37,10 +37,9 @@ LPTagPair class >> newWith: tagOne with: tagTwo [
 
 { #category : #relationship }
 LPTagPair >> relationship [
-	"Return the relationship of the two tags."
+	"Return the relationship of the two tags in the TagPair."
 
-	relationship isNil
-		ifTrue: [ ^ nil ].
+	relationship ifNil: [ ^ nil ].
 		
 	^ relationship relationOf: tagOne with: tagTwo
 ]
@@ -48,6 +47,15 @@ LPTagPair >> relationship [
 { #category : #accessing }
 LPTagPair >> relationship: anObject [
 	relationship := anObject
+]
+
+{ #category : #relationship }
+LPTagPair >> relationshipIs: aBoolean [
+	"Set the relationship of the tags."
+
+	relationship ifNil: [ ^ nil ].
+		
+	^ relationship relationOf: tagOne with: tagTwo is: aBoolean
 ]
 
 { #category : #accessing }
