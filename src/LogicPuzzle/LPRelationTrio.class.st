@@ -79,6 +79,46 @@ LPRelationTrio >> commonAttribute: anAttribute [
 	commonAttribute := anAttribute
 ]
 
+{ #category : #'as yet unclassified' }
+LPRelationTrio >> duplicateTruthTableState: tagPairOne with: tagPairTwo [
+	"One tag pair relation is nil, one is non-nil; 
+	Make the nil state relationship mirror the non-nil state."
+	
+	
+]
+
+{ #category : #deductions }
+LPRelationTrio >> inferRelations [
+	"Use the matches in the center attribute relation to infer 
+	relations between the other two attribute relationships."
+
+	| leftTagPair rightTagPair leftState rightState leftIsNil rightIsNil |
+	centerRelation matchPairs
+		do: [ :pair | 
+			commonAttribute tags
+				do: [ :tag | 
+					leftTagPair := LPTagPair newFor: leftRelation with: pair tagOne with: tag.
+					rightTagPair := LPTagPair newFor: rightRelation with: tag with: pair tagTwo.
+					
+					self syncTruthTablesWith: leftTagPair with: rightTagPair.
+					
+					leftState := leftRelation relationOf: leftTagPair.
+					rightState := rightRelation relationOf: rightTagPair.
+					
+					"check ifNil, then Xor; if true, copy non-nil to nil."
+					"if false, and either is non-nil, then check consistency."
+					"To check, xor the two states; if false, ok; else error."
+					
+					"If only one state is 'nil', replace with the other state."
+					leftIsNil := leftState isNil.
+					rightIsNil := rightState isNil.
+					
+					(leftIsNil xor: rightIsNil) 
+						ifTrue: [  ]
+						ifFalse: [  ]
+					] ]
+]
+
 { #category : #accessing }
 LPRelationTrio >> leftRelation [
 	^ leftRelation
@@ -89,15 +129,6 @@ LPRelationTrio >> leftRelation: aRelationship [
 	leftRelation := aRelationship
 ]
 
-{ #category : #'as yet unclassified' }
-LPRelationTrio >> makeTriplet [
-
-		"triplets: 
-			(LPTraits traits
-				reject: [ :each | 
-					each = traitPair traitOne or: [ each = traitPair traitTwo ] ]);"
-]
-
 { #category : #accessing }
 LPRelationTrio >> rightRelation [
 	^ rightRelation
@@ -106,4 +137,31 @@ LPRelationTrio >> rightRelation [
 { #category : #accessing }
 LPRelationTrio >> rightRelation: aRelationship [
 	rightRelation := aRelationship
+]
+
+{ #category : #deductions }
+LPRelationTrio >> syncTruthTablesWith: tagPairOne with: tagPairTwo [
+	"Compare the states of two TagPairs related by a common attribute.
+	Returns 'nil' if both states are the same: Nothing to do.
+	Returns 'true' if either relationship was changed.
+	Returns 'false' if a consistency error was detected."
+
+	| stateOne stateTwo |
+	stateOne := tagPairOne relationship.
+	stateTwo := tagPairTwo relationship.
+
+	"If the two states match, they're consistent, but there's also 
+	nothing to do here; return 'nil' to indicate 'nothing done'."
+	stateOne = stateTwo
+		ifTrue: [ ^ nil ].
+
+	"If only one state is 'nil', replace it with the other state, 
+	then return 'true' to indicate that a state change occurred."
+	(stateOne isNil xor: stateTwo isNil)
+		ifTrue: [ self duplicateTruthTableState: tagPairOne with: tagPairTwo.
+			^ true ].
+
+	"Two non-nil states that differ is a consistency error;
+	return 'false' to indicate this situation."
+	^ false
 ]

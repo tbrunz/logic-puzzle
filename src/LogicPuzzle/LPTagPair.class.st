@@ -10,10 +10,21 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'tagOne',
-		'tagTwo'
+		'tagTwo',
+		'relationship'
 	],
 	#category : #'LogicPuzzle-Base'
 }
+
+{ #category : #'instance creation' }
+LPTagPair class >> newFor: aRelationship with: tagOne with: tagTwo [
+
+	^ self new
+		relationship: aRelationship;
+		tagOne: tagOne;
+		tagTwo: tagTwo;
+		yourself
+]
 
 { #category : #'instance creation' }
 LPTagPair class >> newWith: tagOne with: tagTwo [
@@ -22,6 +33,21 @@ LPTagPair class >> newWith: tagOne with: tagTwo [
 		tagOne: tagOne;
 		tagTwo: tagTwo;
 		yourself
+]
+
+{ #category : #relationship }
+LPTagPair >> relationship [
+	"Return the relationship of the two tags."
+
+	relationship isNil
+		ifTrue: [ ^ nil ].
+		
+	^ relationship relationOf: tagOne with: tagTwo
+]
+
+{ #category : #accessing }
+LPTagPair >> relationship: anObject [
+	relationship := anObject
 ]
 
 { #category : #accessing }

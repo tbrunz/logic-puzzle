@@ -17,7 +17,7 @@ Class {
 
 { #category : #'instance creation' }
 LPAttributePair class >> newWith: attributes [
-	"Create a new attribute pair from a collection."
+	"Create a new attribute pair from a collection of attributes."
 	
 	^ self new
 		attributeOne: (attributes at: 1);
@@ -27,7 +27,7 @@ LPAttributePair class >> newWith: attributes [
 
 { #category : #'instance creation' }
 LPAttributePair class >> newWith: attributeOne with: attributeTwo [
-	"Create a new attribute pair, in the given order."
+	"Create a new attribute pair from given attributes."
 	
 	^ self new
 		attributeOne: attributeOne;
