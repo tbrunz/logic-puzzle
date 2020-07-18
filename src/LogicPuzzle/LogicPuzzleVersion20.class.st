@@ -39,10 +39,10 @@ Class {
 }
 
 { #category : #adding }
-LogicPuzzleVersion20 >> addTrait: aTraitName withTags: aTagArray [
+LogicPuzzleVersion20 >> addAttribute: aTraitName withTags: aTagArray [
 	"Create a new trait for the puzzle.  The database will do validation."
 	
-	traitDatabase addTrait: aTraitName withTags: aTagArray
+	traitDatabase addAttribute: aTraitName withTags: aTagArray
 ]
 
 { #category : #associating }
@@ -118,7 +118,7 @@ LogicPuzzleVersion20 >> initialize [
 	super initialize.
 	
 	"Create the object that manages collections of traits & tags:"
-	traitDatabase := LPTraitDatabaseVersion20 new.
+	traitDatabase := LPAttributeDatabase new.
 	
 	"Create a set of dictionaries to be filled in as the user adds traits:" 
 	traitTablesDB := Dictionary new.

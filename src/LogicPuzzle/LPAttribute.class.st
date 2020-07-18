@@ -25,6 +25,15 @@ Class {
 }
 
 { #category : #'instance creation' }
+LPAttribute class >> newNamed: anAttributeName [
+	"Create a new attribute object; the name must already be validated."
+
+	^ self new 
+		name: anAttributeName;
+		yourself
+]
+
+{ #category : #'instance creation' }
 LPAttribute class >> newNamed: anAttributeName withTags: aTagArray [
 	"Create a new attribute object; the name must already be validated."
 

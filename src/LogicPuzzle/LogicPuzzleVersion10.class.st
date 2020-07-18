@@ -78,12 +78,12 @@ LogicPuzzleVersion10 class >> validateTraitSize: numberOfTags [
 ]
 
 { #category : #adding }
-LogicPuzzleVersion10 >> addTrait: stringOrSymbol withTags: tagArray [
+LogicPuzzleVersion10 >> addAttribute: stringOrSymbol withTags: tagArray [
 	"Create a new trait from a given symbol & array of tags."
 
 	| trait traitName traitTags |
 	"Accept strings or symbols for the name, convert to symbols."
-	traitName := LPTraitVersion10 validateTraitName: stringOrSymbol.
+	traitName := LPTraitVersion10 validateNewAttributeName: stringOrSymbol.
 	
 	"Validate the trait tags for type and number, also converted to symbols:"
 	traitTags := self validateTraitTags: tagArray.
@@ -508,7 +508,7 @@ LogicPuzzleVersion10 >> primaryTrait: traitName [
 
 	| name traitKeys |
 	"Argument must be a trait name -- string or symbol:"
-	name := LPTraitVersion10 validateTraitName: traitName.
+	name := LPTraitVersion10 validateNewAttributeName: traitName.
 
 	"Get an array of traits keys that match the given name:"
 	traitKeys := traitDatabase keys select: [ :key | key = name ].

@@ -32,7 +32,7 @@ LPTag class >> newNamed: aTagName ofAttribute: anAttribute [
 
 	^ self new 
 		name: aTagName;
-		traitName: anAttribute;
+		attribute: anAttribute;
 		yourself
 ]
 

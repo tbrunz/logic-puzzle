@@ -1,25 +1,24 @@
 Class {
-	#name : #LogicPuzzleVersion20CreationTest,
+	#name : #LogicPuzzleCreationTest,
 	#superclass : #TestCase,
 	#category : #'LogicPuzzle-Tests'
 }
 
 { #category : #tests }
-LogicPuzzleVersion20CreationTest >> test001CreateLogicPuzzle [
+LogicPuzzleCreationTest >> test001CreateLogicPuzzle [
 	"Test behavior of the Logic Puzzle constructor."
 	
-	self shouldnt: [ LogicPuzzleVersion20 new ] raise: Error
+	self shouldnt: [ LogicPuzzle new ] raise: Error
 ]
 
 { #category : #tests }
-LogicPuzzleVersion20CreationTest >> test002AttributeNaming [
-	"Test validation of Trait names when adding traits to a puzzle."
+LogicPuzzleCreationTest >> test002AttributeNaming [
+	"Test validation of attribute names when adding attributes to a puzzle."
 	
 	| puzzle |
-	"We need to do this in the context of a puzzle; the puzzle does validation:"
-	puzzle := LogicPuzzleVersion20 new .
+	puzzle := LogicPuzzle new .
 	
-	"Trait names must be either a non-empty string or a symbol:"
+	"Attribute names must be either a non-empty string or a symbol:"
 	self should: [ puzzle addAttribute: 1 withTags: #( mn no op ) ] raise: Error .
 	self should: [ puzzle addAttribute: #( 1 2 3 ) withTags: #( pq qr rs ) ] raise: Error .
 	self should: [ puzzle addAttribute: '' withTags: #( st tu uv ) ] raise: Error .
@@ -37,84 +36,81 @@ LogicPuzzleVersion20CreationTest >> test002AttributeNaming [
 ]
 
 { #category : #tests }
-LogicPuzzleVersion20CreationTest >> test003SetAttributeTags [
-	"Test validation of Trait tag arays when adding traits to a puzzle."
+LogicPuzzleCreationTest >> test003SetAttributeTags [
+	"Test validation of attribute tag arays when adding attributes to a puzzle."
 	
 	| puzzle |
-	"We need to do this in the context of a puzzle; the puzzle does validation:"
-	puzzle := LogicPuzzleVersion20 new .
+	puzzle := LogicPuzzle new .
 	
-	"Trait tags argument must be an array:"
+	"Attribute tags argument must be an array:"
 	self should: [ puzzle addAttribute: 'abc' withTags: 'xyz' ] raise: Error .
 	self should: [ puzzle addAttribute: 'def' withTags: #uvw ] raise: Error .
 	self should: [ puzzle addAttribute: 'ghi' withTags: 7 ] raise: Error .
 
-	"Trait tag array must have the same size as the puzzle:"
+	"Attribute tag array must have the same size as the puzzle:"
 	self shouldnt: [ puzzle addAttribute: 'jkl' withTags: #( ab bc cd de ) ] raise: Error .
 	self should: [ puzzle addAttribute: 'mno' withTags: #( ef fg gh ) ] raise: Error .
 	self should: [ puzzle addAttribute: 'pqr' withTags: #( hi ij jk kl lm ) ] raise: Error .
 	
-	"Trait tag array elements must be strings or symbols:"
+	"Attribute tag array elements must be strings or symbols:"
 	self should: [ puzzle addAttribute: 'stu' withTags: #( 1 2 3 4 ) ] raise: Error .
 	
-	"Trait tag array with correct size and elements is good:"
+	"Attribute tag array with correct size and elements is good:"
 	self shouldnt: [ puzzle addAttribute: 'vwx' withTags: #( mn no op pq ) ] raise: Error .
 	self shouldnt: [ puzzle addAttribute: 'yza' withTags: #( #qr #rs #st #tu ) ] raise: Error .
 ]
 
 { #category : #tests }
-LogicPuzzleVersion20CreationTest >> test005SetPrimaryAttribute [
-	"Test setting a primary trait."
-	| puzzle |
+LogicPuzzleCreationTest >> test004AddAttributesToPuzzle [
+	"Test adding attributes to a puzzle."
 	
-	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzleVersion20 new .
+	| puzzle |
+	puzzle := LogicPuzzle new .
+	
+	"Adding attributes with 3 tags should be accepted:"
+	self shouldnt: [ puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Pet withTags: #( #Snails #Fox #Zebra ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Beverage withTags: #( #Water #Tea #Coffee ) ] raise: Error .
+	
+	"Adding attributes with too many or too few tags should throw errors:"
+	self should: [ puzzle addAttribute: #House withTags: #( #Yellow #Blue #Red #Green ) ] raise: Error .
+	self should: [ puzzle addAttribute: #Order withTags: #( #Left #Middle ) ] raise: Error .
+	
+	"Adding a attributes with the same name as an existing one should replace, not throw an error:"
+	self assert: ((puzzle attributeDatabase tagsOfAttribute: #Pet) at: 2) name equals: #Fox .
+	self shouldnt: [ puzzle addAttribute: #Pet withTags: #( #Cat #Weasel #Horse ) ] raise: Error .
+	self assert: ((puzzle attributeDatabase tagsOfAttribute: #Pet) at: 2) name equals: #Weasel .
+]
+
+{ #category : #tests }
+LogicPuzzleCreationTest >> test005SetPrimaryAttribute [
+	"Test setting a primary attribute."
+	
+	| puzzle |
+	puzzle := LogicPuzzle new .
 	
 	puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian #Englishman #Spaniard ) .
 	puzzle addAttribute: #Pet withTags: #( #Dog #Horse #Snails #Fox #Zebra ) .
 	
 	"A provided trait name must be a string or symbol:"
-	self should: [ puzzle primaryTrait: 3 ] raise: Error .
-	self should: [ puzzle primaryTrait: #( 'abc' 'def' ) ] raise: Error .
+	self should: [ puzzle primaryAttribute: 3 ] raise: Error .
+	self should: [ puzzle primaryAttribute: #( 'abc' 'def' ) ] raise: Error .
 	
 	"A trait name that we don't recognize is an error:"
-	self should: [ puzzle primaryTrait: #JoeBob ] raise: Error .
+	self should: [ puzzle primaryAttribute: #JoeBob ] raise: Error .
 	
 	"A trait name matching a trait we know is good:"
-	self shouldnt: [ puzzle primaryTrait: 'Pet' ] raise: Error .
-	self shouldnt: [ puzzle primaryTrait: #Nationality ] raise: Error .
+	puzzle primaryAttribute: 'Pet' .
+	self shouldnt: [ puzzle primaryAttribute: 'Pet' ] raise: Error .
+	self shouldnt: [ puzzle primaryAttribute: #Nationality ] raise: Error .
 ]
 
 { #category : #tests }
-LogicPuzzleVersion20CreationTest >> testAddAttributesToPuzzle [
-	"Test adding traits to a puzzle."
+LogicPuzzleCreationTest >> testAttributeRelations [
+	"Test that relating attributesresults in expected truth table values."
 	
 	| puzzle |
-	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzleVersion20 new .
-	
-	"Adding traits with 3 tags should be accepted:"
-	self shouldnt: [ puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #Pet withTags: #( #Snails #Fox #Zebra ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #Beverage withTags: #( #Water #Tea #Coffee ) ] raise: Error .
-	
-	"Adding traits with too many or too few tags should throw errors:"
-	self should: [ puzzle addAttribute: #House withTags: #( #Yellow #Blue #Red #Green ) ] raise: Error .
-	self should: [ puzzle addAttribute: #Order withTags: #( #Left #Middle ) ] raise: Error .
-	
-	"Adding a trait with the same name as an existing one should replace, not throw an error:"
-	self assert: ((puzzle traitsDB tagsOfAttribute: #Pet) at: 2) name equals: #Fox .
-	self shouldnt: [ puzzle addAttribute: #Pet withTags: #( #Cat #Weasel #Horse ) ] raise: Error .
-	self assert: ((puzzle traitsDB tagsOfAttribute: #Pet) at: 2) name equals: #Weasel .
-]
-
-{ #category : #tests }
-LogicPuzzleVersion20CreationTest >> testAttributeRelations [
-	"Test that associating traits results in expected matrix values."
-	
-	| puzzle |
-	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzleVersion20 new .
+	puzzle := LogicPuzzle new .
 	
 	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
 	self shouldnt: [ puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
@@ -137,12 +133,11 @@ LogicPuzzleVersion20CreationTest >> testAttributeRelations [
 ]
 
 { #category : #tests }
-LogicPuzzleVersion20CreationTest >> testCreateRelationships [
-	"Test creating trait associations for a puzzle."
+LogicPuzzleCreationTest >> testCreateRelationships [
+	"Test creating attribute relationships for a puzzle."
 	
 	| puzzle |
-	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzleVersion20 new .
+	puzzle := LogicPuzzle new .
 	
 	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
 	self shouldnt: [ puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
@@ -168,12 +163,11 @@ LogicPuzzleVersion20CreationTest >> testCreateRelationships [
 ]
 
 { #category : #tests }
-LogicPuzzleVersion20CreationTest >> testRelatingAttributes [
-	"Test validating, assigning, and detecting trait associations."
+LogicPuzzleCreationTest >> testRelatingAttributes [
+	"Test validating, assigning, and detecting attribute relationships."
 	
 	| puzzle |
-	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzleVersion20 new .
+	puzzle := LogicPuzzle new .
 	
 	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
 	self shouldnt: [ puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .

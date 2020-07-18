@@ -31,7 +31,7 @@ LPTraitVersion10 class >> newNamed: traitName with: tagArray [
 ]
 
 { #category : #validation }
-LPTraitVersion10 class >> validateTraitName: traitName [ 
+LPTraitVersion10 class >> validateNewAttributeName: traitName [ 
 	"Validate the parameter as being a symbol or a string."
 	"If a string, render it as a valid symbol."
 	
@@ -75,7 +75,7 @@ LPTraitVersion10 >> tags: tagArray [
 
 	| index |
 	"Copy tagArray, validating/converting each tag in turn:"
-	tags := tagArray collect: [ :tag | self class validateTraitName: tag ].
+	tags := tagArray collect: [ :tag | self class validateNewAttributeName: tag ].
 	
 	"Create a dictionary mapping the tags to their corresponding index:"
 	indices := Dictionary new.
