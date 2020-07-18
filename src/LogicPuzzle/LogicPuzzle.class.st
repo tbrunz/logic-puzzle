@@ -46,7 +46,7 @@ Class {
 	#category : #'LogicPuzzle-Base'
 }
 
-{ #category : #adding }
+{ #category : #creating }
 LogicPuzzle >> addAttribute: attributeName withTags: arrayOfTagNames [
 	"Create a new attribute and add to the puzzle attribute dictionary."
 	
@@ -56,6 +56,13 @@ LogicPuzzle >> addAttribute: attributeName withTags: arrayOfTagNames [
 { #category : #accessing }
 LogicPuzzle >> attributeDatabase [
 	^ attributeDatabase
+]
+
+{ #category : #creating }
+LogicPuzzle >> createRelationships [
+	"Tell the attribute database to get busy..."
+	
+	^ attributeDatabase createRelationships
 ]
 
 { #category : #initialization }
@@ -84,15 +91,38 @@ LogicPuzzle >> primaryAttribute: attributeOrName [
 	
 	attributeName := attributeDatabase validateName: attributeOrName.
 	
-	^ primaryAttribute := attributeDatabase attributeSet at: attributeName
+	^ primaryAttribute := attributeDatabase attributeDictionary at: attributeName
 ]
 
-{ #category : #accessing }
-LogicPuzzle >> relationTrioCollection [
-	^ relationTrioCollection
+{ #category : #lookup }
+LogicPuzzle >> relationOfTag: tagOrNameOne withTag: tagOrNameTwo [
+	"Retrieve the relationship between the two tags."
+	
+	| tagOne tagTwo attributePair relationship |
+	tagOne := attributeDatabase validateName: tagOrNameOne.
+	tagTwo := attributeDatabase validateName: tagOrNameTwo.
+	
+	attributePair := LPAttributePair newWith: tagOne attribute with: tagTwo attribute.
+	
+	relationship := attributeDatabase relationshipDictionary at: attributePair.
+	
+	^ relationship relationOf: tagOne with: tagTwo
 ]
 
-{ #category : #accessing }
-LogicPuzzle >> relationshipDictionary [
-	^ relationshipDictionary
+{ #category : #lookup }
+LogicPuzzle >> relationOfTag: tagOrNameOne withTag: tagOrNameTwo is: aBoolean [
+	"Set the relationship between the two tags."
+	
+	| tagOne tagTwo attributePair relationship |
+	tagOne := attributeDatabase validateName: tagOrNameOne.
+	tagTwo := attributeDatabase validateName: tagOrNameTwo.
+	
+	tagOne := attributeDatabase tagDictionary at: tagOne.
+	tagTwo := attributeDatabase tagDictionary at: tagTwo.
+	
+	attributePair := LPAttributePair newWith: tagOne attribute with: tagTwo attribute.
+	self halt.
+	relationship := attributeDatabase relationshipDictionary at: attributePair.
+	
+	^ relationship relationOf: tagOne with: tagTwo is: aBoolean 
 ]

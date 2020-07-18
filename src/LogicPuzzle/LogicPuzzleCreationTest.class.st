@@ -116,12 +116,13 @@ LogicPuzzleCreationTest >> testAttributeRelations [
 	self shouldnt: [ puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
 	self shouldnt: [ puzzle addAttribute: #Pet withTags: #( #Snails #Fox #Zebra ) ] raise: Error .
 	self shouldnt: [ puzzle addAttribute: #Beverage withTags: #( #Water #Tea #Coffee ) ] raise: Error .
-	self assert: (puzzle createTraitTables) size equals: 3 .
-	
+	self assert: puzzle createRelationships relationshipDictionary size equals: 6 .
+
 	"Can refer to traits & their tags with strings or symbols:"
-	self shouldnt: [ puzzle associationOf: #Norwegian with: #Zebra is: true ] raise: Error .
-	self shouldnt: [ puzzle associationOf: 'Ukrainian' with: 'Tea' is: false ] raise: Error .
-	
+	puzzle relationOfTag: #Norwegian withTag: #Zebra is: true.
+	self shouldnt: [ puzzle relationOfTag: #Norwegian withTag: #Zebra is: true ] raise: Error .
+	self shouldnt: [ puzzle relationOfTag: 'Ukrainian' withTag: 'Tea' is: false ] raise: Error .
+	self halt.
 	"Setting the same association a second time should throw an error:"
 	self should: [ puzzle associationOf: #Norwegian with: #Zebra is: true ] raise: Error .
 	self should: [ puzzle associationOf: #Norwegian with: #Zebra is: false ] raise: Error .

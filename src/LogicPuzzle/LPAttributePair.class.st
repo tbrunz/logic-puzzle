@@ -16,12 +16,12 @@ Class {
 }
 
 { #category : #'instance creation' }
-LPAttributePair class >> newWith: attributes [
+LPAttributePair class >> newWith: anAttributeArray [
 	"Create a new attribute pair from a collection of attributes."
 	
 	^ self new
-		attributeOne: (attributes at: 1);
-		attributeTwo: (attributes at: 2);
+		attributeOne: (anAttributeArray at: 1);
+		attributeTwo: (anAttributeArray at: 2);
 		yourself
 ]
 

@@ -24,8 +24,10 @@ Class {
 	#instVars : [
 		'minNumberOfTags',
 		'minNumberOfAttributes',
-		'attributeSet',
-		'tagSet'
+		'attributeDictionary',
+		'tagDictionary',
+		'relationshipDictionary',
+		'relationTrioDictionary'
 	],
 	#category : #'LogicPuzzle-Base'
 }
@@ -52,12 +54,17 @@ LPAttributeDatabase >> addAttribute: stringOrSymbol withTags: arrayOfstringOrSym
 	thisAttribute tags: theseTags.
 
 	"Add the attribute to the attributes dictionary:"
-	attributeSet add: attributeName -> thisAttribute.
+	attributeDictionary add: attributeName -> thisAttribute.
 
 	"Add the tags in the tag array to the tags dictionary:"
-	theseTags do: [ :tag | tagSet add: tag name -> tag ].
+	theseTags do: [ :tag | tagDictionary add: tag name -> tag ].
 	
 	^ thisAttribute
+]
+
+{ #category : #accessing }
+LPAttributeDatabase >> attributeDictionary [
+	^ attributeDictionary
 ]
 
 { #category : #lookup }
@@ -69,7 +76,7 @@ LPAttributeDatabase >> attributeNameOfTag: tagOrName [
 
 { #category : #lookup }
 LPAttributeDatabase >> attributeNames [
-	^ attributeSet keys
+	^ attributeDictionary keys
 ]
 
 { #category : #lookup }
@@ -84,16 +91,100 @@ LPAttributeDatabase >> attributeOfTag: tagOrName [
 	"Otherwise, all we have is a name, so we do a lookup:"
 	tagName := self validateName: tagOrName.
 
-	theTag := tagSet 
+	theTag := tagDictionary 
 		at: tagName
 		ifAbsent: [ self error: 'Unknown trait tag (' , tagName , ')' ].
 		
 	^ theTag attribute
 ]
 
-{ #category : #accessing }
-LPAttributeDatabase >> attributeSet [
-	^ attributeSet
+{ #category : #creating }
+LPAttributeDatabase >> createRelationTrios [
+	"Form combinations of attributes taken 3 at a time."
+
+	| attributeArray relationTrioCollection |
+	"We need a new dictionary and we need the attribute dictionary as an array."
+	relationTrioCollection := OrderedCollection new.
+	attributeArray := attributeDictionary asArray.
+
+	"Step through C(n,3) = every combination of attributes taken 3 at a time:"
+	1 to: attributeArray size - 2 do: [ :outerIndex | 
+		| attributeOne |
+		attributeOne := attributeArray at: outerIndex.
+
+		"Step through all but one of the remaining attributes to pair with this one:"
+		outerIndex + 1 to: attributeArray size - 1 do: [ :middleIndex | 
+			| attributeTwo |
+			attributeTwo := attributeArray at: middleIndex.
+
+			"Step through the remaining attributes in the array to make a trio:"
+			middleIndex + 1 to: attributeArray size do: [ :innerIndex | 
+				| attributeThree attributeTrio relationTrio |
+				attributeThree := attributeArray at: innerIndex.
+
+				"Create a trio combo, then cycle through it to make RelationTrios:"
+				attributeTrio := {attributeOne. attributeTwo. attributeThree}.
+
+				"Cycle through the trio, making each attribute the common attribute:"
+				attributeTrio
+					do: [ :commonAttribute | 
+						relationTrio := LPRelationTrio
+							newFrom: attributeTrio
+							for: commonAttribute
+							using: relationshipDictionary ].
+
+				"Finally, add the new relationship to our collection:"
+				relationTrioCollection add: relationTrio ] ] ].
+	
+	^ relationTrioCollection
+]
+
+{ #category : #creating }
+LPAttributeDatabase >> createRelationshipPairs [
+	"Walk the attributes set to form every pair-wise permutation."
+	
+	| attributeArray relationships |
+	"We need a new dictionary and we need the attribute dictionary as an array."
+	relationships := Dictionary new.
+	attributeArray := attributeDictionary asArray.
+
+	"Step through C(n,2) = every combination of attributes taken 2 at a time:"
+	1 to: attributeArray size - 1 do: [ :outerIndex | 
+		| attributeOne pairOne |
+		attributeOne := attributeArray at: outerIndex.
+
+		"Step through the remaining attributes in the array to pair with this one:"
+		outerIndex + 1 to: attributeArray size do: [ :innerIndex | 
+			| attributeTwo pairTwo relationship |
+			attributeTwo := attributeArray at: innerIndex.
+
+			"Form a pair of keys from the attribute pair for accessing the new 
+			relationship. Why two keys? To eliminate ordering issues."
+			pairOne := LPAttributePair newWith: attributeOne with: attributeTwo.
+			pairTwo := LPAttributePair newWith: attributeTwo with: attributeOne.
+			
+			"Make the relationship between the attributes:"
+			relationship := LPRelationship newWith: pairOne.
+
+			"Finally, add the new relationship to our collection:"
+			relationships add: pairOne -> relationship.
+			relationships add: pairTwo -> relationship ] ].
+
+	^ relationships
+]
+
+{ #category : #creating }
+LPAttributeDatabase >> createRelationships [
+	"Crunch the set of attributes to create the relationships."
+
+	"Create all the pair-wise permutations of attributes, making 
+	a dictionary that points to unique pair-wise combinations:"
+	relationshipDictionary := self createRelationshipPairs.
+
+	"Create all the combinations of attributes taken 3 at time:"
+	"relationTrioDictionary := self createRelationTrios"
+
+	"Do something..."
 ]
 
 { #category : #initialization }
@@ -104,8 +195,8 @@ LPAttributeDatabase >> initialize [
 	
 	"Create the expandable arrays to accumulate the set of 
 	Attributes and the set of Tags as the user provides them."
-	attributeSet := Dictionary new.
-	tagSet := Dictionary new.
+	attributeDictionary := Dictionary new.
+	tagDictionary := Dictionary new.
 
 	"Set constraints for this puzzle that apply universally."
 	minNumberOfAttributes := 3.
@@ -153,7 +244,7 @@ LPAttributeDatabase >> normalizeTagPairWith: nameOne with: nameTwo [
 	tagPairs
 		do: [ :tagPair | 
 			traitPair := self traitPairFrom: tagPair.
-			(tagSet anySatisfy: [ :pair | pair = traitPair ])
+			(tagDictionary anySatisfy: [ :pair | pair = traitPair ])
 				ifTrue: [ ^ tagPair ] ].
 			
 	self
@@ -185,16 +276,31 @@ LPAttributeDatabase >> normalizeTraitPairWith: traitOne with: traitTwo [
 	is in the trait pairs list, return it:"
 	traitPairs
 		do: [ :traitPair | 
-			(tagSet anySatisfy: [ :pair | pair = traitPair ])
+			(tagDictionary anySatisfy: [ :pair | pair = traitPair ])
 				ifTrue: [ ^ traitPair ] ].
 	
 	"If neither orientation is recognized, one/both arguments are bad:"
 	self error: 'Cannot find a trait pair for ', traitOne, ' and ', traitTwo
 ]
 
+{ #category : #accessing }
+LPAttributeDatabase >> relationTrioDictionary [
+	^ relationTrioDictionary
+]
+
+{ #category : #accessing }
+LPAttributeDatabase >> relationshipDictionary [
+	^ relationshipDictionary
+]
+
+{ #category : #accessing }
+LPAttributeDatabase >> tagDictionary [
+	^ tagDictionary
+]
+
 { #category : #lookup }
 LPAttributeDatabase >> tagNames [
-	^ tagSet keys
+	^ tagDictionary keys
 ]
 
 { #category : #lookup }
@@ -217,11 +323,6 @@ LPAttributeDatabase >> tagPairWith: nameOne with: nameTwo [
 		with: traitNameTwo
 ]
 
-{ #category : #accessing }
-LPAttributeDatabase >> tagSet [
-	^ tagSet
-]
-
 { #category : #lookup }
 LPAttributeDatabase >> tagsOfAttribute: attributeOrName [
 	"Respond with the array of tags of the given trait."
@@ -234,7 +335,7 @@ LPAttributeDatabase >> tagsOfAttribute: attributeOrName [
 	"Otherwise, all we have is a name, so we do a lookup:"
 	attributeName := self validateName: attributeOrName.
 	
-	theAttribute := attributeSet 
+	theAttribute := attributeDictionary 
 		at: attributeName
 		ifAbsent: [ self error: 'Unknown attribute (' , attributeName , ')' ].
 		
@@ -295,7 +396,7 @@ LPAttributeDatabase >> validateNewAttributeName: name [
 	attributeName := self validateName: name.
 
 	"Verify that it's not the name of an attribute we already know about."
-	attributeSet 
+	attributeDictionary 
 		do: [ :attribute | 
 			attributeName = attribute name
 				ifTrue: [ self error: 'Duplicate attribute name (' , attributeName , ')' ] ].
@@ -312,9 +413,9 @@ LPAttributeDatabase >> validateNewTagArray: tagArray [
 		ifFalse: [ self error: 'Attribute tags must be an array of symbols' ].
 	size := tagArray size.
 	
-	tagsPerAttribute := attributeSet isEmpty
+	tagsPerAttribute := attributeDictionary isEmpty
 		ifTrue: [ size ]
-		ifFalse: [ attributeSet anyOne tags size ].
+		ifFalse: [ attributeDictionary anyOne tags size ].
 		
 	size = tagsPerAttribute
 		ifFalse: [ self
@@ -337,7 +438,7 @@ LPAttributeDatabase >> validateNewTagName: name [
 	tagName := self validateName: name.
 
 	"Verify that it's not the name of a tag we already know about."
-	tagSet
+	tagDictionary
 		do: [ :tag | 
 			tagName = tag name
 				ifTrue: [ self error: 'Duplicate tag name (' , tagName , ')' ] ].
