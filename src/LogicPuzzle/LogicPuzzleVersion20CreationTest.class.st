@@ -86,58 +86,7 @@ LogicPuzzleVersion20CreationTest >> test005SetPrimaryAttribute [
 ]
 
 { #category : #tests }
-LogicPuzzleVersion20CreationTest >> testAddAttributesToPuzzle [
-	"Test adding traits to a puzzle."
-	
-	| puzzle |
-	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzleVersion20 new .
-	
-	"Adding traits with 3 tags should be accepted:"
-	self shouldnt: [ puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #Pet withTags: #( #Snails #Fox #Zebra ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #Beverage withTags: #( #Water #Tea #Coffee ) ] raise: Error .
-	
-	"Adding traits with too many or too few tags should throw errors:"
-	self should: [ puzzle addAttribute: #House withTags: #( #Yellow #Blue #Red #Green ) ] raise: Error .
-	self should: [ puzzle addAttribute: #Order withTags: #( #Left #Middle ) ] raise: Error .
-	
-	"Adding a trait with the same name as an existing one should replace, not throw an error:"
-	self assert: ((puzzle traitsDB tagsOfAttribute: #Pet) at: 2) name equals: #Fox .
-	self shouldnt: [ puzzle addAttribute: #Pet withTags: #( #Cat #Weasel #Horse ) ] raise: Error .
-	self assert: ((puzzle traitsDB tagsOfAttribute: #Pet) at: 2) name equals: #Weasel .
-]
-
-{ #category : #tests }
-LogicPuzzleVersion20CreationTest >> testAttributeRelations [
-	"Test that associating traits results in expected matrix values."
-	
-	| puzzle |
-	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzleVersion20 new .
-	
-	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
-	self shouldnt: [ puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #Pet withTags: #( #Snails #Fox #Zebra ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #Beverage withTags: #( #Water #Tea #Coffee ) ] raise: Error .
-	self assert: (puzzle createTraitTables) size equals: 3 .
-	
-	"Can refer to traits & their tags with strings or symbols:"
-	self shouldnt: [ puzzle associationOf: #Norwegian with: #Zebra is: true ] raise: Error .
-	self shouldnt: [ puzzle associationOf: 'Ukrainian' with: 'Tea' is: false ] raise: Error .
-	
-	"Setting the same association a second time should throw an error:"
-	self should: [ puzzle associationOf: #Norwegian with: #Zebra is: true ] raise: Error .
-	self should: [ puzzle associationOf: #Norwegian with: #Zebra is: false ] raise: Error .
-	
-	"Associations should report the value they were set with; unset associations should report nil:"
-	self assert: (puzzle associationOf: #Norwegian with: #Zebra) equals: true .
-	self assert: (puzzle associationOf: #Ukrainian with: #Tea) equals: false .
-	self assert: (puzzle associationOf: #Japanese with: #Snails) equals: nil .
-]
-
-{ #category : #tests }
-LogicPuzzleVersion20CreationTest >> testCreateRelationships [
+LogicPuzzleVersion20CreationTest >> test006CreateRelationships [
 	"Test creating trait associations for a puzzle."
 	
 	| puzzle |
@@ -168,7 +117,7 @@ LogicPuzzleVersion20CreationTest >> testCreateRelationships [
 ]
 
 { #category : #tests }
-LogicPuzzleVersion20CreationTest >> testRelatingAttributes [
+LogicPuzzleVersion20CreationTest >> test007RelatingAttributes [
 	"Test validating, assigning, and detecting trait associations."
 	
 	| puzzle |
@@ -195,4 +144,55 @@ LogicPuzzleVersion20CreationTest >> testRelatingAttributes [
 	"Can refer to traits & their tags with strings or symbols:"
 	self shouldnt: [ puzzle associationOf: #Norwegian with: #Zebra is: true ] raise: Error .
 	self shouldnt: [ puzzle associationOf: 'Ukrainian' with: 'Tea' is: true ] raise: Error .
+]
+
+{ #category : #tests }
+LogicPuzzleVersion20CreationTest >> test008AttributeRelations [
+	"Test that associating traits results in expected matrix values."
+	
+	| puzzle |
+	"Create a test puzzle with some traits:"
+	puzzle := LogicPuzzleVersion20 new .
+	
+	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
+	self shouldnt: [ puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Pet withTags: #( #Snails #Fox #Zebra ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Beverage withTags: #( #Water #Tea #Coffee ) ] raise: Error .
+	self assert: (puzzle createTraitTables) size equals: 3 .
+	
+	"Can refer to traits & their tags with strings or symbols:"
+	self shouldnt: [ puzzle associationOf: #Norwegian with: #Zebra is: true ] raise: Error .
+	self shouldnt: [ puzzle associationOf: 'Ukrainian' with: 'Tea' is: false ] raise: Error .
+	
+	"Setting the same association a second time should throw an error:"
+	self should: [ puzzle associationOf: #Norwegian with: #Zebra is: true ] raise: Error .
+	self should: [ puzzle associationOf: #Norwegian with: #Zebra is: false ] raise: Error .
+	
+	"Associations should report the value they were set with; unset associations should report nil:"
+	self assert: (puzzle associationOf: #Norwegian with: #Zebra) equals: true .
+	self assert: (puzzle associationOf: #Ukrainian with: #Tea) equals: false .
+	self assert: (puzzle associationOf: #Japanese with: #Snails) equals: nil .
+]
+
+{ #category : #tests }
+LogicPuzzleVersion20CreationTest >> testAddAttributesToPuzzle [
+	"Test adding traits to a puzzle."
+	
+	| puzzle |
+	"Create a test puzzle with some traits:"
+	puzzle := LogicPuzzleVersion20 new .
+	
+	"Adding traits with 3 tags should be accepted:"
+	self shouldnt: [ puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Pet withTags: #( #Snails #Fox #Zebra ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Beverage withTags: #( #Water #Tea #Coffee ) ] raise: Error .
+	
+	"Adding traits with too many or too few tags should throw errors:"
+	self should: [ puzzle addAttribute: #House withTags: #( #Yellow #Blue #Red #Green ) ] raise: Error .
+	self should: [ puzzle addAttribute: #Order withTags: #( #Left #Middle ) ] raise: Error .
+	
+	"Adding a trait with the same name as an existing one should replace, not throw an error:"
+	self assert: ((puzzle traitsDB tagsOfAttribute: #Pet) at: 2) name equals: #Fox .
+	self shouldnt: [ puzzle addAttribute: #Pet withTags: #( #Cat #Weasel #Horse ) ] raise: Error .
+	self assert: ((puzzle traitsDB tagsOfAttribute: #Pet) at: 2) name equals: #Weasel .
 ]

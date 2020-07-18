@@ -167,8 +167,8 @@ LPAttributeDatabase >> createRelationshipPairs [
 			relationship := LPRelationship newWith: pairOne.
 
 			"Finally, add the new relationship to our collection:"
-			relationships add: pairOne -> relationship.
-			relationships add: pairTwo -> relationship ] ].
+			relationships add: pairOne dictionaryKey -> relationship.
+			relationships add: pairTwo dictionaryKey -> relationship ] ].
 
 	^ relationships
 ]

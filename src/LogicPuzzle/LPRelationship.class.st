@@ -78,8 +78,8 @@ LPRelationship class >> newWith: attributeOne with: attributeTwo [
 		tagOne := attributeOne tags at: i.
 		tagTwo := attributeTwo tags at: i.
 		
-		indices add: tagOne -> i.
-		indices add: tagTwo -> i.
+		indices add: tagOne name -> i.
+		indices add: tagTwo name -> i.
 		
 		tagsOne at: i put: tagOne.
 		tagsTwo at: i put: tagTwo ].
@@ -345,14 +345,14 @@ LPRelationship >> relationOf: aTagPair is: aBoolean [
 LPRelationship >> relationOf: tagOne with: tagTwo [
 	"Look up the truth table value for a pair of tags: true, false, or nil."
 	
-	^ truthTable at: (tagIndices at: tagOne) at: (tagIndices at: tagTwo)
+	^ truthTable at: (tagIndices at: tagOne name) at: (tagIndices at: tagTwo name)
 ]
 
 { #category : #relationship }
 LPRelationship >> relationOf: tagOne with: tagTwo is: aBoolean [
 	"Set the truth table value for a pair of tags: true, false, or nil."
 	
-	^ truthTable at: (tagIndices at: tagOne) at: (tagIndices at: tagTwo) put: aBoolean
+	^ truthTable at: (tagIndices at: tagOne name) at: (tagIndices at: tagTwo name) put: aBoolean
 ]
 
 { #category : #accessing }

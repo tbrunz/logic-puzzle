@@ -54,3 +54,10 @@ LPAttributePair >> attributeTwo [
 LPAttributePair >> attributeTwo: anAttribute [
 	attributeTwo := anAttribute
 ]
+
+{ #category : #label }
+LPAttributePair >> dictionaryKey [
+	"Return a symbol that can serve as a dictionary key."
+	
+	^ attributeOne name , attributeTwo name 
+]

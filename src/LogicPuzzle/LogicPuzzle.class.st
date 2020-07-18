@@ -102,9 +102,12 @@ LogicPuzzle >> relationOfTag: tagOrNameOne withTag: tagOrNameTwo [
 	tagOne := attributeDatabase validateName: tagOrNameOne.
 	tagTwo := attributeDatabase validateName: tagOrNameTwo.
 	
+	tagOne := attributeDatabase tagDictionary at: tagOne.
+	tagTwo := attributeDatabase tagDictionary at: tagTwo.
+	
 	attributePair := LPAttributePair newWith: tagOne attribute with: tagTwo attribute.
 	
-	relationship := attributeDatabase relationshipDictionary at: attributePair.
+	relationship := attributeDatabase relationshipDictionary at: attributePair dictionaryKey.
 	
 	^ relationship relationOf: tagOne with: tagTwo
 ]
@@ -121,8 +124,8 @@ LogicPuzzle >> relationOfTag: tagOrNameOne withTag: tagOrNameTwo is: aBoolean [
 	tagTwo := attributeDatabase tagDictionary at: tagTwo.
 	
 	attributePair := LPAttributePair newWith: tagOne attribute with: tagTwo attribute.
-	self halt.
-	relationship := attributeDatabase relationshipDictionary at: attributePair.
+
+	relationship := attributeDatabase relationshipDictionary at: attributePair dictionaryKey.
 	
 	^ relationship relationOf: tagOne with: tagTwo is: aBoolean 
 ]

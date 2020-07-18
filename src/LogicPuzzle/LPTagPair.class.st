@@ -45,8 +45,8 @@ LPTagPair >> relationship [
 ]
 
 { #category : #accessing }
-LPTagPair >> relationship: anObject [
-	relationship := anObject
+LPTagPair >> relationship: aRelationship [
+	relationship := aRelationship
 ]
 
 { #category : #relationship }
