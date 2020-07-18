@@ -42,7 +42,8 @@ Class {
 		'attributePair',
 		'tagsOne',
 		'tagsTwo',
-		'matchPairs'
+		'matchPairs',
+		'tableString'
 	],
 	#category : #'LogicPuzzle-Base'
 }
@@ -123,8 +124,8 @@ LPRelationship >> attributePair [
 ]
 
 { #category : #accessing }
-LPRelationship >> attributePair: anObject [
-	attributePair := anObject
+LPRelationship >> attributePair: anAttributePair [
+	attributePair := anAttributePair
 ]
 
 { #category : #deductions }
@@ -243,8 +244,8 @@ LPRelationship >> matchPairs [
 ]
 
 { #category : #accessing }
-LPRelationship >> matchPairs: anObject [
-	matchPairs := anObject
+LPRelationship >> matchPairs: aCollection [
+	matchPairs := aCollection
 ]
 
 { #category : #indexing }
@@ -353,6 +354,49 @@ LPRelationship >> relationOf: tagOne with: tagTwo is: aBoolean [
 	"Set the truth table value for a pair of tags: true, false, or nil."
 	
 	^ truthTable at: (tagIndices at: tagOne name) at: (tagIndices at: tagTwo name) put: aBoolean
+]
+
+{ #category : #reporting }
+LPRelationship >> renderRelationship [
+	"Render the truth table of a relationship."
+
+	self
+		tableString:
+			(String
+				streamContents: [ :stream | 
+					stream cr.
+					tagsTwo
+						do: [ :tag | 
+							stream
+								nextPutAll:
+									(String
+										streamContents: [ :s | s nextPutAll: tag name ]
+										limitedTo: 3);
+								space ].
+					1 to: truthTable numberOfRows do: [ :row | 
+						stream cr.
+						1 to: truthTable numberOfColumns do: [ :col | 
+							stream
+								nextPutAll:
+									((truthTable at: row at: col)
+										ifNil: [ ' .  ' ]
+										ifNotNil: [ (truthTable at: row at: col)
+												ifTrue: [ ' @  ' ]
+												ifFalse: [ ' x  ' ] ]) ].
+						stream
+							space;
+							nextPutAll: (tagsOne at: row) name ].
+					stream cr ])
+]
+
+{ #category : #accessing }
+LPRelationship >> tableString [
+	^ tableString
+]
+
+{ #category : #accessing }
+LPRelationship >> tableString: aString [
+	tableString := aString
 ]
 
 { #category : #accessing }

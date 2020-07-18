@@ -62,6 +62,52 @@ LPAttributeDatabase >> addAttribute: stringOrSymbol withTags: arrayOfstringOrSym
 	^ thisAttribute
 ]
 
+{ #category : #inferencing }
+LPAttributeDatabase >> analyzeRelationTrio: relationTrio [
+	"Analyze a relationship trio, making inferences."
+
+	relationTrio
+		isModified: false;
+		inferRelations.
+		
+	^ relationTrio
+]
+
+{ #category : #inferencing }
+LPAttributeDatabase >> analyzeRelationship: relationship [
+	"Analyze a relationship, making deductions for matches & exclusions."
+
+	relationship
+		isModified: false;
+		deduceMatchedRelations;
+		deduceExcludedRelations.
+		
+	^ relationship 
+]
+
+{ #category : #inferencing }
+LPAttributeDatabase >> analyzeRelationships [
+	"Walk the set of relationships, analyzing, until no modifications are made."
+
+	| anyIsModified |
+	anyIsModified := true.
+
+	"Loop through all relationships until no modifications detected:"
+	[ anyIsModified ]
+		whileTrue: [ anyIsModified := false.
+			relationshipDictionary 
+				do: [ :relationship | 
+					relationship isModified: false.
+					self analyzeRelationship: relationship ].
+			relationTrioDictionary 
+				do: [ :relationTrio |
+					self analyzeRelationTrio: relationTrio ].
+			relationshipDictionary 
+				do: [ :relationship | 
+					anyIsModified := anyIsModified or: [ relationship isModified ] ]
+			] 
+]
+
 { #category : #accessing }
 LPAttributeDatabase >> attributeDictionary [
 	^ attributeDictionary

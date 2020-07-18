@@ -112,25 +112,25 @@ LogicPuzzleCreationTest >> test006CreateRelationships [
 	| puzzle |
 	puzzle := LogicPuzzle new .
 	
-	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
+	"Puzzle with 3 traits -> 3*2/2 = 3 relationship pair combinations = 6 permutations:"
 	self shouldnt: [ puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
 	self shouldnt: [ puzzle addAttribute: #Pet withTags: #( #Snails #Fox #Zebra ) ] raise: Error .
 	self shouldnt: [ puzzle addAttribute: #Beverage withTags: #( #Water #Tea #Coffee ) ] raise: Error .
 	self assert: puzzle createRelationships relationshipDictionary size equals: 6 .
 	
-	"Puzzle with 4 traits -> 4*3/2 = 6 associations:"
+	"Puzzle with 4 traits -> 4*3/2 = 6 relationship pair combinations = 12 permutations:"
 	self shouldnt: [ puzzle addAttribute: #Smokes withTags: #( #Kools #Parliaments #Chesterfields ) ] raise: Error .
 	self assert: puzzle createRelationships relationshipDictionary size equals: 12 .
 	
-	"Puzzle with 5 traits -> 5*4/2 = 10 associations:"
+	"Puzzle with 5 traits -> 5*4/2 = 10 relationship pair combinations = 20 permutations:"
 	self shouldnt: [ puzzle addAttribute: #House withTags: #( #Yellow #Blue #Green ) ] raise: Error .
 	self assert: puzzle createRelationships relationshipDictionary size equals: 20 .
 	
-	"Puzzle with 6 traits -> 6*5/2 = 15 associations:"
+	"Puzzle with 6 traits -> 6*5/2 = 15 relationship pair combinations = 30 permutations:"
 	self shouldnt: [ puzzle addAttribute: #Order withTags: #( #Left #Middle #Right ) ] raise: Error .
 	self assert: puzzle createRelationships relationshipDictionary size equals: 30 .
 	
-	"Puzzle with 7 traits --> 7*6/2 = 21 associations:"
+	"Puzzle with 7 traits --> 7*6/2 = 21 relationship pair combinations = 42 permutations:"
 	self shouldnt: [ puzzle addAttribute: #Food withTags: #( #Beef #Pork #Chicken ) ] raise: Error .
 	self assert: puzzle createRelationships relationshipDictionary size equals: 42 .
 ]
@@ -171,7 +171,7 @@ LogicPuzzleCreationTest >> test008AttributeRelations [
 	| puzzle |
 	puzzle := LogicPuzzle new .
 	
-	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
+	"Puzzle with 3 traits -> 3*2/2 = 3 relationship pair combinations = 6 permutations:"
 	self shouldnt: [ puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
 	self shouldnt: [ puzzle addAttribute: #Pet withTags: #( #Snails #Fox #Zebra ) ] raise: Error .
 	self shouldnt: [ puzzle addAttribute: #Beverage withTags: #( #Water #Tea #Coffee ) ] raise: Error .

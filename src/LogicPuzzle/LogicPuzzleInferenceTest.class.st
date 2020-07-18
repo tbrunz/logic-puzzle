@@ -1,16 +1,15 @@
 Class {
-	#name : #LogicPuzzleVersion10InferenceTest,
+	#name : #LogicPuzzleInferenceTest,
 	#superclass : #TestCase,
 	#category : #'LogicPuzzle-Tests'
 }
 
 { #category : #tests }
-LogicPuzzleVersion10InferenceTest >> testDeduceFalseMatches [
+LogicPuzzleInferenceTest >> testDeduceFalseMatches [
 	"Test that a 'true' match will produce row/column falses."
 	
-	| puzzle assn |
-	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzleVersion20 new .
+	| puzzle relationship |
+	puzzle := LogicPuzzle new .
 	
 	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
 	self shouldnt: [ puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
@@ -30,9 +29,9 @@ LogicPuzzleVersion10InferenceTest >> testDeduceFalseMatches [
 	self assert: (puzzle getAssociationOf: #Nationality with: #Pet) isModified equals: true .
 
 	"Render the association matrix for printing:"
-	assn := puzzle getAssociationOf: #Nationality with: #Pet .
-	self shouldnt: [ puzzle renderAssociation: assn ] raise: Error .
-	Transcript crShow: assn matrixString .
+	relationship := puzzle getAssociationOf: #Nationality with: #Pet .
+	self shouldnt: [ puzzle renderAssociation: relationship ] raise: Error .
+	Transcript crShow: relationship matrixString .
 	
 	"Verify again for another association pair:"
 	self shouldnt: [ puzzle deduceFalseMatchesOf: #Nationality with: #Beverage ] raise: Error .
@@ -44,97 +43,104 @@ LogicPuzzleVersion10InferenceTest >> testDeduceFalseMatches [
 	self assert: (puzzle getValueFor: #Nationality being: #Ukrainian with: #Beverage being: #Tea) equals: false .
 	self assert: (puzzle getValueFor: #Nationality being: #Ukrainian with: #Beverage being: #Water) equals: false .
 	
-	assn := puzzle getAssociationOf: #Nationality with: #Beverage .
-	self shouldnt: [ puzzle renderAssociation: assn ] raise: Error .
-	Transcript crShow: assn matrixString .
+	relationship := puzzle getAssociationOf: #Nationality with: #Beverage .
+	self shouldnt: [ puzzle renderAssociation: relationship ] raise: Error .
+	Transcript crShow: relationship matrixString .
 	
 	"Add another match to an association that already has one:"
 	self shouldnt: [ puzzle makeAssociation: 'Nationality' being: 'Japanese' matches: 'Beverage' being: 'Tea' be: true ] raise: Error .
 	self shouldnt: [ puzzle deduceFalseMatchesOf: #Nationality with: #Beverage ] raise: Error .
 	self assert: (puzzle getAssociationOf: #Nationality with: #Beverage) isModified equals: true .
 	
-	assn := puzzle getAssociationOf: #Nationality with: #Beverage.
-	self shouldnt: [ puzzle renderAssociation: assn ] raise: Error .
-	Transcript crShow: assn matrixString .
+	relationship := puzzle getAssociationOf: #Nationality with: #Beverage.
+	self shouldnt: [ puzzle renderAssociation: relationship ] raise: Error .
+	Transcript crShow: relationship matrixString .
 	
 	Transcript crShow: '------------------------------------'; cr 
 	
 ]
 
 { #category : #tests }
-LogicPuzzleVersion10InferenceTest >> testDeduceTrueMatches [
+LogicPuzzleInferenceTest >> testDeduceTrueMatches [
 	"Test that row or column of N-1 'falses' will produce row/column true."
 	
-	| puzzle assn |
-	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzleVersion20 new .
+	| puzzle database relationship |
+	puzzle := LogicPuzzle new .
 	
-	"Puzzle with 4 traits -> 4*3/2 = 6 associations:"
+	"Puzzle with 4 traits -> 4*3/2 = 6 relationship pair combinations = 12 permutations:"
 	self shouldnt: [ puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian #Englishman ) ] raise: Error .
 	self shouldnt: [ puzzle addAttribute: #Pet withTags: #( #Dog #Snails #Fox #Zebra ) ] raise: Error .
 	self shouldnt: [ puzzle addAttribute: #Beverage withTags: #( #Water #Milk #Tea #Coffee ) ] raise: Error .
 	
 	"Make some association matches to test with:"
-	self shouldnt: [ puzzle createAssociations ] raise: Error .
-	self shouldnt: [ puzzle makeAssociation: #Nationality being: #Norwegian matches: #Pet being: #Zebra be: true ] raise: Error .
-	self shouldnt: [ puzzle makeAssociation: 'Nationality' being: 'Ukrainian' matches: 'Beverage' being: 'Tea' be: false ] raise: Error .
-	self shouldnt: [ puzzle makeAssociation: 'Nationality' being: 'Ukrainian' matches: 'Beverage' being: 'Coffee' be: true ] raise: Error .
+	self shouldnt: [ puzzle createRelationships ] raise: Error .
+	database := puzzle attributeDatabase relationshipDictionary.
+
+	self shouldnt: [ puzzle relationOfTag: #Norwegian withTag: #Zebra is: true ] raise: Error .
+	self shouldnt: [ puzzle relationOfTag: 'Ukrainian' withTag: 'Tea' is: false ] raise: Error .
+	self shouldnt: [ puzzle relationOfTag: 'Ukrainian' withTag: 'Coffee' is: true ] raise: Error .
 	
 	"Verify that the rows & columns of a matched association are set false:"
-	self shouldnt: [ puzzle deduceFalseMatchesOf: #Nationality with: #Pet ] raise: Error .
-	self assert: (puzzle getAssociationOf: #Nationality with: #Pet) isModified equals: true .
+	self shouldnt: [ (database at: #Nationality , #Beverage) deduceMatchedRelations ] raise: Error .
+	self assert: (database at: #Beverage , #Nationality) isModified equals: true .
 
-	assn := puzzle getAssociationOf: #Nationality with: #Pet .
-	self shouldnt: [ puzzle renderAssociation: assn ] raise: Error .
-	Transcript crShow: assn matrixString .
-		
+	self shouldnt: [ (database at: #Nationality , #Pet) deduceMatchedRelations ] raise: Error .
+	self assert: (database at: #Nationality , #Pet) isModified equals: true .
+
+	self shouldnt: [ (database at: #Nationality , #Beverage) renderRelationship ] raise: Error .
+	Transcript crShow: (database at: #Nationality , #Beverage) tableString .
+
+	self shouldnt: [ (database at: #Nationality , #Pet) renderRelationship ] raise: Error .
+	Transcript crShow: (database at: #Nationality , #Pet) tableString .
+	
+	
 	self shouldnt: [ puzzle deduceFalseMatchesOf: #Nationality with: #Beverage ] raise: Error .
 	self assert: (puzzle getAssociationOf: #Nationality with: #Beverage) isModified equals: true .
 	
-	assn := puzzle getAssociationOf: #Nationality with: #Beverage .
-	self shouldnt: [ puzzle renderAssociation: assn ] raise: Error .
-	Transcript crShow: assn matrixString .
+	relationship := puzzle getAssociationOf: #Nationality with: #Beverage .
+	self shouldnt: [ puzzle renderAssociation: relationship ] raise: Error .
+	Transcript crShow: relationship matrixString .
 	
-	self shouldnt: [ puzzle makeAssociation: 'Nationality' being: 'Japanese' matches: 'Beverage' being: 'Tea' be: true ] raise: Error .
-	self shouldnt: [ puzzle makeAssociation: 'Nationality' being: 'Norwegian' matches: 'Beverage' being: 'Water' be: false ] raise: Error .
-	self shouldnt: [ puzzle deduceFalseMatchesOf: #Nationality with: #Beverage ] raise: Error .
+	self shouldnt: [ puzzle relationOfTag: 'Japanese' withTag: 'Tea' is: true ] raise: Error .
+	self shouldnt: [ puzzle relationOfTag: 'Norwegian' withTag: 'Water' is: false ] raise: Error .
+	
+	self shouldnt: [ (database at: #Nationality , #Beverage) deduceMatchedRelations ] raise: Error .
 	self assert: (puzzle getAssociationOf: #Nationality with: #Beverage) isModified equals: true .
 	
-	assn := puzzle getAssociationOf: #Nationality with: #Beverage .
-	self shouldnt: [ puzzle renderAssociation: assn ] raise: Error .
-	Transcript crShow: assn matrixString .
+	relationship := puzzle getAssociationOf: #Nationality with: #Beverage .
+	self shouldnt: [ puzzle renderAssociation: relationship ] raise: Error .
+	Transcript crShow: relationship matrixString .
 	
 	
 	"Test for deducing association matches:"
-	self shouldnt: [ puzzle deduceTrueMatchesIn: assn ] raise: Error .
+	self shouldnt: [ puzzle deduceTrueMatchesIn: relationship ] raise: Error .
 	
-	assn := puzzle getAssociationOf: #Nationality with: #Beverage .
-	self shouldnt: [ puzzle renderAssociation: assn ] raise: Error .
-	Transcript crShow: assn matrixString .
+	relationship := puzzle getAssociationOf: #Nationality with: #Beverage .
+	self shouldnt: [ puzzle renderAssociation: relationship ] raise: Error .
+	Transcript crShow: relationship matrixString .
 	
 	self shouldnt: [ puzzle deduceFalseMatchesOf: #Nationality with: #Beverage ] raise: Error .
 	
-	assn := puzzle getAssociationOf: #Nationality with: #Beverage .
-	self shouldnt: [ puzzle renderAssociation: assn ] raise: Error .
-	Transcript crShow: assn matrixString .
+	relationship := puzzle getAssociationOf: #Nationality with: #Beverage .
+	self shouldnt: [ puzzle renderAssociation: relationship ] raise: Error .
+	Transcript crShow: relationship matrixString .
 	
-	self shouldnt: [ puzzle deduceTrueMatchesIn: assn ] raise: Error .
+	self shouldnt: [ puzzle deduceTrueMatchesIn: relationship ] raise: Error .
 	
-	assn := puzzle getAssociationOf: #Nationality with: #Beverage .
-	self shouldnt: [ puzzle renderAssociation: assn ] raise: Error .
-	Transcript crShow: assn matrixString .
+	relationship := puzzle getAssociationOf: #Nationality with: #Beverage .
+	self shouldnt: [ puzzle renderAssociation: relationship ] raise: Error .
+	Transcript crShow: relationship matrixString .
 	
 	Transcript crShow: '------------------------------------'; cr 
 	
 ]
 
 { #category : #tests }
-LogicPuzzleVersion10InferenceTest >> testVettingAssociations [
+LogicPuzzleInferenceTest >> testVettingAssociations [
 	"Test iterating over all associations, deducing true/false, until no modifications are made."
 	
 	| puzzle assnNatBev assnNatPet assnBevPet |
-	"Create a test puzzle with some traits:"
-	puzzle := LogicPuzzleVersion20 new .
+	puzzle := LogicPuzzle new .
 	
 	"Puzzle with 4 traits -> 4*3/2 = 6 associations:"
 	self shouldnt: [ puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian #Englishman ) ] raise: Error .

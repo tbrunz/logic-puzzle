@@ -39,8 +39,6 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'primaryAttribute',
-		'relationshipDictionary',
-		'relationTrioCollection',
 		'attributeDatabase'
 	],
 	#category : #'LogicPuzzle-Base'
@@ -51,6 +49,13 @@ LogicPuzzle >> addAttribute: attributeName withTags: arrayOfTagNames [
 	"Create a new attribute and add to the puzzle attribute dictionary."
 	
 	attributeDatabase addAttribute: attributeName withTags: arrayOfTagNames 
+]
+
+{ #category : #inferencing }
+LogicPuzzle >> analyzeRelationships [ 
+	"Perform an analysis pass on the current relationship states."
+	
+	attributeDatabase analyzeRelationships 
 ]
 
 { #category : #accessing }
@@ -73,9 +78,7 @@ LogicPuzzle >> initialize [
 	
 	"Create the expandable arrays to accumulate the set of 
 	Attributes and the set of Tags as the user provides them."
-	attributeDatabase := LPAttributeDatabase new.
-	relationshipDictionary := Dictionary new.
-	relationTrioCollection := OrderedCollection new
+	attributeDatabase := LPAttributeDatabase new
 ]
 
 { #category : #accessing }
@@ -98,6 +101,8 @@ LogicPuzzle >> primaryAttribute: attributeOrName [
 LogicPuzzle >> relationOfTag: tagOrNameOne withTag: tagOrNameTwo [
 	"Retrieve the relationship between the two tags."
 	
+	"THIS IS CODE UNDER DEVELOPMENT"
+	
 	| tagOne tagTwo attributePair relationship |
 	tagOne := attributeDatabase validateName: tagOrNameOne.
 	tagTwo := attributeDatabase validateName: tagOrNameTwo.
@@ -116,6 +121,8 @@ LogicPuzzle >> relationOfTag: tagOrNameOne withTag: tagOrNameTwo [
 LogicPuzzle >> relationOfTag: tagOrNameOne withTag: tagOrNameTwo is: aBoolean [
 	"Set the relationship between the two tags."
 	
+	"THIS IS CODE UNDER DEVELOPMENT"
+	
 	| tagOne tagTwo attributePair relationship |
 	tagOne := attributeDatabase validateName: tagOrNameOne.
 	tagTwo := attributeDatabase validateName: tagOrNameTwo.
@@ -127,5 +134,8 @@ LogicPuzzle >> relationOfTag: tagOrNameOne withTag: tagOrNameTwo is: aBoolean [
 
 	relationship := attributeDatabase relationshipDictionary at: attributePair dictionaryKey.
 	
-	^ relationship relationOf: tagOne with: tagTwo is: aBoolean 
+	relationship relationOf: tagOne with: tagTwo is: aBoolean.
+	relationship isModified: true.
+	
+	^ relationship 
 ]
