@@ -54,17 +54,23 @@ LPTruthTable >> commitRelationship: aPropertyRelationship [
 ]
 
 { #category : #lookup }
-LPTruthTable >> fetchRelationship: aPropertyRelationship [
+LPTruthTable >> fetchRelationshipFor: propertyOne with: propertyTwo [
 	"Return a PropertyRelationship from the TruthTable."
 
-	| tablePoint propertyOne propertyTwo |
-	propertyOne := aPropertyRelationship propertyOne.
-	propertyTwo := aPropertyRelationship propertyTwo.
+	| tablePoint |
 	
 	tablePoint := propertyConverter
 		propertyToPointWith: propertyOne with: propertyTwo.
 		
 	^ truthTable at: tablePoint x at: tablePoint y
+]
+
+{ #category : #lookup }
+LPTruthTable >> fetchRelationshipStateFor: propertyOne with: propertyTwo [
+	"Return a PropertyRelationship State from the TruthTable."
+
+	^ (self fetchRelationshipFor: propertyOne with: propertyTwo)
+		relationshipState
 ]
 
 { #category : #initialization }
@@ -90,4 +96,18 @@ LPTruthTable >> initializeWith: anAttributeRelationship [
 	propertyConverter := LPPropertyConverter
 		newWith: attributeOne
 		with: attributeTwo
+]
+
+{ #category : #lookup }
+LPTruthTable >> updateRelationship: aPropertyRelationship [
+	"Return a PropertyRelationship from the TruthTable."
+
+	| tablePoint propertyOne propertyTwo |
+	propertyOne := aPropertyRelationship propertyOne.
+	propertyTwo := aPropertyRelationship propertyTwo.
+	
+	tablePoint := propertyConverter
+		propertyToPointWith: propertyOne with: propertyTwo.
+		
+	^ truthTable at: tablePoint x at: tablePoint y
 ]

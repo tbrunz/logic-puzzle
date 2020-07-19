@@ -27,6 +27,15 @@ Class {
 	#category : #'LogicPuzzle-Relationships'
 }
 
+{ #category : #'instance creation' }
+LPPropertyRelationship class >> newFor: attributeRelationship With: propertyOne with: propertyTwo [
+	"Make a new PropertyRelationship of Unknown state."
+	
+	^ self new 
+		initializeFor: attributeRelationship With: propertyOne with: propertyTwo;
+		yourself
+]
+
 { #category : #accessing }
 LPPropertyRelationship >> attributeRelationship [
 	^ attributeRelationship
@@ -37,6 +46,18 @@ LPPropertyRelationship >> commit [
 	"Commit myself to my AttributeRelationship."
 	
 	attributeRelationship commitPropertyRelationship: self
+]
+
+{ #category : #initialization }
+LPPropertyRelationship >> initializeFor: anAttributeRelationship With: firstProperty with: secondProperty [
+	"Set up a new PropertyRelationship with an Unknown state."
+	
+	attributeRelationship := anAttributeRelationship.
+	
+	propertyOne := firstProperty.
+	propertyTwo := secondProperty.
+	
+	relationshipState := LPRelationshipUnknown 
 ]
 
 { #category : #testing }

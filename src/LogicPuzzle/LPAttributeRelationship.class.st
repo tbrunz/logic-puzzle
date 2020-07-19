@@ -34,68 +34,22 @@ Class {
 	#instVars : [
 		'truthTable',
 		'isModified',
-		'hasTruesAdded',
 		'isInconsistent',
-		'tagIndices',
-		'attributePair',
-		'tagsOne',
-		'tagsTwo',
-		'matchPairs',
-		'tableString'
+		'attributeOne',
+		'attributeTwo',
+		'hasNewMatches',
+		'matchedProperties',
+		'displayString'
 	],
-	#category : #'LogicPuzzle-Base'
+	#category : #'LogicPuzzle-Relationships'
 }
 
 { #category : #'instance creation' }
-LPAttributeRelationship class >> newWith: attributePair [
-	"Create a new trait table instance for the given trait pair."
-	
-	^ self 
-		newWith: attributePair attributeOne with: attributePair attributeTwo 
-]
-
-{ #category : #'instance creation' }
 LPAttributeRelationship class >> newWith: attributeOne with: attributeTwo [
-	"Create a new relationship instance for the given attributes."
-
-	| count indices tagsOne tagsTwo |
-	"Make a dictionary to map tags to their corresponding matrix indices,
-	and a pair of arrays to map truth table indices back to their tags."
-	indices := Dictionary new.
-	count := attributeOne propertySet size.
+	"Create a new Attribute Relationship with the given attributes."
 	
-	tagsOne := Array ofSize: count.
-	tagsTwo := Array ofSize: count.
-	
-	"Note that tags are unique, even between attributes; matrix indices aren't.
-	This is because the truth table is 2D, so the index ranges are the same.
-	We'll need to address the truth table with a pair of tags.  There's a 
-	1D Dictionary, but not a 2D dictionary, so we'll need the combination 
-	of a Dictionary and an Array2D to make the mapping."
-	1 to: count do: [ :i | 
-		| tagOne tagTwo |
-		tagOne := attributeOne propertySet at: i.
-		tagTwo := attributeTwo propertySet at: i.
-		
-		indices add: tagOne name -> i.
-		indices add: tagTwo name -> i.
-		
-		tagsOne at: i put: tagOne.
-		tagsTwo at: i put: tagTwo ].
-	
-	"Now create a new instance and initialize it with the above collections."
 	^ self new
-		truthTable: (Array2D new: count);
-		
-		tagsOne: tagsOne;
-		tagsTwo: tagsTwo;
-		
-		tagIndices: indices;
-		matchPairs: OrderedCollection new;
-		
-		isModified: false;
-		hasTruesAdded: false;
-		
+		initializeWith: attributeOne with: attributeTwo;
 		yourself
 ]
 
@@ -112,18 +66,8 @@ LPAttributeRelationship >> addMatchPairAt: indexOne at: indexTwo [
 	If even one index was zero, then multiple tags of that 	attribute were 
 	found to be 'true'; this is an inconsistency."
 	(indexOne > 0 and: [ indexTwo > 0 ])
-		ifTrue: [ matchPairs add: (Array with: indexOne with: indexTwo) ]
+		ifTrue: [ matchedProperties add: (Array with: indexOne with: indexTwo) ]
 		ifFalse: [ isInconsistent := true ]
-]
-
-{ #category : #accessing }
-LPAttributeRelationship >> attributePair [
-	^ attributePair
-]
-
-{ #category : #accessing }
-LPAttributeRelationship >> attributePair: anAttributePair [
-	attributePair := anAttributePair
 ]
 
 { #category : #deductions }
@@ -135,7 +79,7 @@ LPAttributeRelationship >> deduceExcludedRelations [
 
 	"Now that we have a list of all 'trues', walk their attributes, 
 	and set each pair that isn't the 'true' coordinates to 'false'."
-	matchPairs
+	matchedProperties
 		do: [ :pair | 
 			indexOne := pair at: 1.
 			indexTwo := pair at: 2.
@@ -207,13 +151,30 @@ LPAttributeRelationship >> findMatchedRelations [
 ]
 
 { #category : #accessing }
-LPAttributeRelationship >> hasTruesAdded [
-	^ hasTruesAdded
+LPAttributeRelationship >> hasNewMatches [
+	^ hasNewMatches
 ]
 
 { #category : #accessing }
-LPAttributeRelationship >> hasTruesAdded: aBoolean [
-	hasTruesAdded := aBoolean
+LPAttributeRelationship >> hasNewMatches: aBoolean [
+	hasNewMatches := aBoolean
+]
+
+{ #category : #initialization }
+LPAttributeRelationship >> initializeWith: firstAttribute with: secondAttribute [
+
+	attributeOne := firstAttribute.
+	attributeTwo := secondAttribute.
+	
+	truthTable := Array2D new: (attributeOne propertySet size).
+		
+	matchedProperties := OrderedCollection new.
+		
+	displayString := ''.
+	
+	isModified := false.
+	hasNewMatches := false.
+	isInconsistent := false
 ]
 
 { #category : #accessing }
@@ -236,16 +197,6 @@ LPAttributeRelationship >> isModified: aBoolean [
 	isModified := aBoolean
 ]
 
-{ #category : #accessing }
-LPAttributeRelationship >> matchPairs [
-	^ matchPairs
-]
-
-{ #category : #accessing }
-LPAttributeRelationship >> matchPairs: aCollection [
-	matchPairs := aCollection
-]
-
 { #category : #indexing }
 LPAttributeRelationship >> matchRelationOf: indexOne at: indexTwo [
 	"If the indices are valid, make a 'true' relationship in the truth table."
@@ -262,7 +213,17 @@ LPAttributeRelationship >> matchRelationOf: indexOne at: indexTwo [
 	"Otherwise, we have the table entry of a 'true' by deduction; set it."
 	truthTable at: indexOne at: indexTwo put: true.
 	self isModified: true.
-	self hasTruesAdded: true.
+	self hasNewMatches: true.
+]
+
+{ #category : #accessing }
+LPAttributeRelationship >> matchedProperties [
+	^ matchedProperties
+]
+
+{ #category : #accessing }
+LPAttributeRelationship >> matchedProperties: aCollection [
+	matchedProperties := aCollection
 ]
 
 { #category : #indexing }
@@ -327,104 +288,76 @@ LPAttributeRelationship >> nilIndexOfTwoAt: indexOne [
 ]
 
 { #category : #relationship }
-LPAttributeRelationship >> relationOf: aTagPair [
-	"Look up the truth table value for a tag pair: true, false, or nil."
+LPAttributeRelationship >> relationOf: propertyArray [
+	"Look up the truth table value for a pair of properties."
 	
-	^ self relationOf: aTagPair tagOne with: aTagPair tagTwo
+	^ self relationOf: propertyArray first with: propertyArray second
 ]
 
 { #category : #relationship }
-LPAttributeRelationship >> relationOf: aTagPair is: aBoolean [
-	"Set the truth table value for a tag pair: true, false, or nil."
-	
-	^ self relationOf: aTagPair tagOne with: aTagPair tagTwo is: aBoolean 
+LPAttributeRelationship >> relationOf: propertyArray is: propertyRelationship [
+	"Set the truth table value for a pair of properties."
+
+	^ self
+		relationOf: propertyArray first
+		with: propertyArray second
+		is: propertyRelationship
 ]
 
 { #category : #relationship }
-LPAttributeRelationship >> relationOf: tagOne with: tagTwo [
-	"Look up the truth table value for a pair of tags: true, false, or nil."
-	
-	^ truthTable at: (tagIndices at: tagOne name) at: (tagIndices at: tagTwo name)
+LPAttributeRelationship >> relationOf: propertyOne with: propertyTwo [
+	"Look up the truth table value for a pair of properties."
+
+	| propertyRelationship |
+	propertyRelationship := LPPropertyRelationship
+		newFor: self
+		With: propertyOne
+		with: propertyTwo.
+
+	^ truthTable updateRelationship: propertyRelationship
 ]
 
 { #category : #relationship }
-LPAttributeRelationship >> relationOf: tagOne with: tagTwo is: aBoolean [
-	"Set the truth table value for a pair of tags: true, false, or nil."
-	
-	^ truthTable at: (tagIndices at: tagOne name) at: (tagIndices at: tagTwo name) put: aBoolean
+LPAttributeRelationship >> relationOf: propertyOne with: propertyTwo is: propertyRelationship [
+	"Look up the truth table value for a pair of properties."
+
+	^ truthTable commitRelationship: propertyRelationship
 ]
 
 { #category : #reporting }
 LPAttributeRelationship >> renderRelationship [
 	"Render the truth table of a relationship."
 
-	self
-		tableString:
+	displayString :=
 			(String
 				streamContents: [ :stream | 
 					stream cr.
-					tagsTwo
-						do: [ :tag | 
+					attributeTwo propertySet
+						do: [ :property | 
 							stream
 								nextPutAll:
 									(String
-										streamContents: [ :s | s nextPutAll: tag name ]
+										streamContents: [ :s | s nextPutAll: property name ]
 										limitedTo: 3);
 								space ].
-					1 to: truthTable numberOfRows do: [ :row | 
+					1 to: attributeOne propertySet do: [ :propertyOne | 
 						stream cr.
-						1 to: truthTable numberOfColumns do: [ :col | 
+						1 to: attributeTwo propertySet do: [ :propertyTwo | 
 							stream
-								nextPutAll:
-									((truthTable at: row at: col)
-										ifNil: [ ' .  ' ]
-										ifNotNil: [ (truthTable at: row at: col)
-												ifTrue: [ ' @  ' ]
-												ifFalse: [ ' x  ' ] ]) ].
+								nextPut: ' ';
+								nextPut:
+									(truthTable fetchRelationshipStateFor: propertyOne with: propertyTwo)
+										printSymbol;
+								nextPutAll: '  ' ].
 						stream
 							space;
-							nextPutAll: (tagsOne at: row) name ].
+							nextPutAll: (attributeOne propertySet at: propertyOne) name ].
 					stream cr ])
 ]
 
 { #category : #accessing }
-LPAttributeRelationship >> tableString [
-	^ tableString
-]
-
-{ #category : #accessing }
-LPAttributeRelationship >> tableString: aString [
-	tableString := aString
-]
-
-{ #category : #accessing }
-LPAttributeRelationship >> tagIndices [
-	^ tagIndices
-]
-
-{ #category : #accessing }
-LPAttributeRelationship >> tagIndices: anIndexArray [
-	tagIndices := anIndexArray
-]
-
-{ #category : #accessing }
-LPAttributeRelationship >> tagsOne [
-	^ tagsOne
-]
-
-{ #category : #accessing }
-LPAttributeRelationship >> tagsOne: anIndex [
-	tagsOne := anIndex
-]
-
-{ #category : #accessing }
-LPAttributeRelationship >> tagsTwo [
-	^ tagsTwo
-]
-
-{ #category : #accessing }
-LPAttributeRelationship >> tagsTwo: anIndex [
-	tagsTwo := anIndex
+LPAttributeRelationship >> stringRepresentation [
+	^ displayString
 ]
 
 { #category : #indexing }
@@ -455,14 +388,4 @@ LPAttributeRelationship >> trueIndexOfTwoAt: indexOne [
 		trueIndex := self nextTrueAfter: trueIndex for: truth at: indexTwo ].
 	
 	^ trueIndex
-]
-
-{ #category : #accessing }
-LPAttributeRelationship >> truthTable [
-	^ truthTable
-]
-
-{ #category : #accessing }
-LPAttributeRelationship >> truthTable: aTruthTable [
-	truthTable := aTruthTable
 ]
