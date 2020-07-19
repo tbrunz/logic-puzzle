@@ -36,7 +36,7 @@ LPTruthTable class >> newWith: attributeRelationship [
 		yourself
 ]
 
-{ #category : #lookup }
+{ #category : #updating }
 LPTruthTable >> commitRelationship: aPropertyRelationship [
 	"Overwrite the truth table PropertyRelationship with the argument."
 
@@ -108,7 +108,7 @@ LPTruthTable >> initializeWith: anAttributeRelationship [
 		with: attributeTwo
 ]
 
-{ #category : #lookup }
+{ #category : #updating }
 LPTruthTable >> updateRelationshipToExcluded: aPropertyRelationship [
 	"Change the PropertyRelationship in the TruthTable to 'excluded'."
 
@@ -119,7 +119,7 @@ LPTruthTable >> updateRelationshipToExcluded: aPropertyRelationship [
 	^ self commitRelationship: propertyRelationship
 ]
 
-{ #category : #lookup }
+{ #category : #updating }
 LPTruthTable >> updateRelationshipToMatched: aPropertyRelationship [
 	"Change the PropertyRelationship in the TruthTable to 'matched'."
 
@@ -128,4 +128,41 @@ LPTruthTable >> updateRelationshipToMatched: aPropertyRelationship [
 	propertyRelationship relationshipState: LPRelationshipMatched.
 
 	^ self commitRelationship: propertyRelationship
+]
+
+{ #category : #validating }
+LPTruthTable >> validateTruthTable [
+	"Scan the truth table and indicate its consistency."
+
+	| propertyCount matchCount excludeCount |
+	propertyCount := truthTable numberOfRows.
+
+	"This is low-level: Take advantage of our knowledge of the 
+	TruthTable construction to scan through it; start by rows:"
+	1 to: propertyCount do: [ :rowIndex | 
+		matchCount := excludeCount := 0.
+		
+		1 to: propertyCount do: [ :colIndex | 
+			(truthTable at: rowIndex at: colIndex) isMatched
+				ifTrue: [ matchCount := matchCount + 1 ].
+			(truthTable at: rowIndex at: colIndex) isExcluded
+				ifTrue: [ excludeCount := excludeCount + 1 ] ].
+			
+		(matchCount > 1 or: [ excludeCount = propertyCount ])
+			ifTrue: [ ^ false ] ].
+
+	"Then scan through it by columns:"
+	1 to: propertyCount do: [ :colIndex | 
+		matchCount := excludeCount := 0.
+		
+		1 to: propertyCount do: [ :rowIndex | 
+			(truthTable at: rowIndex at: colIndex) isMatched
+				ifTrue: [ matchCount := matchCount + 1 ].
+			(truthTable at: rowIndex at: colIndex) isExcluded
+				ifTrue: [ excludeCount := excludeCount + 1 ] ].
+			
+		(matchCount > 1 or: [ excludeCount = propertyCount ])
+			ifTrue: [ ^ false ] ].
+		
+	^ true
 ]
