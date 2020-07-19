@@ -78,7 +78,7 @@ LogicPuzzleVersion10 class >> validateTraitSize: numberOfTags [
 ]
 
 { #category : #adding }
-LogicPuzzleVersion10 >> addAttribute: stringOrSymbol withTags: tagArray [
+LogicPuzzleVersion10 >> addAttribute: stringOrSymbol withProperties: tagArray [
 	"Create a new trait from a given symbol & array of tags."
 
 	| trait traitName traitTags |

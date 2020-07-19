@@ -39,10 +39,10 @@ Class {
 }
 
 { #category : #adding }
-LogicPuzzleVersion20 >> addAttribute: aTraitName withTags: aTagArray [
+LogicPuzzleVersion20 >> addAttribute: aTraitName withProperties: aTagArray [
 	"Create a new trait for the puzzle.  The database will do validation."
 	
-	traitDatabase addAttribute: aTraitName withTags: aTagArray
+	traitDatabase addAttribute: aTraitName withProperties: aTagArray
 ]
 
 { #category : #associating }

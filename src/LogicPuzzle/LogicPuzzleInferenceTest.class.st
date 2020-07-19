@@ -12,9 +12,9 @@ LogicPuzzleInferenceTest >> testDeduceFalseMatches [
 	puzzle := LogicPuzzle new .
 	
 	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
-	self shouldnt: [ puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #Pet withTags: #( #Snails #Fox #Zebra ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #Beverage withTags: #( #Water #Tea #Coffee ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Nationality withProperties: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Pet withProperties: #( #Snails #Fox #Zebra ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Beverage withProperties: #( #Water #Tea #Coffee ) ] raise: Error .
 	
 	"Create the associations for this puzzle:"
 	self shouldnt: [ puzzle createAssociations ] raise: Error .
@@ -68,9 +68,9 @@ LogicPuzzleInferenceTest >> testDeduceTrueMatches [
 	puzzle := LogicPuzzle new .
 	
 	"Puzzle with 4 traits -> 4*3/2 = 6 relationship pair combinations = 12 permutations:"
-	self shouldnt: [ puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian #Englishman ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #Pet withTags: #( #Dog #Snails #Fox #Zebra ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #Beverage withTags: #( #Water #Milk #Tea #Coffee ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Nationality withProperties: #( #Norwegian #Japanese #Ukrainian #Englishman ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Pet withProperties: #( #Dog #Snails #Fox #Zebra ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Beverage withProperties: #( #Water #Milk #Tea #Coffee ) ] raise: Error .
 	
 	"Make some association matches to test with:"
 	self shouldnt: [ puzzle createRelationships ] raise: Error .
@@ -148,9 +148,9 @@ LogicPuzzleInferenceTest >> testVettingAssociations [
 	puzzle := LogicPuzzle new .
 	
 	"Puzzle with 4 traits -> 4*3/2 = 6 associations:"
-	self shouldnt: [ puzzle addAttribute: #Nationality withTags: #( #Norwegian #Japanese #Ukrainian #Englishman ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #Pet withTags: #( #Dog #Snails #Fox #Zebra ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #Beverage withTags: #( #Water #Milk #Tea #Coffee ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Nationality withProperties: #( #Norwegian #Japanese #Ukrainian #Englishman ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Pet withProperties: #( #Dog #Snails #Fox #Zebra ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Beverage withProperties: #( #Water #Milk #Tea #Coffee ) ] raise: Error .
 	
 	"Create the set of associations:"
 	self shouldnt: [ puzzle createAssociations ] raise: Error .

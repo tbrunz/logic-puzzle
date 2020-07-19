@@ -96,7 +96,7 @@ LPRelationshipTrio >> duplicateTruthTableState: tagPairOne with: tagPairTwo [
 ]
 
 { #category : #deductions }
-LPRelationshipTrio >> inferRelations [
+LPRelationshipTrio >> inferRelationships [
 	"Use the matches in the center attribute relation to infer 
 	relations between the other two attribute relationships."
 

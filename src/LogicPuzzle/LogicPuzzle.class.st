@@ -45,10 +45,10 @@ Class {
 }
 
 { #category : #creating }
-LogicPuzzle >> addAttribute: attributeName withTags: arrayOfTagNames [
+LogicPuzzle >> addAttribute: attributeName withProperties: arrayOfTagNames [
 	"Create a new attribute and add to the puzzle attribute dictionary."
 	
-	attributeDatabase addAttribute: attributeName withTags: arrayOfTagNames 
+	attributeDatabase addAttribute: attributeName withProperties: arrayOfTagNames 
 ]
 
 { #category : #inferencing }

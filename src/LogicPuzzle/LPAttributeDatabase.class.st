@@ -25,52 +25,55 @@ Class {
 		'minNumberOfAttributes',
 		'attributeDictionary',
 		'relationshipDictionary',
-		'relationTrioDictionary',
 		'minNumberOfProperties',
-		'propertyDictionary'
+		'propertyDictionary',
+		'relationshipTrioCollection'
 	],
 	#category : #'LogicPuzzle-Base'
 }
 
 { #category : #creating }
-LPAttributeDatabase >> addAttribute: stringOrSymbol withTags: arrayOfstringOrSymbol [
-	"Create a new trait from a given symbol & array of tags."
+LPAttributeDatabase >> addAttribute: stringOrSymbol withProperties: arrayOrSetOfstringOrSymbol [
+	"Create a new Attribute from a given symbol & set of Property names."
 
-	| attributeName tagNames thisAttribute theseTags |
+	| attributeName propertyNames attribute propertySet |
 	"Validate all the name tokens as String/Symbol and covert them to symbols;
-	Ensure that the array of attribute tags has the required number of tags:"
-	"attributeName := self validateNewAttributeName: stringOrSymbol."
+	Ensure that the array of Attribute Properties has the required number of 
+	Properties, and if provided as a collection or array, convert to a Set:"
 	attributeName := self validateName: stringOrSymbol.
-	tagNames := self validateNewPropertySet: arrayOfstringOrSymbol.
+	propertyNames := self validateNewPropertySet: arrayOrSetOfstringOrSymbol.
 
-	"Create the attribute, name it; we'll insert its tag array shortly:"
-	thisAttribute := LPAttribute newNamed: attributeName.
+	"Create the Attribute, name it; we'll insert its PropertySet shortly:"
+	attribute := LPAttribute newNamed: attributeName propertySet: nil.
 
-	"Create an array of tags from the array of tag names, inserting the attribute:"
-	theseTags := tagNames
-		collect: [ :tagName | LPProperty newNamed: tagName ofAttribute: thisAttribute ].
+	"Create a PropertySet from the set of Property names, 
+	inserting the owning Attribute into each:"
+	propertySet := propertyNames
+		collect: [ :propertyName | 
+			LPProperty newNamed: propertyName ofAttribute: attribute ].
 
-	"Now plug the tags array back into the attribute:"
-	thisAttribute propertySet: theseTags.
+	"Now plug the actual PropertySet into the Attribute:"
+	attribute propertySet: propertySet.
 
-	"Add the attribute to the attributes dictionary:"
-	attributeDictionary add: attributeName -> thisAttribute.
+	"Add the Attribute to the Attributes dictionary:"
+	attributeDictionary add: attribute name -> attribute.
 
-	"Add the tags in the tag array to the tags dictionary:"
-	theseTags do: [ :tag | propertyDictionary add: tag name -> tag ].
+	"Add the Properties in the PropertySet to the Properties dictionary:"
+	propertySet do: [ :property | 
+		propertyDictionary add: property name -> property ].
 	
-	^ thisAttribute
+	^ attribute
 ]
 
 { #category : #inferencing }
-LPAttributeDatabase >> analyzeRelationTrio: relationTrio [
+LPAttributeDatabase >> analyzeRelationTrio: relationshipTrio [
 	"Analyze a relationship trio, making inferences."
 
-	relationTrio
+	relationshipTrio
 		isModified: false;
-		inferRelations.
+		inferRelationships.
 		
-	^ relationTrio
+	^ relationshipTrio
 ]
 
 { #category : #inferencing }
@@ -95,13 +98,16 @@ LPAttributeDatabase >> analyzeRelationships [
 	"Loop through all relationships until no modifications detected:"
 	[ anyIsModified ]
 		whileTrue: [ anyIsModified := false.
+			
 			relationshipDictionary 
 				do: [ :relationship | 
 					relationship isModified: false.
 					self analyzeRelationship: relationship ].
-			relationTrioDictionary 
+				
+			relationshipTrioCollection 
 				do: [ :relationTrio |
 					self analyzeRelationTrio: relationTrio ].
+				
 			relationshipDictionary 
 				do: [ :relationship | 
 					anyIsModified := anyIsModified or: [ relationship isModified ] ]
@@ -144,79 +150,92 @@ LPAttributeDatabase >> attributeOfTag: tagOrName [
 	^ theTag attribute
 ]
 
-{ #category : #creating }
-LPAttributeDatabase >> createRelationTrios [
-	"Form combinations of attributes taken 3 at a time."
-
-	| attributeArray relationTrioCollection |
-	"We need a new dictionary and we need the attribute dictionary as an array."
-	relationTrioCollection := OrderedCollection new.
-	attributeArray := attributeDictionary asArray.
-
-	"Step through C(n,3) = every combination of attributes taken 3 at a time:"
-	1 to: attributeArray size - 2 do: [ :outerIndex | 
-		| attributeOne |
-		attributeOne := attributeArray at: outerIndex.
-
-		"Step through all but one of the remaining attributes to pair with this one:"
-		outerIndex + 1 to: attributeArray size - 1 do: [ :middleIndex | 
-			| attributeTwo |
-			attributeTwo := attributeArray at: middleIndex.
-
-			"Step through the remaining attributes in the array to make a trio:"
-			middleIndex + 1 to: attributeArray size do: [ :innerIndex | 
-				| attributeThree attributeTrio relationTrio |
-				attributeThree := attributeArray at: innerIndex.
-
-				"Create a trio combo, then cycle through it to make RelationTrios:"
-				attributeTrio := {attributeOne. attributeTwo. attributeThree}.
-
-				"Cycle through the trio, making each attribute the common attribute:"
-				attributeTrio
-					do: [ :commonAttribute | 
-						relationTrio := LPRelationshipTrio
-							newFrom: attributeTrio
-							for: commonAttribute
-							using: relationshipDictionary ].
-
-				"Finally, add the new relationship to our collection:"
-				relationTrioCollection add: relationTrio ] ] ].
+{ #category : #lookup }
+LPAttributeDatabase >> attributeRelationshipKeyFor: attributeOne with: attributeTwo [
+	"Combine Attribute one and Attribute two to make a single symbol."
 	
-	^ relationTrioCollection
+	^ attributeOne name , attributeTwo name
 ]
 
 { #category : #creating }
-LPAttributeDatabase >> createRelationshipPairs [
-	"Walk the attributes set to form every pair-wise permutation."
+LPAttributeDatabase >> createAttributeRelationships [
+	"Walk the Attributes set to form every pair-wise permutation."
 	
 	| attributeArray relationships |
-	"We need a new dictionary and we need the attribute dictionary as an array."
+	"We need a new dictionary and we need the Attribute dictionary as an array."
 	relationships := Dictionary new.
 	attributeArray := attributeDictionary asArray.
 
 	"Step through C(n,2) = every combination of attributes taken 2 at a time:"
 	1 to: attributeArray size - 1 do: [ :outerIndex | 
-		| attributeOne pairOne |
+		| attributeOne keyOne |
 		attributeOne := attributeArray at: outerIndex.
 
-		"Step through the remaining attributes in the array to pair with this one:"
+		"Step through the remaining attributes to pair with this one:"
 		outerIndex + 1 to: attributeArray size do: [ :innerIndex | 
-			| attributeTwo pairTwo relationship |
+			| attributeTwo keyTwo relationship |
 			attributeTwo := attributeArray at: innerIndex.
 
 			"Form a pair of keys from the attribute pair for accessing the new 
 			relationship. Why two keys? To eliminate ordering issues."
-			pairOne := LPAttributePair newWith: attributeOne with: attributeTwo.
-			pairTwo := LPAttributePair newWith: attributeTwo with: attributeOne.
+			keyOne := self 
+				attributeRelationshipKeyFor: attributeOne 
+				with: attributeTwo.
+			keyTwo := self 
+				attributeRelationshipKeyFor: attributeTwo 
+				with: attributeOne.
 			
 			"Make the relationship between the attributes:"
-			relationship := LPAttributeRelationship newWith: pairOne.
+			relationship := LPAttributeRelationship 
+				newWith: attributeOne 
+				with: attributeTwo.
 
 			"Finally, add the new relationship to our collection:"
-			relationships add: pairOne dictionaryKey -> relationship.
-			relationships add: pairTwo dictionaryKey -> relationship ] ].
+			relationships add: keyOne dictionaryKey -> relationship.
+			relationships add: keyTwo dictionaryKey -> relationship ] ].
 
 	^ relationships
+]
+
+{ #category : #creating }
+LPAttributeDatabase >> createRelationshipTrios [
+	"Form combinations of Attributes taken 3 at a time."
+
+	| attributeArray relationTrioCollection |
+	"We need a new dictionary and we need the Attribute dictionary as an array."
+	relationTrioCollection := OrderedCollection new.
+	attributeArray := attributeDictionary asArray.
+
+	"Step through C(n,3) = every combination of Attributes taken 3 at a time:"
+	1 to: attributeArray size - 2 do: [ :outerIndex | 
+		| attributeOne |
+		attributeOne := attributeArray at: outerIndex.
+
+		"Step through all but one of the remaining Attributes to pair with this one:"
+		outerIndex + 1 to: attributeArray size - 1 do: [ :middleIndex | 
+			| attributeTwo |
+			attributeTwo := attributeArray at: middleIndex.
+
+			"Step through the remaining Attributes in the array to make a trio:"
+			middleIndex + 1 to: attributeArray size do: [ :innerIndex | 
+				| attributeThree attributeTrio relationshipTrio |
+				attributeThree := attributeArray at: innerIndex.
+
+				"Create a trio combo, then cycle through it to make RelationshipTrios:"
+				attributeTrio := {attributeOne. attributeTwo. attributeThree}.
+
+				"Cycle through the trio, making each Attribute the common Attribute:"
+				attributeTrio
+					do: [ :commonAttribute | 
+						relationshipTrio := LPRelationshipTrio
+							newFrom: attributeTrio
+							for: commonAttribute
+							using: relationshipDictionary ].
+
+				"Finally, add the new relationship to our collection:"
+				relationTrioCollection add: relationshipTrio ] ] ].
+	
+	^ relationTrioCollection
 ]
 
 { #category : #creating }
@@ -225,12 +244,12 @@ LPAttributeDatabase >> createRelationships [
 
 	"Create all the pair-wise permutations of attributes, making 
 	a dictionary that points to unique pair-wise combinations:"
-	relationshipDictionary := self createRelationshipPairs.
+	relationshipDictionary := self createAttributeRelationships.
 
 	"Create all the combinations of attributes taken 3 at time:"
-	"relationTrioDictionary := self createRelationTrios"
+	relationshipTrioCollection := self createRelationshipTrios
 
-	"Do something..."
+	"Now do something useful..."
 ]
 
 { #category : #initialization }
@@ -259,89 +278,19 @@ LPAttributeDatabase >> minNumberOfProperties [
 	^ minNumberOfProperties
 ]
 
-{ #category : #normalization }
-LPAttributeDatabase >> normalizeTagPair: aTagPair [
-	"Validate & check the order of the trait pair elements.
-	Swap the order of the elements as necessary."
-	
-	^ self 
-		normalizeTagPairWith: aTagPair tagOne 
-		with: aTagPair tagTwo
-]
-
-{ #category : #normalization }
-LPAttributeDatabase >> normalizeTagPairWith: nameOne with: nameTwo [
-	"Validate & check the names, form a corresponding normalized 
-	trait 	pair, then return the corresponding 	normalized tag pair."
-
-	| tagOne tagTwo tagPairs traitPair |
-	"Extract the elements, validate them, and convert to symbols:"
-	tagOne := self validateName: nameOne.
-	tagTwo := self validateName: nameTwo.
-
-	"Make a set of candidate tag pairs to evaluate:"
-	tagPairs := Array
-		with: (LPTagPair newWith: tagOne with: tagTwo)
-		with: (LPTagPair newWith: tagTwo with: tagOne).
-
-	"Loop through the candidate tag pairs, making a corresponding 
-	trait pair from each; if the trait pair is in the trait pairs 
-	list, return the corresponding tag pair:"
-	tagPairs
-		do: [ :tagPair | 
-			traitPair := self traitPairFrom: tagPair.
-			(propertyDictionary anySatisfy: [ :pair | pair = traitPair ])
-				ifTrue: [ ^ tagPair ] ].
-			
-	self
-		error: 'Cannot find a trait pair for ' , tagOne , ' and ' , tagTwo
-]
-
-{ #category : #normalization }
-LPAttributeDatabase >> normalizeTraitPair: aTraitPair [
-	"Validate & check the order of the trait pair elements.
-	Swap the order of the elements as necessary."
-
-	^ self
-		normalizeTraitPairWith: aTraitPair traitOne
-		with: aTraitPair traitTwo
-]
-
-{ #category : #normalization }
-LPAttributeDatabase >> normalizeTraitPairWith: traitOne with: traitTwo [
-	"Validate & check the names, form a trait pair from them,
-	verify the trait pair exists, and return it normalized."
-
-	| traitPairs |
-	"Make a set of candidate trait pairs to evaluate:"
-	traitPairs := Array
-		with: (LPAttributePair newWith: traitOne with: traitTwo)
-		with: (LPAttributePair newWith: traitTwo with: traitOne).
-
-	"Loop through the candidate trait pairs; if the trait pair 
-	is in the trait pairs list, return it:"
-	traitPairs
-		do: [ :traitPair | 
-			(propertyDictionary anySatisfy: [ :pair | pair = traitPair ])
-				ifTrue: [ ^ traitPair ] ].
-	
-	"If neither orientation is recognized, one/both arguments are bad:"
-	self error: 'Cannot find a trait pair for ', traitOne, ' and ', traitTwo
-]
-
 { #category : #accessing }
 LPAttributeDatabase >> propertyDictionary [
 	^ propertyDictionary
 ]
 
 { #category : #accessing }
-LPAttributeDatabase >> relationTrioDictionary [
-	^ relationTrioDictionary
+LPAttributeDatabase >> relationshipDictionary [
+	^ relationshipDictionary
 ]
 
 { #category : #accessing }
-LPAttributeDatabase >> relationshipDictionary [
-	^ relationshipDictionary
+LPAttributeDatabase >> relationshipTrioCollection [
+	^ relationshipTrioCollection
 ]
 
 { #category : #lookup }
@@ -354,19 +303,6 @@ LPAttributeDatabase >> tagNamesOfAttribute: attributeOrName [
 	"Respond with an array of the names of the tags of the given attribute."
 
 	^ (self tagsOfAttribute: attributeOrName) collect: [ :tag | tag name ]
-]
-
-{ #category : #deprecated }
-LPAttributeDatabase >> tagPairWith: nameOne with: nameTwo [
-	"Create a normalized tag pair object from the given tags."
-	
-	| traitNameOne traitNameTwo |
-	traitNameOne := self validateNewAttributeName: nameOne.
-	traitNameTwo := self validateNewAttributeName: nameTwo.
-		
-	^ self
-		normalizeTraitPairWith: traitNameOne
-		with: traitNameTwo
 ]
 
 { #category : #lookup }
@@ -386,38 +322,6 @@ LPAttributeDatabase >> tagsOfAttribute: attributeOrName [
 		ifAbsent: [ self error: 'Unknown attribute (' , attributeName , ')' ].
 		
 	^ theAttribute propertySet
-]
-
-{ #category : #deprecated }
-LPAttributeDatabase >> traitPairFrom: aTagPair [
-	"Promote the tags in a tag pair to traits & return the trait pair."
-	
-	| tagOne tagTwo traitOne traitTwo |
-	"Extract the elements, validate them, and convert to symbols:"
-	tagOne := self validateName: aTagPair tagOne.
-	tagTwo := self validateName: aTagPair tagTwo.
-	
-	"Promote the tags to their respective traits:"
-	traitOne := self attributeOfTag: tagOne.
-	traitTwo := self attributeOfTag: tagTwo.
-	
-	"Form a trait pair and normalize it:"
-	^ self normalizeTraitPairWith: traitOne with: traitTwo
-	
-]
-
-{ #category : #deprecated }
-LPAttributeDatabase >> traitPairWith: nameOne with: nameTwo [
-	"Create a normalized trait pair object.  Interpret the arguments 
-	as either trait objects or trait names (string or symbol)."
-	
-	| traitNameOne traitNameTwo |
-	traitNameOne := self validateNewAttributeName: nameOne.
-	traitNameTwo := self validateNewAttributeName: nameTwo.
-		
-	^ self
-		normalizeTraitPairWith: traitNameOne
-		with: traitNameTwo
 ]
 
 { #category : #validation }
@@ -501,10 +405,8 @@ LPAttributeDatabase >> validateNewPropertySet: propertyCollection [
 	| propertySet size propertyCount |
 	propertySet := propertyCollection.
 	
-	propertyCollection isArray
+	propertyCollection isCollection 
 		ifTrue: [ propertySet := propertyCollection asSet ]
-	
-	propertySet class = Set
 		ifFalse: [ self error: 'Attribute properties must be a set of symbols' ].
 	
 	size := propertySet size.
