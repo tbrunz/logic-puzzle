@@ -53,11 +53,6 @@ LPPropertyConverter >> initializeWith: attributeOne with: attributeTwo [
 		pointToProperty add: tablePoint -> property ]
 ]
 
-{ #category : #accessing }
-LPPropertyConverter >> pointToProperty [
-	^ pointToProperty
-]
-
 { #category : #converting }
 LPPropertyConverter >> pointToProperty: aPoint [
 	"Convert the Point into a Property or Property array."
@@ -86,11 +81,6 @@ LPPropertyConverter >> pointToProperty: aPoint [
 	"Finally, if we're here, both Point components are good, so 
 	we've looked up two Properties; return them as an array:"
 	^ Array with: propertyOne with: propertyTwo
-]
-
-{ #category : #accessing }
-LPPropertyConverter >> propertyToPoint [
-	^ propertyToPoint
 ]
 
 { #category : #converting }

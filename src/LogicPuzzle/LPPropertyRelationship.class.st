@@ -28,7 +28,7 @@ Class {
 }
 
 { #category : #'instance creation' }
-LPPropertyRelationship class >> newFor: attributeRelationship With: propertyOne with: propertyTwo [
+LPPropertyRelationship class >> newFor: attributeRelationship with: propertyOne with: propertyTwo [
 	"Make a new PropertyRelationship of Unknown state."
 	
 	^ self new 
@@ -46,6 +46,31 @@ LPPropertyRelationship >> commit [
 	"Commit myself to my AttributeRelationship."
 	
 	attributeRelationship commitPropertyRelationship: self
+]
+
+{ #category : #updating }
+LPPropertyRelationship >> commitAsExcluded [
+	"Set my state to 'unknown', then commit myself to the TruthTable."
+	
+	relationshipState := LPRelationshipExcluded.
+	
+	^ self commit
+]
+
+{ #category : #updating }
+LPPropertyRelationship >> commitAsMatched [
+	"Set my state to 'unknown', then commit myself to the TruthTable."
+	
+	relationshipState := LPRelationshipMatched.
+	
+	^ self commit
+]
+
+{ #category : #updating }
+LPPropertyRelationship >> fetch [
+	"Refresh myself from my AttributeRelationship."
+	
+	^ attributeRelationship fetchPropertyRelationship: self
 ]
 
 { #category : #initialization }
@@ -99,11 +124,4 @@ LPPropertyRelationship >> relationshipState [
 { #category : #accessing }
 LPPropertyRelationship >> relationshipState: aRelationshipState [
 	relationshipState := aRelationshipState
-]
-
-{ #category : #updating }
-LPPropertyRelationship >> update [
-	"Refresh myself from my AttributeRelationship."
-	
-	^ attributeRelationship fetchPropertyRelationship: self
 ]
