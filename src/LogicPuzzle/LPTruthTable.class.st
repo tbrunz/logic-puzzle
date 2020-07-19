@@ -36,7 +36,7 @@ LPTruthTable class >> newWith: attributeRelationship [
 		yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #lookup }
 LPTruthTable >> commitRelationship: aPropertyRelationship [
 	"Return a PropertyRelationship from the TruthTable."
 
@@ -53,7 +53,7 @@ LPTruthTable >> commitRelationship: aPropertyRelationship [
 		put: aPropertyRelationship
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #lookup }
 LPTruthTable >> fetchRelationship: aPropertyRelationship [
 	"Return a PropertyRelationship from the TruthTable."
 
