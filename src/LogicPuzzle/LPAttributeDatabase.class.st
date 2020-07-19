@@ -79,8 +79,8 @@ LPAttributeDatabase >> analyzeRelationship: relationship [
 
 	relationship
 		isModified: false;
-		deduceMatchedRelations;
-		deduceExcludedRelations.
+		deduceMatchedRelationships;
+		deduceExcludedRelationships.
 		
 	^ relationship 
 ]

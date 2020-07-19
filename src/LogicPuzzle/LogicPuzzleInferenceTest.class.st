@@ -86,10 +86,10 @@ LogicPuzzleInferenceTest >> testDeduceTrueMatches [
 	self assert: ((database at: #Beverage , #Nationality) relationOf: #Ukranian with: #Coffee) equals: true.
 	
 	"Verify that the rows & columns of a matched association are set false:"
-	self shouldnt: [ (database at: #Nationality , #Beverage) deduceMatchedRelations ] raise: Error .
+	self shouldnt: [ (database at: #Nationality , #Beverage) deduceMatchedRelationships ] raise: Error .
 	self assert: (database at: #Beverage , #Nationality) isModified equals: true .
 
-	self shouldnt: [ (database at: #Nationality , #Pet) deduceMatchedRelations ] raise: Error .
+	self shouldnt: [ (database at: #Nationality , #Pet) deduceMatchedRelationships ] raise: Error .
 	self assert: (database at: #Nationality , #Pet) isModified equals: true .
 
 	self shouldnt: [ (database at: #Nationality , #Beverage) renderRelationship ] raise: Error .
@@ -109,7 +109,7 @@ LogicPuzzleInferenceTest >> testDeduceTrueMatches [
 	self shouldnt: [ puzzle relationOfTag: 'Japanese' withTag: 'Tea' is: true ] raise: Error .
 	self shouldnt: [ puzzle relationOfTag: 'Norwegian' withTag: 'Water' is: false ] raise: Error .
 	
-	self shouldnt: [ (database at: #Nationality , #Beverage) deduceMatchedRelations ] raise: Error .
+	self shouldnt: [ (database at: #Nationality , #Beverage) deduceMatchedRelationships ] raise: Error .
 	self assert: (puzzle getAssociationOf: #Nationality with: #Beverage) isModified equals: true .
 	
 	relationship := puzzle getAssociationOf: #Nationality with: #Beverage .

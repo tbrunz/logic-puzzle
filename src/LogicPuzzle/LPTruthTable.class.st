@@ -38,14 +38,14 @@ LPTruthTable class >> newWith: attributeRelationship [
 
 { #category : #lookup }
 LPTruthTable >> commitRelationship: aPropertyRelationship [
-	"Return a PropertyRelationship from the TruthTable."
+	"Overwrite the truth table PropertyRelationship with the argument."
 
-	| tablePoint propertyOne propertyTwo |
-	propertyOne := aPropertyRelationship propertyOne.
-	propertyTwo := aPropertyRelationship propertyTwo.
-	
+	| tablePoint |
+	"Corvert the property pair into a Point that can be used
+	as a pair of indices into the truth table:"
 	tablePoint := propertyConverter
-		propertyToPointWith: propertyOne with: propertyTwo.
+		propertyToPointWith: aPropertyRelationship propertyOne
+		with: aPropertyRelationship propertyTwo.
 		
 	^ truthTable
 		at: tablePoint x
@@ -54,11 +54,21 @@ LPTruthTable >> commitRelationship: aPropertyRelationship [
 ]
 
 { #category : #lookup }
+LPTruthTable >> fetchRelationship: aPropertyRelationship [
+	"Update a PropertyRelationship from the TruthTable."
+
+	^ self 
+		fetchRelationshipFor: aPropertyRelationship propertyOne
+		with: aPropertyRelationship propertyTwo
+]
+
+{ #category : #lookup }
 LPTruthTable >> fetchRelationshipFor: propertyOne with: propertyTwo [
 	"Return a PropertyRelationship from the TruthTable."
 
 	| tablePoint |
-	
+	"Corvert the property pair into a Point that can be used
+	as a pair of indices into the truth table:"
 	tablePoint := propertyConverter
 		propertyToPointWith: propertyOne with: propertyTwo.
 		
@@ -99,15 +109,23 @@ LPTruthTable >> initializeWith: anAttributeRelationship [
 ]
 
 { #category : #lookup }
-LPTruthTable >> updateRelationship: aPropertyRelationship [
-	"Return a PropertyRelationship from the TruthTable."
+LPTruthTable >> updateRelationshipToExcluded: aPropertyRelationship [
+	"Change the PropertyRelationship in the TruthTable to 'excluded'."
 
-	| tablePoint propertyOne propertyTwo |
-	propertyOne := aPropertyRelationship propertyOne.
-	propertyTwo := aPropertyRelationship propertyTwo.
-	
-	tablePoint := propertyConverter
-		propertyToPointWith: propertyOne with: propertyTwo.
-		
-	^ truthTable at: tablePoint x at: tablePoint y
+	| propertyRelationship |
+	propertyRelationship := aPropertyRelationship.
+	propertyRelationship relationshipState: LPRelationshipExcluded.
+
+	^ self commitRelationship: propertyRelationship
+]
+
+{ #category : #lookup }
+LPTruthTable >> updateRelationshipToMatched: aPropertyRelationship [
+	"Change the PropertyRelationship in the TruthTable to 'matched'."
+
+	| propertyRelationship |
+	propertyRelationship := aPropertyRelationship.
+	propertyRelationship relationshipState: LPRelationshipMatched.
+
+	^ self commitRelationship: propertyRelationship
 ]

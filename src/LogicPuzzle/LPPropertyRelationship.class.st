@@ -61,6 +61,13 @@ LPPropertyRelationship >> initializeFor: anAttributeRelationship With: firstProp
 ]
 
 { #category : #testing }
+LPPropertyRelationship >> isExcluded [
+	"Convenience wrapper for relationship state."
+	
+	^ relationshipState = LPRelationshipExcluded 
+]
+
+{ #category : #testing }
 LPPropertyRelationship >> isMatched [
 	"Convenience wrapper for relationship state."
 	

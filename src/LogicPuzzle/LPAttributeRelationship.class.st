@@ -38,8 +38,8 @@ Class {
 		'attributeOne',
 		'attributeTwo',
 		'hasNewMatches',
-		'matchedProperties',
-		'displayString'
+		'displayString',
+		'matchedRelationships'
 	],
 	#category : #'LogicPuzzle-Relationships'
 }
@@ -66,28 +66,49 @@ LPAttributeRelationship >> addMatchPairAt: indexOne at: indexTwo [
 	If even one index was zero, then multiple tags of that 	attribute were 
 	found to be 'true'; this is an inconsistency."
 	(indexOne > 0 and: [ indexTwo > 0 ])
-		ifTrue: [ matchedProperties add: (Array with: indexOne with: indexTwo) ]
+		ifTrue: [ matchedRelationships add: (Array with: indexOne with: indexTwo) ]
 		ifFalse: [ isInconsistent := true ]
 ]
 
 { #category : #deductions }
-LPAttributeRelationship >> deduceExcludedRelations [
-	"For each 'true' tag pairing, make all others in each attribute 'false'."
+LPAttributeRelationship >> addMatchedPropertyFor: propertyOne with: propertyTwo [
+	"If this PropertyRelationship is 'matched', then cache it."
 
-	| indexOne indexTwo |
-	self findMatchedRelations.
-
-	"Now that we have a list of all 'trues', walk their attributes, 
-	and set each pair that isn't the 'true' coordinates to 'false'."
-	matchedProperties
-		do: [ :pair | 
-			indexOne := pair at: 1.
-			indexTwo := pair at: 2.
-			self excludeRelationAround: indexOne at: indexTwo ]
+	| propertyRelationship |
+	"Fetch the corresponding PropertyRelationship; we want to 
+	cache the entire relationship, not just its state:"
+	propertyRelationship := truthTable
+		fetchRelationshipFor: propertyOne
+		with: propertyTwo.
+	
+	"Only keep matched relationships; no meaningful return."
+	propertyRelationship isMatched
+		ifTrue: [ matchedRelationships add: propertyRelationship ]
 ]
 
 { #category : #deductions }
-LPAttributeRelationship >> deduceMatchedRelations [
+LPAttributeRelationship >> deduceExcludedRelationships [
+	"For each 'matched' Property pairing, mark the exclusions."
+
+	| propertyOne propertyTwo |
+	self findMatchedRelationships.
+
+	"Now that we have a list of all 'matches', walk their attributes, 
+	with the opposing Property held constant in turn, and set each 
+	pair that isn't the 'matched' coordinates to 'excluded'."
+	matchedRelationships
+		do: [ :pair | 
+			propertyOne := pair propertyOne.
+			attributeTwo propertySet do: [ :property |
+				self excludeRelationshipFor: propertyOne with: property ].
+			
+			propertyTwo := pair propertyTwo.
+			attributeOne propertySet do: [ :property |
+				self excludeRelationshipFor: property with: propertyTwo ] ]
+]
+
+{ #category : #deductions }
+LPAttributeRelationship >> deduceMatchedRelationships [
 	"Walk each tag of each attribute in the truth table, looking for N-1 'falses'."
 
 	| indexOne indexTwo |
@@ -137,17 +158,36 @@ LPAttributeRelationship >> excludeRelationAround: indexOne at: indexTwo [
 ]
 
 { #category : #deductions }
-LPAttributeRelationship >> findMatchedRelations [
-	"Scan the truth table to find all the 'true' relationships."
-	
-	| indexOne indexTwo |
-	1 to: truthTable numberOfRows do: [ :index |
-		indexOne := self trueIndexOfOneAt: index.
-		indexTwo := self trueIndexOfTwoAt: index.
+LPAttributeRelationship >> excludeRelationshipFor: propertyOne with: propertyTwo [
+	"For each 'unknown' PropertyRelationship, mark as 'excluded'."
+
+	| propertyRelationship |
+	"If the PropertyRelationship for the pair is 'unknown', then 
+	update it to 'excluded'.  If it is 'excluded', do nothing. 
+	If it is 'matched', do nothing, as we are essentially stateless, 
+	so we can't do consistency checking here."
+	propertyRelationship := truthTable
+		fetchRelationshipFor: propertyOne
+		with: propertyTwo.
 		
-		self addMatchPairAt: indexOne at: index.
-		self addMatchPairAt: index at: indexTwo
-		]
+	propertyRelationship isMatched and: [ ^ propertyRelationship ].
+	
+	^ truthTable updateRelationshipToExcluded: propertyRelationship
+]
+
+{ #category : #deductions }
+LPAttributeRelationship >> findMatchedRelationships [
+	"Scan the truth table to find all the 'matched' relationships."
+
+	"We're going to regenerate the collection, so empty it first:"
+	matchedRelationships := OrderedCollection new.
+
+	"Walk each set of properties, and add them if they're a match:"
+	attributeOne propertySet
+		do: [ :propertyOne | 
+			attributeTwo propertySet
+				do: [ :propertyTwo | 
+					self addMatchedPropertyFor: propertyOne with: propertyTwo ] ]
 ]
 
 { #category : #accessing }
@@ -168,7 +208,7 @@ LPAttributeRelationship >> initializeWith: firstAttribute with: secondAttribute 
 	
 	truthTable := Array2D new: (attributeOne propertySet size).
 		
-	matchedProperties := OrderedCollection new.
+	matchedRelationships := OrderedCollection new.
 		
 	displayString := ''.
 	
@@ -217,13 +257,13 @@ LPAttributeRelationship >> matchRelationOf: indexOne at: indexTwo [
 ]
 
 { #category : #accessing }
-LPAttributeRelationship >> matchedProperties [
-	^ matchedProperties
+LPAttributeRelationship >> matchedRelationships [
+	^ matchedRelationships
 ]
 
 { #category : #accessing }
-LPAttributeRelationship >> matchedProperties: aCollection [
-	matchedProperties := aCollection
+LPAttributeRelationship >> matchedRelationships: aPropertyRelationship [
+	matchedRelationships := aPropertyRelationship
 ]
 
 { #category : #indexing }
@@ -314,7 +354,7 @@ LPAttributeRelationship >> relationOf: propertyOne with: propertyTwo [
 		With: propertyOne
 		with: propertyTwo.
 
-	^ truthTable updateRelationship: propertyRelationship
+	^ truthTable fetchRelationship: propertyRelationship
 ]
 
 { #category : #relationship }

@@ -102,7 +102,7 @@ LPRelationTrio >> inferRelations [
 
 	| leftTagPair rightTagPair |
 	"We can only infer associated relationship for matched pairs."
-	centerRelation matchedProperties
+	centerRelation matchedRelationships
 		do: [ :pair | 
 			"Walk the tags for the attribute common to left & right:"
 			commonAttribute propertySet
