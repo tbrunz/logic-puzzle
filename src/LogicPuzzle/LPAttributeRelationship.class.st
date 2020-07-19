@@ -1,37 +1,35 @@
 "
-I represent a relationship between two attributes of subjects 
-of a logic puzzle. 
+I represent a relationship between two Attributes of subjects 
+of a Logic Puzzle. 
 
-The attributes in a logic puzzle have names, 
+The Attributes in a Logic Puzzle have names, 
 e.g., #Nationality, #Color, #Sequence. 
 
-Each of these attributes defines a set of tags, its values. 
+Each of these Attributes defines a set of Properties. 
 e.g., #( #Yellow, #Blue, #Red ), or #( #1, #2, #3 ). 
 
-I manage a 'truth table' that matches up the tags of one attribute 
-against those of the second attribute.  Each truth table value 
-can be 'nil', 'true', or 'false'.  ('nil' means the relationship 
-between the two tags is indeterminate.)
+I manage a 'truth table' that matches up the Properties of my 
+first Attribute against those of my second Attribute.  Each 
+TruthTable 'cell' holds an instance of PropertyRelationship. 
 
-I can get or set a truth table cell value, or the entire truth 
-table.  I can also return an array of all the 'true' cell 
-coordinates.
+PropertyRelationships determine the state of the relationship 
+between the Properties of my Attributes, which can be Unknown, 
+Excluded, or Matched.
 
-I know how to peform deductive analyses on my truth table, to 
-deduce 'true' relations and 'excluded' relations.  I can update 
-my truth table accordingly, and track when I make modifications 
-and when I detect inconsistencies.
+I can get or set a TruthTable cell value, and I can return an 
+array of all the 'Matched' cell PropertyRelationships.
 
-A logic puzzle contains C(m,2) instances of me (where 'm' is the 
-number of attributes in the puzzle), in the form of a dictionary 
-keyed by an AttributePair.  And since the ordering of attributes 
-is important for how my truth table is stored, my dictionary has 
-P(m,2) elements; half its elements are for (a,b) ordering, and 
-half are for (b,a) ordering, but both point to the single (a,b) 
-Relationship.
+I know how to peform deductive analyses on my TruthTable, to 
+deduce 'Matched' relationships and 'Excluded' relationships.  
+I can update my TruthTable accordingly, and track when I make 
+modifications and when I detect inconsistencies.
+
+A Logic Puzzle contains C(m,2) instances of me (where 'm' is 
+the number of Attributes in the puzzle; the ordering of my 
+Attributes is irrelevant).
 "
 Class {
-	#name : #LPRelationship,
+	#name : #LPAttributeRelationship,
 	#superclass : #Object,
 	#instVars : [
 		'truthTable',
@@ -49,7 +47,7 @@ Class {
 }
 
 { #category : #'instance creation' }
-LPRelationship class >> newWith: attributePair [
+LPAttributeRelationship class >> newWith: attributePair [
 	"Create a new trait table instance for the given trait pair."
 	
 	^ self 
@@ -57,14 +55,14 @@ LPRelationship class >> newWith: attributePair [
 ]
 
 { #category : #'instance creation' }
-LPRelationship class >> newWith: attributeOne with: attributeTwo [
+LPAttributeRelationship class >> newWith: attributeOne with: attributeTwo [
 	"Create a new relationship instance for the given attributes."
 
 	| count indices tagsOne tagsTwo |
 	"Make a dictionary to map tags to their corresponding matrix indices,
 	and a pair of arrays to map truth table indices back to their tags."
 	indices := Dictionary new.
-	count := attributeOne tags size.
+	count := attributeOne propertySet size.
 	
 	tagsOne := Array ofSize: count.
 	tagsTwo := Array ofSize: count.
@@ -76,8 +74,8 @@ LPRelationship class >> newWith: attributeOne with: attributeTwo [
 	of a Dictionary and an Array2D to make the mapping."
 	1 to: count do: [ :i | 
 		| tagOne tagTwo |
-		tagOne := attributeOne tags at: i.
-		tagTwo := attributeTwo tags at: i.
+		tagOne := attributeOne propertySet at: i.
+		tagTwo := attributeTwo propertySet at: i.
 		
 		indices add: tagOne name -> i.
 		indices add: tagTwo name -> i.
@@ -102,7 +100,7 @@ LPRelationship class >> newWith: attributeOne with: attributeTwo [
 ]
 
 { #category : #indexing }
-LPRelationship >> addMatchPairAt: indexOne at: indexTwo [
+LPAttributeRelationship >> addMatchPairAt: indexOne at: indexTwo [
 	"If the indices are valid, add this pair to the true pairs collection."
 
 	"A 'nil' index means this relationship is currently indeterminate,
@@ -119,17 +117,17 @@ LPRelationship >> addMatchPairAt: indexOne at: indexTwo [
 ]
 
 { #category : #accessing }
-LPRelationship >> attributePair [
+LPAttributeRelationship >> attributePair [
 	^ attributePair
 ]
 
 { #category : #accessing }
-LPRelationship >> attributePair: anAttributePair [
+LPAttributeRelationship >> attributePair: anAttributePair [
 	attributePair := anAttributePair
 ]
 
 { #category : #deductions }
-LPRelationship >> deduceExcludedRelations [
+LPAttributeRelationship >> deduceExcludedRelations [
 	"For each 'true' tag pairing, make all others in each attribute 'false'."
 
 	| indexOne indexTwo |
@@ -145,7 +143,7 @@ LPRelationship >> deduceExcludedRelations [
 ]
 
 { #category : #deductions }
-LPRelationship >> deduceMatchedRelations [
+LPAttributeRelationship >> deduceMatchedRelations [
 	"Walk each tag of each attribute in the truth table, looking for N-1 'falses'."
 
 	| indexOne indexTwo |
@@ -159,7 +157,7 @@ LPRelationship >> deduceMatchedRelations [
 ]
 
 { #category : #indexing }
-LPRelationship >> excludeAttributeOneAt: indexTwo [
+LPAttributeRelationship >> excludeAttributeOneAt: indexTwo [
 	"Hold indexTwo constant and walk attributeOne to set 'nil' cells 'false'."
 
 	"If we change a cell from 'nil' to 'false', mark this table 'modified'."
@@ -170,7 +168,7 @@ LPRelationship >> excludeAttributeOneAt: indexTwo [
 ]
 
 { #category : #indexing }
-LPRelationship >> excludeAttributeTwoAt: indexOne [
+LPAttributeRelationship >> excludeAttributeTwoAt: indexOne [
 	"Hold indexTwo constant and walk attributeOne to set 'nil' cells 'false'."
 
 	"If we change a cell from 'nil' to 'false', mark this table 'modified'."
@@ -181,7 +179,7 @@ LPRelationship >> excludeAttributeTwoAt: indexOne [
 ]
 
 { #category : #indexing }
-LPRelationship >> excludeRelationAround: indexOne at: indexTwo [
+LPAttributeRelationship >> excludeRelationAround: indexOne at: indexTwo [
 	"Walk each of the attributes for the indices, making each 'false'."
 
 	"Hold indexOne constant and walk attributeTwo, setting all 'nil' cells  
@@ -195,7 +193,7 @@ LPRelationship >> excludeRelationAround: indexOne at: indexTwo [
 ]
 
 { #category : #deductions }
-LPRelationship >> findMatchedRelations [
+LPAttributeRelationship >> findMatchedRelations [
 	"Scan the truth table to find all the 'true' relationships."
 	
 	| indexOne indexTwo |
@@ -209,47 +207,47 @@ LPRelationship >> findMatchedRelations [
 ]
 
 { #category : #accessing }
-LPRelationship >> hasTruesAdded [
+LPAttributeRelationship >> hasTruesAdded [
 	^ hasTruesAdded
 ]
 
 { #category : #accessing }
-LPRelationship >> hasTruesAdded: aBoolean [
+LPAttributeRelationship >> hasTruesAdded: aBoolean [
 	hasTruesAdded := aBoolean
 ]
 
 { #category : #accessing }
-LPRelationship >> isInconsistent [
+LPAttributeRelationship >> isInconsistent [
 	^ isInconsistent
 ]
 
 { #category : #accessing }
-LPRelationship >> isInconsistent: aBoolean [
+LPAttributeRelationship >> isInconsistent: aBoolean [
 	isInconsistent := aBoolean
 ]
 
 { #category : #accessing }
-LPRelationship >> isModified [
+LPAttributeRelationship >> isModified [
 	^ isModified
 ]
 
 { #category : #accessing }
-LPRelationship >> isModified: aBoolean [
+LPAttributeRelationship >> isModified: aBoolean [
 	isModified := aBoolean
 ]
 
 { #category : #accessing }
-LPRelationship >> matchPairs [
+LPAttributeRelationship >> matchPairs [
 	^ matchPairs
 ]
 
 { #category : #accessing }
-LPRelationship >> matchPairs: aCollection [
+LPAttributeRelationship >> matchPairs: aCollection [
 	matchPairs := aCollection
 ]
 
 { #category : #indexing }
-LPRelationship >> matchRelationOf: indexOne at: indexTwo [
+LPAttributeRelationship >> matchRelationOf: indexOne at: indexTwo [
 	"If the indices are valid, make a 'true' relationship in the truth table."
 
 	"A 'nil' index means this relationship is currently indeterminate."
@@ -268,7 +266,7 @@ LPRelationship >> matchRelationOf: indexOne at: indexTwo [
 ]
 
 { #category : #indexing }
-LPRelationship >> nextNilAfter: nilIndex for: truth at: index [
+LPAttributeRelationship >> nextNilAfter: nilIndex for: truth at: index [
 	"Compare a value in the truth table, looking for 1 nil + N-1 falses."
 
 	"if an earlier failure occurred, propogate the failure."
@@ -284,7 +282,7 @@ LPRelationship >> nextNilAfter: nilIndex for: truth at: index [
 ]
 
 { #category : #indexing }
-LPRelationship >> nextTrueAfter: trueIndex for: truth at: index [
+LPAttributeRelationship >> nextTrueAfter: trueIndex for: truth at: index [
 	"Compare a value in the truth table, looking for 1 'true'."
 
 	"if an earlier failure occurred, propogate the failure."
@@ -299,7 +297,7 @@ LPRelationship >> nextTrueAfter: trueIndex for: truth at: index [
 ]
 
 { #category : #indexing }
-LPRelationship >> nilIndexOfOneAt: indexTwo [
+LPAttributeRelationship >> nilIndexOfOneAt: indexTwo [
 	"Scan attributeOne x indexTwo in the truth table for 1 nil + N-1 falses."
 
 	| truth nilIndex |
@@ -314,7 +312,7 @@ LPRelationship >> nilIndexOfOneAt: indexTwo [
 ]
 
 { #category : #indexing }
-LPRelationship >> nilIndexOfTwoAt: indexOne [
+LPAttributeRelationship >> nilIndexOfTwoAt: indexOne [
 	"Scan indexOne x attributeTwo in the truth table for 1 nil + N-1 falses."
 
 	| truth nilIndex |
@@ -329,35 +327,35 @@ LPRelationship >> nilIndexOfTwoAt: indexOne [
 ]
 
 { #category : #relationship }
-LPRelationship >> relationOf: aTagPair [
+LPAttributeRelationship >> relationOf: aTagPair [
 	"Look up the truth table value for a tag pair: true, false, or nil."
 	
 	^ self relationOf: aTagPair tagOne with: aTagPair tagTwo
 ]
 
 { #category : #relationship }
-LPRelationship >> relationOf: aTagPair is: aBoolean [
+LPAttributeRelationship >> relationOf: aTagPair is: aBoolean [
 	"Set the truth table value for a tag pair: true, false, or nil."
 	
 	^ self relationOf: aTagPair tagOne with: aTagPair tagTwo is: aBoolean 
 ]
 
 { #category : #relationship }
-LPRelationship >> relationOf: tagOne with: tagTwo [
+LPAttributeRelationship >> relationOf: tagOne with: tagTwo [
 	"Look up the truth table value for a pair of tags: true, false, or nil."
 	
 	^ truthTable at: (tagIndices at: tagOne name) at: (tagIndices at: tagTwo name)
 ]
 
 { #category : #relationship }
-LPRelationship >> relationOf: tagOne with: tagTwo is: aBoolean [
+LPAttributeRelationship >> relationOf: tagOne with: tagTwo is: aBoolean [
 	"Set the truth table value for a pair of tags: true, false, or nil."
 	
 	^ truthTable at: (tagIndices at: tagOne name) at: (tagIndices at: tagTwo name) put: aBoolean
 ]
 
 { #category : #reporting }
-LPRelationship >> renderRelationship [
+LPAttributeRelationship >> renderRelationship [
 	"Render the truth table of a relationship."
 
 	self
@@ -390,47 +388,47 @@ LPRelationship >> renderRelationship [
 ]
 
 { #category : #accessing }
-LPRelationship >> tableString [
+LPAttributeRelationship >> tableString [
 	^ tableString
 ]
 
 { #category : #accessing }
-LPRelationship >> tableString: aString [
+LPAttributeRelationship >> tableString: aString [
 	tableString := aString
 ]
 
 { #category : #accessing }
-LPRelationship >> tagIndices [
+LPAttributeRelationship >> tagIndices [
 	^ tagIndices
 ]
 
 { #category : #accessing }
-LPRelationship >> tagIndices: anIndexArray [
+LPAttributeRelationship >> tagIndices: anIndexArray [
 	tagIndices := anIndexArray
 ]
 
 { #category : #accessing }
-LPRelationship >> tagsOne [
+LPAttributeRelationship >> tagsOne [
 	^ tagsOne
 ]
 
 { #category : #accessing }
-LPRelationship >> tagsOne: anIndex [
+LPAttributeRelationship >> tagsOne: anIndex [
 	tagsOne := anIndex
 ]
 
 { #category : #accessing }
-LPRelationship >> tagsTwo [
+LPAttributeRelationship >> tagsTwo [
 	^ tagsTwo
 ]
 
 { #category : #accessing }
-LPRelationship >> tagsTwo: anIndex [
+LPAttributeRelationship >> tagsTwo: anIndex [
 	tagsTwo := anIndex
 ]
 
 { #category : #indexing }
-LPRelationship >> trueIndexOfOneAt: indexTwo [
+LPAttributeRelationship >> trueIndexOfOneAt: indexTwo [
 	"Scan attributeOne x indexTwo in the truth table for 1 'true'."
 
 	| truth trueIndex |
@@ -445,7 +443,7 @@ LPRelationship >> trueIndexOfOneAt: indexTwo [
 ]
 
 { #category : #indexing }
-LPRelationship >> trueIndexOfTwoAt: indexOne [
+LPAttributeRelationship >> trueIndexOfTwoAt: indexOne [
 	"Scan indexOne x attributeTwo in the truth table for 1 'true'."
 
 	| truth trueIndex |
@@ -460,11 +458,11 @@ LPRelationship >> trueIndexOfTwoAt: indexOne [
 ]
 
 { #category : #accessing }
-LPRelationship >> truthTable [
+LPAttributeRelationship >> truthTable [
 	^ truthTable
 ]
 
 { #category : #accessing }
-LPRelationship >> truthTable: aTruthTable [
+LPAttributeRelationship >> truthTable: aTruthTable [
 	truthTable := aTruthTable
 ]

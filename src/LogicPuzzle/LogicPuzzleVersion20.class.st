@@ -104,7 +104,7 @@ LogicPuzzleVersion20 >> createTraitTables [
 
 			"Form a table 'name' & make a new table using the two traits:"
 			traitPair := traitDatabase traitPairWith: traitOne with: traitTwo.
-			traitTable := LPRelationship newWith: traitPair.
+			traitTable := LPAttributeRelationship newWith: traitPair.
 
 			"Finally, add the new trait table to our collection:"
 			traitTablesDB add: traitPair -> traitTable ] ].

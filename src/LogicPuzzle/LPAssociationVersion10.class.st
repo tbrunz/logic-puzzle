@@ -76,7 +76,7 @@ LPAssociationVersion10 class >> newWith: firstTrait with: secondTrait [
 		name: (self nameWith: firstTrait name with: secondTrait name);
 			
 		"Create the matrix that will hold the linked associations:"
-		matrix: (Array2D new: firstTrait tags size);
+		matrix: (Array2D new: firstTrait propertySet size);
 		matrixString: '';
 		
 		"There can be as many as N matched traits per association:"

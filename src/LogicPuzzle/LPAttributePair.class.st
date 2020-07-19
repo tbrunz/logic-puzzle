@@ -12,7 +12,7 @@ Class {
 		'attributeOne',
 		'attributeTwo'
 	],
-	#category : #'LogicPuzzle-Base'
+	#category : #'LogicPuzzle-Version30'
 }
 
 { #category : #'instance creation' }

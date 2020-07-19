@@ -348,7 +348,7 @@ LogicPuzzleVersion10 >> inferTraitMatchesIn: anAssociation with: firstAssociatio
 
 	"We need the name of the third trait in common, and its tag array:"
 	thirdTrait := firstAssociation traitOppositeOf: firstTraitName.
-	thirdTraitTags := thirdTrait tags.
+	thirdTraitTags := thirdTrait propertySet.
 	thirdTraitName := thirdTrait name.
 
 	"For our given association, get the 'matrix coordinates' of each of its 'true' 
@@ -357,8 +357,8 @@ LogicPuzzleVersion10 >> inferTraitMatchesIn: anAssociation with: firstAssociatio
 	anAssociation matchCoords
 		do: [ :coord | 
 			| rowTag colTag |
-			rowTag := anAssociation firstTrait tags at: coord x.
-			colTag := anAssociation secondTrait tags at: coord y.
+			rowTag := anAssociation firstTrait propertySet at: coord x.
+			colTag := anAssociation secondTrait propertySet at: coord y.
 			
 			thirdTraitTags
 				do: [ :commonTag | 
@@ -454,7 +454,7 @@ LogicPuzzleVersion10 >> listTraits [
 						cr.
 
 					"Then list its tags, indented, on separate lines:"
-					trait tags 
+					trait propertySet 
 						do: [ :tag | 
 							stream
 								tab;
@@ -531,8 +531,8 @@ LogicPuzzleVersion10 >> renderAssociation: anAssociation [
 	"Render the matrix of an association."
 
 	| matrix rowTraitTags colTraitTags |
-	rowTraitTags := (self setOfTraits at: anAssociation firstTrait name) tags.
-	colTraitTags := (self setOfTraits at: anAssociation secondTrait name) tags.
+	rowTraitTags := (self setOfTraits at: anAssociation firstTrait name) propertySet.
+	colTraitTags := (self setOfTraits at: anAssociation secondTrait name) propertySet.
 	
 	matrix := anAssociation matrix.
 	
@@ -654,7 +654,7 @@ LogicPuzzleVersion10 >> verifyTrait: aTraitName containsTag: aTag [
 	tagName isSymbol
 		ifFalse: [ self error: 'Trait tags must be referred to with their names' ].
 		
-	((traitDatabase at: traitName) tags includes: aTag)
+	((traitDatabase at: traitName) propertySet includes: aTag)
 		ifFalse:
 			[ self error: 'Unknown tag ' , aTag , ' for trait ' , aTraitName ].
 		

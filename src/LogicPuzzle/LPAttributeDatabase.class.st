@@ -48,10 +48,10 @@ LPAttributeDatabase >> addAttribute: stringOrSymbol withTags: arrayOfstringOrSym
 
 	"Create an array of tags from the array of tag names, inserting the attribute:"
 	theseTags := tagNames
-		collect: [ :tagName | LPTag newNamed: tagName ofAttribute: thisAttribute ].
+		collect: [ :tagName | LPProperty newNamed: tagName ofAttribute: thisAttribute ].
 
 	"Now plug the tags array back into the attribute:"
-	thisAttribute tags: theseTags.
+	thisAttribute propertySet: theseTags.
 
 	"Add the attribute to the attributes dictionary:"
 	attributeDictionary add: attributeName -> thisAttribute.
@@ -131,7 +131,7 @@ LPAttributeDatabase >> attributeOfTag: tagOrName [
 
 	| tagName theTag |
 	"You could just ask the tag itself for its attribute..."
-	tagOrName class = LPTag
+	tagOrName class = LPProperty
 		ifTrue: [ ^ tagOrName attribute ].
 
 	"Otherwise, all we have is a name, so we do a lookup:"
@@ -210,7 +210,7 @@ LPAttributeDatabase >> createRelationshipPairs [
 			pairTwo := LPAttributePair newWith: attributeTwo with: attributeOne.
 			
 			"Make the relationship between the attributes:"
-			relationship := LPRelationship newWith: pairOne.
+			relationship := LPAttributeRelationship newWith: pairOne.
 
 			"Finally, add the new relationship to our collection:"
 			relationships add: pairOne dictionaryKey -> relationship.
@@ -376,7 +376,7 @@ LPAttributeDatabase >> tagsOfAttribute: attributeOrName [
 	| attributeName theAttribute |
 	"You could just ask the attribute itself for its tags..."
 	attributeOrName class = LPAttribute
-		ifTrue: [ ^ attributeOrName tags ].
+		ifTrue: [ ^ attributeOrName propertySet ].
 
 	"Otherwise, all we have is a name, so we do a lookup:"
 	attributeName := self validateName: attributeOrName.
@@ -385,7 +385,7 @@ LPAttributeDatabase >> tagsOfAttribute: attributeOrName [
 		at: attributeName
 		ifAbsent: [ self error: 'Unknown attribute (' , attributeName , ')' ].
 		
-	^ theAttribute tags
+	^ theAttribute propertySet
 ]
 
 { #category : #deprecated }
@@ -461,7 +461,7 @@ LPAttributeDatabase >> validateNewTagArray: tagArray [
 	
 	tagsPerAttribute := attributeDictionary isEmpty
 		ifTrue: [ size ]
-		ifFalse: [ attributeDictionary anyOne tags size ].
+		ifFalse: [ attributeDictionary anyOne propertySet size ].
 		
 	size = tagsPerAttribute
 		ifFalse: [ self

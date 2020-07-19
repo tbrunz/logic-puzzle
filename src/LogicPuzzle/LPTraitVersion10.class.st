@@ -26,7 +26,7 @@ LPTraitVersion10 class >> newNamed: traitName with: tagArray [
 	
 	^ self new
 		name: traitName;
-		tags: tagArray;
+		propertySet: tagArray;
 		yourself
 ]
 
@@ -65,12 +65,12 @@ LPTraitVersion10 >> name: aTraitName [
 ]
 
 { #category : #accessing }
-LPTraitVersion10 >> tags [
+LPTraitVersion10 >> propertySet [
 	^ tags
 ]
 
 { #category : #accessing }
-LPTraitVersion10 >> tags: tagArray [
+LPTraitVersion10 >> propertySet: tagArray [
 	"Validate and set an array of tags, plus a dictionary of their indices."
 
 	| index |

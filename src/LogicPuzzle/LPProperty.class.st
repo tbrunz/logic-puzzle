@@ -17,41 +17,48 @@ A logic puzzle contains many instances of me, as I am the focus
 of all elements of a puzzle.
 "
 Class {
-	#name : #LPTag,
+	#name : #LPProperty,
 	#superclass : #Object,
 	#instVars : [
-		'name',
-		'attribute'
+		'attribute',
+		'symbol'
 	],
 	#category : #'LogicPuzzle-Base'
 }
 
 { #category : #'instance creation' }
-LPTag class >> newNamed: aTagName ofAttribute: anAttribute [
-	"Create a new tag object; the name must already be validated."
+LPProperty class >> newNamed: aSymbol ofAttribute: anAttribute [
+	"Called only after the arguments have been validated."
 
 	^ self new 
-		name: aTagName;
+		symbol: aSymbol;
 		attribute: anAttribute;
 		yourself
 ]
 
 { #category : #accessing }
-LPTag >> attribute [
+LPProperty >> attribute [
 	^ attribute
 ]
 
 { #category : #accessing }
-LPTag >> attribute: anAttribute [
+LPProperty >> attribute: anAttribute [
 	attribute := anAttribute 
 ]
 
-{ #category : #accessing }
-LPTag >> name [
-	^ name
+{ #category : #printing }
+LPProperty >> printString [ 
+	"Render the property name as a string."
+	
+	^ symbol asString
 ]
 
 { #category : #accessing }
-LPTag >> name: aStringOrSymbol [
-	name := aStringOrSymbol asSymbol
+LPProperty >> symbol [
+	^ symbol
+]
+
+{ #category : #accessing }
+LPProperty >> symbol: aSymbol [
+	symbol := aSymbol
 ]

@@ -18,47 +18,45 @@ Class {
 	#name : #LPAttribute,
 	#superclass : #Object,
 	#instVars : [
-		'name',
-		'tags'
+		'symbol',
+		'propertySet'
 	],
 	#category : #'LogicPuzzle-Base'
 }
 
 { #category : #'instance creation' }
-LPAttribute class >> newNamed: anAttributeName [
+LPAttribute class >> newNamed: aSymbol propertySet: aPropertySet [
 	"Create a new attribute object; the name must already be validated."
 
 	^ self new 
-		name: anAttributeName;
+		symbol: aSymbol;
+		propertySet: aPropertySet;
 		yourself
 ]
 
-{ #category : #'instance creation' }
-LPAttribute class >> newNamed: anAttributeName withTags: aTagArray [
-	"Create a new attribute object; the name must already be validated."
-
-	^ self new 
-		name: anAttributeName;
-		tags: aTagArray;
-		yourself
+{ #category : #printing }
+LPAttribute >> printString [ 
+	"Render the attribute name as a string."
+	
+	^ symbol asString
 ]
 
 { #category : #accessing }
-LPAttribute >> name [
-	^ name
+LPAttribute >> propertySet [
+	^ propertySet
 ]
 
 { #category : #accessing }
-LPAttribute >> name: aStringOrSymbol [
-	name := aStringOrSymbol asSymbol
+LPAttribute >> propertySet: aPropertySet [
+	propertySet := aPropertySet
 ]
 
 { #category : #accessing }
-LPAttribute >> tags [
-	^ tags
+LPAttribute >> symbol [
+	^ symbol
 ]
 
 { #category : #accessing }
-LPAttribute >> tags: aTagArray [
-	tags := aTagArray
+LPAttribute >> symbol: aSymbol [
+	symbol := aSymbol
 ]

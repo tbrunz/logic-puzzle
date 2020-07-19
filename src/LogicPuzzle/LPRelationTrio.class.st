@@ -105,7 +105,7 @@ LPRelationTrio >> inferRelations [
 	centerRelation matchPairs
 		do: [ :pair | 
 			"Walk the tags for the attribute common to left & right:"
-			commonAttribute tags
+			commonAttribute propertySet
 				do: [ :tag | 
 					leftTagPair := LPTagPair
 						newFor: leftRelation

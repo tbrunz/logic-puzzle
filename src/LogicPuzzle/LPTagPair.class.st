@@ -13,7 +13,7 @@ Class {
 		'tagTwo',
 		'relationship'
 	],
-	#category : #'LogicPuzzle-Base'
+	#category : #'LogicPuzzle-Version30'
 }
 
 { #category : #'instance creation' }
