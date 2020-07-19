@@ -18,19 +18,19 @@ dictionary has twice as many elements; half its elements are for
 the (a,b) Relationship.
 "
 Class {
-	#name : #LPRelationTrio,
+	#name : #LPRelationshipTrio,
 	#superclass : #Object,
 	#instVars : [
 		'commonAttribute',
-		'leftRelation',
-		'centerRelation',
-		'rightRelation'
+		'leftRelationship',
+		'centerRelationship',
+		'rightRelationship'
 	],
-	#category : #'LogicPuzzle-Base'
+	#category : #'LogicPuzzle-Relationships'
 }
 
 { #category : #'instance creation' }
-LPRelationTrio class >> newFrom: attributeTrio for: commonAttribute using: relationDictionary [
+LPRelationshipTrio class >> newFrom: attributeTrio for: commonAttribute using: relationDictionary [
 	"Form an relationship trio from the given attributes."
 
 	| centerPair leftPair rightPair |
@@ -54,34 +54,34 @@ LPRelationTrio class >> newFrom: attributeTrio for: commonAttribute using: relat
 	"Now create an instance and fill in its instance variables:"
 	^ self new
 		commonAttribute: commonAttribute;
-		leftRelation: (relationDictionary at: leftPair);
-		rightRelation: (relationDictionary at: rightPair);
-		centerRelation: (relationDictionary at: centerPair);
+		leftRelationship: (relationDictionary at: leftPair);
+		rightRelationship: (relationDictionary at: rightPair);
+		centerRelationship: (relationDictionary at: centerPair);
 		yourself
 ]
 
 { #category : #accessing }
-LPRelationTrio >> centerRelation [
-	^ centerRelation
+LPRelationshipTrio >> centerRelationship [
+	^ centerRelationship
 ]
 
 { #category : #accessing }
-LPRelationTrio >> centerRelation: aRelationship [
-	centerRelation := aRelationship
+LPRelationshipTrio >> centerRelationship: aRelationship [
+	centerRelationship := aRelationship
 ]
 
 { #category : #accessing }
-LPRelationTrio >> commonAttribute [
+LPRelationshipTrio >> commonAttribute [
 	^ commonAttribute
 ]
 
 { #category : #accessing }
-LPRelationTrio >> commonAttribute: anAttribute [
+LPRelationshipTrio >> commonAttribute: anAttribute [
 	commonAttribute := anAttribute
 ]
 
 { #category : #deductions }
-LPRelationTrio >> duplicateTruthTableState: tagPairOne with: tagPairTwo [
+LPRelationshipTrio >> duplicateTruthTableState: tagPairOne with: tagPairTwo [
 	"One tag pair relation is nil, one is non-nil; 
 	Make the nil state relationship mirror the non-nil state."
 
@@ -96,50 +96,50 @@ LPRelationTrio >> duplicateTruthTableState: tagPairOne with: tagPairTwo [
 ]
 
 { #category : #deductions }
-LPRelationTrio >> inferRelations [
+LPRelationshipTrio >> inferRelations [
 	"Use the matches in the center attribute relation to infer 
 	relations between the other two attribute relationships."
 
 	| leftTagPair rightTagPair |
 	"We can only infer associated relationship for matched pairs."
-	centerRelation matchedRelationships
+	centerRelationship matchedRelationships
 		do: [ :pair | 
 			"Walk the tags for the attribute common to left & right:"
 			commonAttribute propertySet
 				do: [ :tag | 
 					leftTagPair := LPTagPair
-						newFor: leftRelation
+						newFor: leftRelationship
 						with: pair tagOne
 						with: tag.
 					rightTagPair := LPTagPair
-						newFor: rightRelation
+						newFor: rightRelationship
 						with: tag
 						with: pair tagTwo.
 					self syncTruthTablesWith: leftTagPair with: rightTagPair ] ]
 ]
 
 { #category : #accessing }
-LPRelationTrio >> leftRelation [
-	^ leftRelation
+LPRelationshipTrio >> leftRelationship [
+	^ leftRelationship
 ]
 
 { #category : #accessing }
-LPRelationTrio >> leftRelation: aRelationship [
-	leftRelation := aRelationship
+LPRelationshipTrio >> leftRelationship: aRelationship [
+	leftRelationship := aRelationship
 ]
 
 { #category : #accessing }
-LPRelationTrio >> rightRelation [
-	^ rightRelation
+LPRelationshipTrio >> rightRelationship [
+	^ rightRelationship
 ]
 
 { #category : #accessing }
-LPRelationTrio >> rightRelation: aRelationship [
-	rightRelation := aRelationship
+LPRelationshipTrio >> rightRelationship: aRelationship [
+	rightRelationship := aRelationship
 ]
 
 { #category : #deductions }
-LPRelationTrio >> syncTruthTablesWith: tagPairOne with: tagPairTwo [
+LPRelationshipTrio >> syncTruthTablesWith: tagPairOne with: tagPairTwo [
 	"Compare the states of two TagPairs related by a common attribute.
 	Returns 'nil' if both states are the same: Nothing to do.
 	Returns 'true' if either relationship was changed.

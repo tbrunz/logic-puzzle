@@ -22,12 +22,12 @@ Class {
 	#name : #LPAttributeDatabase,
 	#superclass : #Object,
 	#instVars : [
-		'minNumberOfTags',
 		'minNumberOfAttributes',
 		'attributeDictionary',
-		'tagDictionary',
 		'relationshipDictionary',
-		'relationTrioDictionary'
+		'relationTrioDictionary',
+		'minNumberOfProperties',
+		'propertyDictionary'
 	],
 	#category : #'LogicPuzzle-Base'
 }
@@ -41,7 +41,7 @@ LPAttributeDatabase >> addAttribute: stringOrSymbol withTags: arrayOfstringOrSym
 	Ensure that the array of attribute tags has the required number of tags:"
 	"attributeName := self validateNewAttributeName: stringOrSymbol."
 	attributeName := self validateName: stringOrSymbol.
-	tagNames := self validateNewTagArray: arrayOfstringOrSymbol.
+	tagNames := self validateNewPropertySet: arrayOfstringOrSymbol.
 
 	"Create the attribute, name it; we'll insert its tag array shortly:"
 	thisAttribute := LPAttribute newNamed: attributeName.
@@ -57,7 +57,7 @@ LPAttributeDatabase >> addAttribute: stringOrSymbol withTags: arrayOfstringOrSym
 	attributeDictionary add: attributeName -> thisAttribute.
 
 	"Add the tags in the tag array to the tags dictionary:"
-	theseTags do: [ :tag | tagDictionary add: tag name -> tag ].
+	theseTags do: [ :tag | propertyDictionary add: tag name -> tag ].
 	
 	^ thisAttribute
 ]
@@ -137,7 +137,7 @@ LPAttributeDatabase >> attributeOfTag: tagOrName [
 	"Otherwise, all we have is a name, so we do a lookup:"
 	tagName := self validateName: tagOrName.
 
-	theTag := tagDictionary 
+	theTag := propertyDictionary 
 		at: tagName
 		ifAbsent: [ self error: 'Unknown trait tag (' , tagName , ')' ].
 		
@@ -174,7 +174,7 @@ LPAttributeDatabase >> createRelationTrios [
 				"Cycle through the trio, making each attribute the common attribute:"
 				attributeTrio
 					do: [ :commonAttribute | 
-						relationTrio := LPRelationTrio
+						relationTrio := LPRelationshipTrio
 							newFrom: attributeTrio
 							for: commonAttribute
 							using: relationshipDictionary ].
@@ -242,11 +242,11 @@ LPAttributeDatabase >> initialize [
 	"Create the expandable arrays to accumulate the set of 
 	Attributes and the set of Tags as the user provides them."
 	attributeDictionary := Dictionary new.
-	tagDictionary := Dictionary new.
+	propertyDictionary := Dictionary new.
 
 	"Set constraints for this puzzle that apply universally."
 	minNumberOfAttributes := 3.
-	minNumberOfTags := 2
+	minNumberOfProperties := 2
 ]
 
 { #category : #accessing }
@@ -255,8 +255,8 @@ LPAttributeDatabase >> minNumberOfAttributes [
 ]
 
 { #category : #accessing }
-LPAttributeDatabase >> minNumberOfTags [
-	^ minNumberOfTags
+LPAttributeDatabase >> minNumberOfProperties [
+	^ minNumberOfProperties
 ]
 
 { #category : #normalization }
@@ -290,7 +290,7 @@ LPAttributeDatabase >> normalizeTagPairWith: nameOne with: nameTwo [
 	tagPairs
 		do: [ :tagPair | 
 			traitPair := self traitPairFrom: tagPair.
-			(tagDictionary anySatisfy: [ :pair | pair = traitPair ])
+			(propertyDictionary anySatisfy: [ :pair | pair = traitPair ])
 				ifTrue: [ ^ tagPair ] ].
 			
 	self
@@ -322,11 +322,16 @@ LPAttributeDatabase >> normalizeTraitPairWith: traitOne with: traitTwo [
 	is in the trait pairs list, return it:"
 	traitPairs
 		do: [ :traitPair | 
-			(tagDictionary anySatisfy: [ :pair | pair = traitPair ])
+			(propertyDictionary anySatisfy: [ :pair | pair = traitPair ])
 				ifTrue: [ ^ traitPair ] ].
 	
 	"If neither orientation is recognized, one/both arguments are bad:"
 	self error: 'Cannot find a trait pair for ', traitOne, ' and ', traitTwo
+]
+
+{ #category : #accessing }
+LPAttributeDatabase >> propertyDictionary [
+	^ propertyDictionary
 ]
 
 { #category : #accessing }
@@ -339,14 +344,9 @@ LPAttributeDatabase >> relationshipDictionary [
 	^ relationshipDictionary
 ]
 
-{ #category : #accessing }
-LPAttributeDatabase >> tagDictionary [
-	^ tagDictionary
-]
-
 { #category : #lookup }
 LPAttributeDatabase >> tagNames [
-	^ tagDictionary keys
+	^ propertyDictionary keys
 ]
 
 { #category : #lookup }
@@ -421,13 +421,43 @@ LPAttributeDatabase >> traitPairWith: nameOne with: nameTwo [
 ]
 
 { #category : #validation }
+LPAttributeDatabase >> validateExistingAttributeName: nameOrSymbol [
+	"Validate the Attribute name, convert it to a symbol, verify we know it."
+
+	| attributeName |
+	attributeName := self validateName: nameOrSymbol.
+
+	"Verify that it is the name of an Attribute we already know."
+	(attributeDictionary
+		anySatisfy: [ :attribute | attribute name = attributeName ])
+		ifTrue: [ ^ attributeName ].
+		
+	self error: 'Unknown attribute name (' , attributeName , ')'
+]
+
+{ #category : #validation }
+LPAttributeDatabase >> validateExistingPropertyName: nameOrSymbol [
+	"Validate the Property name, convert it to a symbol, verify we know it."
+
+	| propertyName |
+	propertyName := self validateName: nameOrSymbol.
+
+	"Verify that it is the name of a Property we already know."
+	(propertyDictionary
+		anySatisfy: [ :property | property name = propertyName ])
+		ifTrue: [ ^ propertyName ].
+		
+	self error: 'Unknown property name (' , propertyName , ')'
+]
+
+{ #category : #validation }
 LPAttributeDatabase >> validateName: tokenName [ 
 	"Validate the parameter as being a symbol or a string."
-	"If a string, render it as a valid symbol."
 	
 	tokenName isSymbol 
 		ifTrue: [ ^ tokenName ] .
 	
+	"If a string, render it as a valid symbol."
 	(tokenName isString and: [ tokenName isNotEmpty ])
 		ifTrue: [ ^ tokenName asSymbol ] .
 	
@@ -435,58 +465,63 @@ LPAttributeDatabase >> validateName: tokenName [
 ]
 
 { #category : #validation }
-LPAttributeDatabase >> validateNewAttributeName: name [
-	"Validate the attribute name, convert it to a symbol, verify that it's unique."
+LPAttributeDatabase >> validateNewAttributeName: nameOrSymbol [
+	"Validate the Attribute name, convert it to a symbol, verify it's unique."
 
 	| attributeName |
-	attributeName := self validateName: name.
+	attributeName := self validateName: nameOrSymbol.
 
-	"Verify that it's not the name of an attribute we already know about."
-	attributeDictionary 
-		do: [ :attribute | 
-			attributeName = attribute name
-				ifTrue: [ self error: 'Duplicate attribute name (' , attributeName , ')' ] ].
+	"Verify that it's not the name of an Attribute we already know."
+	(attributeDictionary
+		anySatisfy: [ :attribute | attribute name = attributeName ])
+		ifFalse: [ ^ attributeName ].
 			
-	^ attributeName
+	self error: 'Duplicate attribute name (' , attributeName , ')'
 ]
 
 { #category : #validation }
-LPAttributeDatabase >> validateNewTagArray: tagArray [
-	"Validate a collection of attribute tags."
+LPAttributeDatabase >> validateNewPropertyName: nameOrSymbol [
+	"Validate the Property name, convert it to a symbol, verify it's unique."
 
-	| size tagsPerAttribute |
-	tagArray isArray
-		ifFalse: [ self error: 'Attribute tags must be an array of symbols' ].
-	size := tagArray size.
+	| propertyName |
+	propertyName := self validateName: nameOrSymbol.
+
+	"Verify that it's not the name of a Property we already know."
+	(propertyDictionary
+		anySatisfy: [ :property | property name = propertyName ])
+		ifFalse: [ ^ propertyName ].
+		
+	self error: 'Duplicate property name (' , propertyName , ')'
+]
+
+{ #category : #validation }
+LPAttributeDatabase >> validateNewPropertySet: propertyCollection [
+	"Validate a collection of Attribute Properties."
+
+	| propertySet size propertyCount |
+	propertySet := propertyCollection.
 	
-	tagsPerAttribute := attributeDictionary isEmpty
+	propertyCollection isArray
+		ifTrue: [ propertySet := propertyCollection asSet ]
+	
+	propertySet class = Set
+		ifFalse: [ self error: 'Attribute properties must be a set of symbols' ].
+	
+	size := propertySet size.
+	
+	propertyCount := attributeDictionary isEmpty
 		ifTrue: [ size ]
 		ifFalse: [ attributeDictionary anyOne propertySet size ].
 		
-	size = tagsPerAttribute
+	size = propertyCount
 		ifFalse: [ self
-				error: 'Attributes must have ' , tagsPerAttribute printString , ' tags' ].
+				error: 'Attributes must have ' , propertyCount printString , ' properties' ].
 			
-	size < minNumberOfTags
+	size < minNumberOfProperties
 		ifTrue: [ self
 				error:
-					'Attributes must have at least ' , minNumberOfTags printString
-						, ' tags' ].
+					'Attributes must have at least ' , minNumberOfProperties printString
+						, ' properties' ].
 					
-	^ tagArray collect: [ :tag | self validateNewTagName: tag ]
-]
-
-{ #category : #validation }
-LPAttributeDatabase >> validateNewTagName: name [
-	"Validate the tag name, convert it to a symbol, verify that it's unique."
-
-	| tagName |
-	tagName := self validateName: name.
-
-	"Verify that it's not the name of a tag we already know about."
-	tagDictionary
-		do: [ :tag | 
-			tagName = tag name
-				ifTrue: [ self error: 'Duplicate tag name (' , tagName , ')' ] ].
-	^ tagName
+	^ propertySet collect: [ :property | self validateNewPropertyName: property ]
 ]
