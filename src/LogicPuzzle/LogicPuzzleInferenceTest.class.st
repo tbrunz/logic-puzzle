@@ -75,10 +75,15 @@ LogicPuzzleInferenceTest >> testDeduceTrueMatches [
 	"Make some association matches to test with:"
 	self shouldnt: [ puzzle createRelationships ] raise: Error .
 	database := puzzle attributeDatabase relationshipDictionary.
-
+	
+	"Verify that relations set in the truth table are what we expect:"
 	self shouldnt: [ puzzle relationOfTag: #Norwegian withTag: #Zebra is: true ] raise: Error .
 	self shouldnt: [ puzzle relationOfTag: 'Ukrainian' withTag: 'Tea' is: false ] raise: Error .
 	self shouldnt: [ puzzle relationOfTag: 'Ukrainian' withTag: 'Coffee' is: true ] raise: Error .
+	
+	self assert: ((database at: #Nationality , #Pet) relationOf: #Norwegian with: #Zebra) equals: true.
+	self assert: ((database at: #Nationality , #Beverage) relationOf: #Ukranian with: #Tea) equals: false.
+	self assert: ((database at: #Beverage , #Nationality) relationOf: #Ukranian with: #Coffee) equals: true.
 	
 	"Verify that the rows & columns of a matched association are set false:"
 	self shouldnt: [ (database at: #Nationality , #Beverage) deduceMatchedRelations ] raise: Error .
