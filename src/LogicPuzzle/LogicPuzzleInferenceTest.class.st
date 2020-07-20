@@ -35,34 +35,35 @@ LogicPuzzleInferenceTest >> testDeduceExclusions [
 	self shouldnt: [ (relationships at: #Nationality , #Pet) deduceExcludedRelationships ] raise: Error .
 	self assert: (relationships at: #Nationality , #Pet) isModified equals: true .
 
-self halt.
 	"Render the association matrix for printing:"
-	relationship := puzzle getAssociationOf: #Nationality with: #Pet .
-	self shouldnt: [ puzzle renderAssociation: relationship ] raise: Error .
-	Transcript crShow: relationship matrixString .
-	
+	(relationship := relationships at: #Nationality , #Pet) renderRelationship .
+	self shouldnt: [ relationship renderRelationship ] raise: Error .
+	Transcript crShow: relationship stringRepresentation .
+
 	"Verify again for another association pair:"
-	self shouldnt: [ puzzle deduceFalseMatchesOf: #Nationality with: #Beverage ] raise: Error .
-	self assert: (puzzle getAssociationOf: #Nationality with: #Beverage) isModified equals: true .
+	(relationships at: #Nationality , #Beverage) deduceExcludedRelationships.
 	
-	self assert: (puzzle getValueFor: #Nationality being: #Norwegian with: #Beverage being: #Coffee) equals: false .
-	self assert: (puzzle getValueFor: #Nationality being: #Japanese with: #Beverage being: #Coffee) equals: false .
-	self assert: (puzzle getValueFor: #Nationality being: #Ukrainian with: #Beverage being: #Coffee) equals: true .
-	self assert: (puzzle getValueFor: #Nationality being: #Ukrainian with: #Beverage being: #Tea) equals: false .
-	self assert: (puzzle getValueFor: #Nationality being: #Ukrainian with: #Beverage being: #Water) equals: false .
+	self shouldnt: [ (relationships at: #Nationality , #Beverage) deduceExcludedRelationships ] raise: Error .
+	self assert: (relationships at: #Nationality , #Beverage) isModified equals: true .
 	
-	relationship := puzzle getAssociationOf: #Nationality with: #Beverage .
-	self shouldnt: [ puzzle renderAssociation: relationship ] raise: Error .
-	Transcript crShow: relationship matrixString .
+	self assert: (puzzle relationshipOf: #Norwegian with: #Coffee) equals: 'excluded'.
+	self assert: (puzzle relationshipOf: #Japanese with: #Coffee) equals: 'excluded'.
+	self assert: (puzzle relationshipOf: #Ukrainian with: #Coffee) equals: 'matched'.
+	self assert: (puzzle relationshipOf: #Ukrainian with: #Tea) equals: 'excluded'.
+	self assert: (puzzle relationshipOf: #Ukrainian with: #Water) equals: 'excluded'.
+	
+	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
+	Transcript crShow: relationship stringRepresentation .
 	
 	"Add another match to an association that already has one:"
-	self shouldnt: [ puzzle makeAssociation: 'Nationality' being: 'Japanese' matches: 'Beverage' being: 'Tea' be: true ] raise: Error .
-	self shouldnt: [ puzzle deduceFalseMatchesOf: #Nationality with: #Beverage ] raise: Error .
-	self assert: (puzzle getAssociationOf: #Nationality with: #Beverage) isModified equals: true .
+	self shouldnt: [ puzzle relationshipOf: #Japanese with: #Tea is: #Matched ] raise: Error .	
+	self assert: (puzzle relationshipOf: #Japanese with: #Tea) equals: 'matched'.
+
+	self shouldnt: [ (relationships at: #Nationality , #Beverage) deduceExcludedRelationships ] raise: Error .
+	self assert: (relationships at: #Nationality , #Beverage) isModified equals: true .
 	
-	relationship := puzzle getAssociationOf: #Nationality with: #Beverage.
-	self shouldnt: [ puzzle renderAssociation: relationship ] raise: Error .
-	Transcript crShow: relationship matrixString .
+	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
+	Transcript crShow: relationship stringRepresentation .
 	
 	Transcript crShow: '------------------------------------'; cr 
 	
@@ -102,50 +103,44 @@ LogicPuzzleInferenceTest >> testDeduceMatches [
 	self shouldnt: [ (relationships at: #Nationality , #Pet) deduceMatchedRelationships ] raise: Error .
 	self assert: (relationships at: #Nationality , #Pet) isModified equals: true .
 
-self halt.
-	self shouldnt: [ (relationships at: #Nationality , #Beverage) renderRelationship ] raise: Error .
-	Transcript crShow: (relationships at: #Nationality , #Beverage) tableString .
+	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
+	Transcript crShow: relationship stringRepresentation .
 
-	self shouldnt: [ (relationships at: #Nationality , #Pet) renderRelationship ] raise: Error .
-	Transcript crShow: (relationships at: #Nationality , #Pet) tableString .
+	(relationship := relationships at: #Nationality , #Pet) renderRelationship .
+	Transcript crShow: relationship stringRepresentation .
 	
-self halt.
-	self shouldnt: [ puzzle deduceFalseMatchesOf: #Nationality with: #Beverage ] raise: Error .
-	self assert: (puzzle getAssociationOf: #Nationality with: #Beverage) isModified equals: true .
+	self shouldnt: [ (relationships at: #Nationality , #Beverage) deduceExcludedRelationships ] raise: Error .
+	self assert: (relationships at: #Nationality , #Beverage) isModified equals: true .
+
+	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
+	Transcript crShow: relationship stringRepresentation .
 	
-	relationship := puzzle getAssociationOf: #Nationality with: #Beverage .
-	self shouldnt: [ puzzle renderAssociation: relationship ] raise: Error .
-	Transcript crShow: relationship matrixString .
-	
-	self shouldnt: [ puzzle relationshipOf: 'Japanese' with: 'Tea' is: LPRelationshipMatched ] raise: Error .
-	self shouldnt: [ puzzle relationshipOf: 'Norwegian' with: 'Water' is: LPRelationshipExcluded ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Japanese with: #Tea is: #Matched ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: 'Norwegian' with: 'Water' is: #Excluded ] raise: Error .
 	
 	self shouldnt: [ (relationships at: #Nationality , #Beverage) deduceMatchedRelationships ] raise: Error .
-	self assert: (puzzle getAssociationOf: #Nationality with: #Beverage) isModified equals: true .
-	
-	relationship := puzzle getAssociationOf: #Nationality with: #Beverage .
-	self shouldnt: [ puzzle renderAssociation: relationship ] raise: Error .
-	Transcript crShow: relationship matrixString .
-	
+	self assert: (relationships at: #Nationality , #Beverage) isModified equals: true .
+
+	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
+	Transcript crShow: relationship stringRepresentation .
+
 	
 	"Test for deducing relationship matches:"
-	self shouldnt: [ puzzle deduceTrueMatchesIn: relationship ] raise: Error .
+	self shouldnt: [ relationship deduceMatchedRelationships ] raise: Error .
+	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
+	Transcript crShow: relationship stringRepresentation .
 	
-	relationship := puzzle getAssociationOf: #Nationality with: #Beverage .
-	self shouldnt: [ puzzle renderAssociation: relationship ] raise: Error .
-	Transcript crShow: relationship matrixString .
+	self shouldnt: [ relationship deduceExcludedRelationships ] raise: Error .
+	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
+	Transcript crShow: relationship stringRepresentation .
 	
-	self shouldnt: [ puzzle deduceFalseMatchesOf: #Nationality with: #Beverage ] raise: Error .
+	self shouldnt: [ relationship deduceMatchedRelationships ] raise: Error .
+	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
+	Transcript crShow: relationship stringRepresentation .
 	
-	relationship := puzzle getAssociationOf: #Nationality with: #Beverage .
-	self shouldnt: [ puzzle renderAssociation: relationship ] raise: Error .
-	Transcript crShow: relationship matrixString .
-	
-	self shouldnt: [ puzzle deduceTrueMatchesIn: relationship ] raise: Error .
-	
-	relationship := puzzle getAssociationOf: #Nationality with: #Beverage .
-	self shouldnt: [ puzzle renderAssociation: relationship ] raise: Error .
-	Transcript crShow: relationship matrixString .
+	self shouldnt: [ relationship deduceExcludedRelationships ] raise: Error .
+	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
+	Transcript crShow: relationship stringRepresentation .
 	
 	Transcript crShow: '------------------------------------'; cr 
 	

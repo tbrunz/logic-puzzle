@@ -141,7 +141,7 @@ LPAttributeRelationship >> deduceMatchedRelationships [
 					propertyRelationship isExcluded ].
 				
 			nonExcludedRelationships size = 1
-				ifTrue: [ nonExcludedRelationships first commitAsMatched ] ].
+				ifTrue: [ nonExcludedRelationships anyOne commitAsMatched ] ].
 
 	"Now do the same by holding Properties of Attribute two constant:"
 	attributeTwo propertySet
@@ -155,7 +155,7 @@ LPAttributeRelationship >> deduceMatchedRelationships [
 					propertyRelationship isExcluded ].
 				
 			nonExcludedRelationships size = 1
-				ifTrue: [ nonExcludedRelationships first commitAsMatched ] ]
+				ifTrue: [ nonExcludedRelationships anyOne commitAsMatched ] ]
 ]
 
 { #category : #deductions }
@@ -268,20 +268,24 @@ LPAttributeRelationship >> relationshipOf: propertyOne with: propertyTwo [
 ]
 
 { #category : #lookup }
-LPAttributeRelationship >> relationshipOf: propertyOne with: propertyTwo is: relationshipState [
+LPAttributeRelationship >> relationshipOf: propertyOne with: propertyTwo is: aRelationshipState [
 	"Set the truth table value for a pair of Properties."
 
-	| propertyRelationship |
+	| propertyRelationship relationshipState |
 	"Ensure that we're given a RelationshipState subclass."
+	relationshipState := aRelationshipState.
+	
 	relationshipState superclass = LPRelationshipState
-		ifFalse: [ self error: 'Must provide an RelationshipState subclass' ].
+		ifFalse: [ relationshipState := LPRelationshipState 
+			stateNameToClass: aRelationshipState ].
+		"ifFalse: [ self error: 'Must provide an RelationshipState subclass' ]."
 		
 	propertyRelationship := LPPropertyRelationship
 		newFor: self
 		with: propertyOne
 		with: propertyTwo.
 		
-	propertyRelationship relationshipState: relationshipState.
+	propertyRelationship relationshipState: aRelationshipState.
 	
 	^ propertyRelationship commit
 ]
@@ -302,18 +306,19 @@ LPAttributeRelationship >> renderRelationship [
 										streamContents: [ :s | s nextPutAll: property name ]
 										limitedTo: 3);
 								space ].
-					1 to: attributeOne propertySet do: [ :propertyOne | 
+					attributeOne propertySet do: [ :propertyOne | 
 						stream cr.
-						1 to: attributeTwo propertySet do: [ :propertyTwo | 
+						attributeTwo propertySet do: [ :propertyTwo | 
 							stream
-								nextPut: ' ';
-								nextPut:
+								space;
+								nextPutAll:
 									(truthTable fetchRelationshipStateFor: propertyOne with: propertyTwo)
 										printSymbol;
-								nextPutAll: '  ' ].
+								space; 
+								space ].
 						stream
 							space;
-							nextPutAll: (attributeOne propertySet at: propertyOne) name ].
+							nextPutAll: propertyOne name ]. 
 					stream cr ])
 ]
 

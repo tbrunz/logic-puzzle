@@ -179,7 +179,10 @@ LPAttributeDatabase >> attributeRelationshipFor: attributeOrPropertyOne with: at
 LPAttributeDatabase >> attributeRelationshipKeyFor: attributeOne with: attributeTwo [
 	"Combine Attribute one and Attribute two to make a single symbol."
 	
-	^ attributeOne name , attributeTwo name
+	attributeOne = attributeTwo 
+		ifFalse: [ ^ attributeOne name , attributeTwo name ].
+		
+	self error: 'Attempt to make relationship key with duplicate attributes'
 ]
 
 { #category : #creating }

@@ -76,13 +76,19 @@ LPPropertyRelationship >> fetch [
 { #category : #initialization }
 LPPropertyRelationship >> initializeFor: anAttributeRelationship With: firstProperty with: secondProperty [
 	"Set up a new PropertyRelationship with an Unknown state."
-	
+
 	attributeRelationship := anAttributeRelationship.
 	
-	propertyOne := firstProperty.
-	propertyTwo := secondProperty.
-	
-	relationshipState := LPRelationshipUnknown 
+	"Ensure that the Property order matches to Attribute order:"
+	firstProperty attribute = attributeRelationship attributeOne
+		ifTrue: [ 
+			propertyOne := firstProperty.
+			propertyTwo := secondProperty ]
+		ifFalse: [ 
+			propertyOne := secondProperty.
+			propertyTwo := firstProperty ].
+		
+	relationshipState := LPRelationshipUnknown
 ]
 
 { #category : #testing }

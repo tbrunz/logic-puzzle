@@ -51,5 +51,5 @@ LPRelationshipState class >> stateNameToClass: relationshipName [
 	firstLetter = $U
 		ifTrue: [ ^ LPRelationshipUnknown ].
 		
-	self error: 'Unknown relationship state (', relationshipName, ')'
+	self error: 'Unknown relationship state (', relationshipName printString, ')'
 ]
