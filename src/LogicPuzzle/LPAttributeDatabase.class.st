@@ -120,10 +120,10 @@ LPAttributeDatabase >> attributeDictionary [
 ]
 
 { #category : #lookup }
-LPAttributeDatabase >> attributeNameOfTag: tagOrName [
-	"Respond with the name of the attribute that the given tag belongs to."
+LPAttributeDatabase >> attributeNameOfProperty: propertyOrName [
+	"Respond with the name of the Attribute the Property/name belongs to."
 	
-	^ (self attributeOfTag: tagOrName) name
+	^ (self attributeOfProperty: propertyOrName) name
 ]
 
 { #category : #lookup }
@@ -132,22 +132,15 @@ LPAttributeDatabase >> attributeNames [
 ]
 
 { #category : #lookup }
-LPAttributeDatabase >> attributeOfTag: tagOrName [
-	"Respond with the trait that the given tag belongs to."
+LPAttributeDatabase >> attributeOfProperty: propertyOrName [
+	"Respond with the Attribute that the given Property belongs to."
 
-	| tagName theTag |
-	"You could just ask the tag itself for its attribute..."
-	tagOrName class = LPProperty
-		ifTrue: [ ^ tagOrName attribute ].
+	"You could just ask the Property itself for its Attribute..."
+	propertyOrName class = LPProperty
+		ifTrue: [ ^ propertyOrName attribute ].
 
 	"Otherwise, all we have is a name, so we do a lookup:"
-	tagName := self validateName: tagOrName.
-
-	theTag := propertyDictionary 
-		at: tagName
-		ifAbsent: [ self error: 'Unknown trait tag (' , tagName , ')' ].
-		
-	^ theTag attribute
+	^ (self validateExistingPropertyName: propertyOrName) attribute
 ]
 
 { #category : #lookup }
@@ -283,6 +276,31 @@ LPAttributeDatabase >> propertyDictionary [
 	^ propertyDictionary
 ]
 
+{ #category : #lookup }
+LPAttributeDatabase >> propertyNames [
+	^ propertyDictionary keys
+]
+
+{ #category : #lookup }
+LPAttributeDatabase >> propertyNamesOfAttribute: attributeOrName [
+	"Respond with an array of the names of the Properties of the given Attribute."
+
+	^ (self propertySetOfAttribute: attributeOrName)
+		collect: [ :property | property name ]
+]
+
+{ #category : #lookup }
+LPAttributeDatabase >> propertySetOfAttribute: attributeOrName [
+	"Respond with the array of Properties of the given Attribute/name."
+
+	"You could just ask the Attribute itself for its PropertySet..."
+	attributeOrName class = LPAttribute
+		ifTrue: [ ^ attributeOrName propertySet ].
+
+	"Otherwise, all we have is a name, so we do a lookup:"
+	^ (self validateExistingAttributeName: attributeOrName) propertySet
+]
+
 { #category : #accessing }
 LPAttributeDatabase >> relationshipDictionary [
 	^ relationshipDictionary
@@ -293,65 +311,30 @@ LPAttributeDatabase >> relationshipTrioCollection [
 	^ relationshipTrioCollection
 ]
 
-{ #category : #lookup }
-LPAttributeDatabase >> tagNames [
-	^ propertyDictionary keys
-]
-
-{ #category : #lookup }
-LPAttributeDatabase >> tagNamesOfAttribute: attributeOrName [
-	"Respond with an array of the names of the tags of the given attribute."
-
-	^ (self tagsOfAttribute: attributeOrName) collect: [ :tag | tag name ]
-]
-
-{ #category : #lookup }
-LPAttributeDatabase >> tagsOfAttribute: attributeOrName [
-	"Respond with the array of tags of the given trait."
-
-	| attributeName theAttribute |
-	"You could just ask the attribute itself for its tags..."
-	attributeOrName class = LPAttribute
-		ifTrue: [ ^ attributeOrName propertySet ].
-
-	"Otherwise, all we have is a name, so we do a lookup:"
-	attributeName := self validateName: attributeOrName.
-	
-	theAttribute := attributeDictionary 
-		at: attributeName
-		ifAbsent: [ self error: 'Unknown attribute (' , attributeName , ')' ].
-		
-	^ theAttribute propertySet
-]
-
 { #category : #validation }
 LPAttributeDatabase >> validateExistingAttributeName: nameOrSymbol [
-	"Validate the Attribute name, convert it to a symbol, verify we know it."
+	"Validate the Attribute name, convert it to a symbol, 
+	and return it if we know it.  Else throw an error."
 
 	| attributeName |
 	attributeName := self validateName: nameOrSymbol.
 
-	"Verify that it is the name of an Attribute we already know."
-	(attributeDictionary
-		anySatisfy: [ :attribute | attribute name = attributeName ])
-		ifTrue: [ ^ attributeName ].
-		
-	self error: 'Unknown attribute name (' , attributeName , ')'
+	attributeDictionary
+		at: attributeName
+		ifAbsent: [ self error: 'Unknown attribute name (' , attributeName , ')' ]
 ]
 
 { #category : #validation }
 LPAttributeDatabase >> validateExistingPropertyName: nameOrSymbol [
-	"Validate the Property name, convert it to a symbol, verify we know it."
+	"Validate the Property name, convert it to a symbol, 
+	and return it if we know it.  Else throw an error."
 
 	| propertyName |
 	propertyName := self validateName: nameOrSymbol.
 
-	"Verify that it is the name of a Property we already know."
-	(propertyDictionary
-		anySatisfy: [ :property | property name = propertyName ])
-		ifTrue: [ ^ propertyName ].
-		
-	self error: 'Unknown property name (' , propertyName , ')'
+	propertyDictionary
+		at: propertyName
+		ifAbsent: [ self error: 'Unknown property name (' , propertyName , ')' ]
 ]
 
 { #category : #validation }

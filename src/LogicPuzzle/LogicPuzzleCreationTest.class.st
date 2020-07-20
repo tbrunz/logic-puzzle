@@ -77,9 +77,9 @@ LogicPuzzleCreationTest >> test004AddAttributesToPuzzle [
 	self should: [ puzzle addAttribute: #Order withProperties: #( #Left #Middle ) ] raise: Error .
 	
 	"Adding a attributes with the same name as an existing one should replace, not throw an error:"
-	self assert: ((puzzle attributeDatabase tagsOfAttribute: #Pet) at: 2) name equals: #Fox .
+	self assert: ((puzzle attributeDatabase propertySetOfAttribute: #Pet) at: 2) name equals: #Fox .
 	self shouldnt: [ puzzle addAttribute: #Pet withProperties: #( #Cat #Weasel #Horse ) ] raise: Error .
-	self assert: ((puzzle attributeDatabase tagsOfAttribute: #Pet) at: 2) name equals: #Weasel .
+	self assert: ((puzzle attributeDatabase propertySetOfAttribute: #Pet) at: 2) name equals: #Weasel .
 ]
 
 { #category : #tests }

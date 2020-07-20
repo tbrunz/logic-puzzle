@@ -192,7 +192,7 @@ LogicPuzzleVersion20CreationTest >> testAddAttributesToPuzzle [
 	self should: [ puzzle addAttribute: #Order withProperties: #( #Left #Middle ) ] raise: Error .
 	
 	"Adding a trait with the same name as an existing one should replace, not throw an error:"
-	self assert: ((puzzle traitsDB tagsOfAttribute: #Pet) at: 2) name equals: #Fox .
+	self assert: ((puzzle traitsDB propertySetOfAttribute: #Pet) at: 2) name equals: #Fox .
 	self shouldnt: [ puzzle addAttribute: #Pet withProperties: #( #Cat #Weasel #Horse ) ] raise: Error .
-	self assert: ((puzzle traitsDB tagsOfAttribute: #Pet) at: 2) name equals: #Weasel .
+	self assert: ((puzzle traitsDB propertySetOfAttribute: #Pet) at: 2) name equals: #Weasel .
 ]
