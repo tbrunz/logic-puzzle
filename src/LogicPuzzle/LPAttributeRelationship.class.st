@@ -52,6 +52,16 @@ LPAttributeRelationship class >> newWith: attributeOne with: attributeTwo [
 		yourself
 ]
 
+{ #category : #accessing }
+LPAttributeRelationship >> attributeOne [
+	^ attributeOne
+]
+
+{ #category : #accessing }
+LPAttributeRelationship >> attributeTwo [
+	^ attributeTwo
+]
+
 { #category : #deductions }
 LPAttributeRelationship >> collectMatchedRelationships [
 	"Scan the truth table to find all the 'matched' relationships."
@@ -76,7 +86,7 @@ LPAttributeRelationship >> collectMatchedRelationships [
 	^ matchedRelationships
 ]
 
-{ #category : #relationship }
+{ #category : #lookup }
 LPAttributeRelationship >> commitPropertyRelationship: propertyRelationship [
 	"Commit my argument to my TruthTable."
 	
@@ -169,7 +179,7 @@ LPAttributeRelationship >> excludeRelationshipFor: propertyOne with: propertyTwo
 	^ truthTable commitRelationshipAsExcluded: propertyRelationship
 ]
 
-{ #category : #relationship }
+{ #category : #lookup }
 LPAttributeRelationship >> fetchPropertyRelationship: propertyRelationship [
 	"Fetch my argument from my TruthTable."
 	
@@ -187,7 +197,7 @@ LPAttributeRelationship >> initializeWith: firstAttribute with: secondAttribute 
 	attributeOne := firstAttribute.
 	attributeTwo := secondAttribute.
 	
-	truthTable := Array2D new: (attributeOne propertySet size).
+	truthTable := LPTruthTable newWith: self.
 		
 	displayString := ''.
 	
@@ -229,41 +239,50 @@ LPAttributeRelationship >> matchedRelationshipOf: propertyOne with: propertyTwo 
 	^ propertyRelationship
 ]
 
-{ #category : #relationship }
-LPAttributeRelationship >> relationOf: propertyArray [
-	"Look up the truth table value for a pair of properties."
+{ #category : #lookup }
+LPAttributeRelationship >> relationshipOf: propertyCollection [
+	"Look up the truth table value for a pair of Properties."
 	
-	^ self relationOf: propertyArray first with: propertyArray second
+	^ self relationshipOf: propertyCollection first with: propertyCollection second
 ]
 
-{ #category : #relationship }
-LPAttributeRelationship >> relationOf: propertyArray is: propertyRelationship [
-	"Set the truth table value for a pair of properties."
+{ #category : #lookup }
+LPAttributeRelationship >> relationshipOf: propertyCollection is: relationshipState [
+	"Set the truth table value for a pair of Properties."
 
 	^ self
-		relationshipOf: propertyArray first
-		with: propertyArray second
-		is: propertyRelationship
+		relationshipOf: propertyCollection first
+		with: propertyCollection second
+		is: relationshipState
 ]
 
-{ #category : #relationship }
-LPAttributeRelationship >> relationOf: propertyOne with: propertyTwo [
-	"Look up the truth table value for a pair of properties."
+{ #category : #lookup }
+LPAttributeRelationship >> relationshipOf: propertyOne with: propertyTwo [
+	"Look up the truth table value for a pair of Properties."
+
+	^ (LPPropertyRelationship
+		newFor: self
+		with: propertyOne
+		with: propertyTwo) fetch
+]
+
+{ #category : #lookup }
+LPAttributeRelationship >> relationshipOf: propertyOne with: propertyTwo is: relationshipState [
+	"Set the truth table value for a pair of Properties."
 
 	| propertyRelationship |
+	"Ensure that we're given a RelationshipState subclass."
+	relationshipState superclass = LPRelationshipState
+		ifFalse: [ self error: 'Must provide an RelationshipState subclass' ].
+		
 	propertyRelationship := LPPropertyRelationship
 		newFor: self
 		with: propertyOne
 		with: propertyTwo.
-
-	^ truthTable fetchRelationship: propertyRelationship
-]
-
-{ #category : #relationship }
-LPAttributeRelationship >> relationshipOf: propertyOne with: propertyTwo is: propertyRelationship [
-	"Look up the truth table value for a pair of properties."
-
-	^ truthTable commitRelationship: propertyRelationship
+		
+	propertyRelationship relationshipState: relationshipState.
+	
+	^ propertyRelationship commit
 ]
 
 { #category : #reporting }

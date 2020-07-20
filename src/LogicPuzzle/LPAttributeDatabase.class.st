@@ -120,6 +120,26 @@ LPAttributeDatabase >> attributeDictionary [
 ]
 
 { #category : #lookup }
+LPAttributeDatabase >> attributeFrom: attributeOrProperty [
+	"Return an Attribute after determining what the argument represents."
+
+	| symbol |
+	attributeOrProperty class = LPAttribute
+		ifTrue: [ ^ attributeOrProperty ].
+		
+	attributeOrProperty class = LPProperty
+		ifTrue: [ ^ attributeOrProperty attribute ].
+		
+	symbol := self validateName: attributeOrProperty.
+	
+	^ attributeDictionary
+		at: symbol
+		ifAbsent: [ propertyDictionary
+				at: symbol
+				ifAbsent: [ self error: 'Unknown name (' , symbol , ')' ] attribute ]
+]
+
+{ #category : #lookup }
 LPAttributeDatabase >> attributeNameOfProperty: propertyOrName [
 	"Respond with the name of the Attribute the Property/name belongs to."
 	
@@ -141,6 +161,18 @@ LPAttributeDatabase >> attributeOfProperty: propertyOrName [
 
 	"Otherwise, all we have is a name, so we do a lookup:"
 	^ (self validateExistingPropertyName: propertyOrName) attribute
+]
+
+{ #category : #lookup }
+LPAttributeDatabase >> attributeRelationshipFor: attributeOrPropertyOne with: attributeOrPropertyTwo [
+	"Return the Attribute Relationship of the validated/converted arguments."
+
+	| attributeOne attributeTwo |
+	attributeOne := self attributeFrom: attributeOrPropertyOne.
+	attributeTwo := self attributeFrom: attributeOrPropertyTwo.
+
+	^ relationshipDictionary
+		at: (self attributeRelationshipKeyFor: attributeOne with: attributeTwo)
 ]
 
 { #category : #lookup }
@@ -287,6 +319,37 @@ LPAttributeDatabase >> propertyNamesOfAttribute: attributeOrName [
 
 	^ (self propertySetOfAttribute: attributeOrName)
 		collect: [ :property | property name ]
+]
+
+{ #category : #lookup }
+LPAttributeDatabase >> propertyRelationshipFor: propertyOrNameOne with: propertyOrNameTwo [
+	"Get the PropertyRelationship for the two Properties."
+
+	| propertyOne propertyTwo |
+	propertyOne := self validateExistingPropertyName: propertyOrNameOne.
+	propertyTwo := self validateExistingPropertyName: propertyOrNameTwo.
+
+	^ (self
+			attributeRelationshipFor: propertyOne attribute
+			with: propertyTwo attribute)
+		relationshipOf: propertyOne
+		with: propertyTwo
+]
+
+{ #category : #lookup }
+LPAttributeDatabase >> propertyRelationshipFor: propertyOrNameOne with: propertyOrNameTwo is: relationshipState [
+	"Set the PropertyRelationship for the two Properties."
+
+	| propertyOne propertyTwo |
+	propertyOne := self validateExistingPropertyName: propertyOrNameOne.
+	propertyTwo := self validateExistingPropertyName: propertyOrNameTwo.
+
+	^ (self
+			attributeRelationshipFor: propertyOne attribute
+			with: propertyTwo attribute)
+		relationshipOf: propertyOne
+		with: propertyTwo
+		is: relationshipState 
 ]
 
 { #category : #lookup }

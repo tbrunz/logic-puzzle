@@ -98,44 +98,21 @@ LogicPuzzle >> primaryAttribute: attributeOrName [
 ]
 
 { #category : #lookup }
-LogicPuzzle >> relationshipOf: tagOrNameOne with: tagOrNameTwo [
-	"Retrieve the relationship between the two tags."
-	
-	"THIS IS CODE UNDER DEVELOPMENT"
-	
-	| tagOne tagTwo attributePair relationship |
-	tagOne := attributeDatabase validateName: tagOrNameOne.
-	tagTwo := attributeDatabase validateName: tagOrNameTwo.
-	
-	tagOne := attributeDatabase propertyDictionary at: tagOne.
-	tagTwo := attributeDatabase propertyDictionary at: tagTwo.
-	
-	attributePair := LPAttributePair newWith: tagOne attribute with: tagTwo attribute.
-	
-	relationship := attributeDatabase relationshipDictionary at: attributePair dictionaryKey.
-	
-	^ relationship relationOf: tagOne with: tagTwo
+LogicPuzzle >> relationshipOf: propertyOrNameOne with: propertyOrNameTwo [
+	"Get the relationship between the two Properties."
+
+	^ (attributeDatabase
+			propertyRelationshipFor: propertyOrNameOne
+			with: propertyOrNameTwo) 
+		relationshipState
 ]
 
 { #category : #lookup }
-LogicPuzzle >> relationshipOf: tagOrNameOne with: tagOrNameTwo is: aBoolean [
-	"Set the relationship between the two tags."
-	
-	"THIS IS CODE UNDER DEVELOPMENT"
-	
-	| tagOne tagTwo attributePair relationship |
-	tagOne := attributeDatabase validateName: tagOrNameOne.
-	tagTwo := attributeDatabase validateName: tagOrNameTwo.
-	
-	tagOne := attributeDatabase propertyDictionary at: tagOne.
-	tagTwo := attributeDatabase propertyDictionary at: tagTwo.
-	
-	attributePair := LPAttributePair newWith: tagOne attribute with: tagTwo attribute.
+LogicPuzzle >> relationshipOf: propertyOrNameOne with: propertyOrNameTwo is: relationshipState [
+	"Set the relationship between the two Properties."
 
-	relationship := attributeDatabase relationshipDictionary at: attributePair dictionaryKey.
-	
-	relationship relationshipOf: tagOne with: tagTwo is: aBoolean.
-	relationship isModified: true.
-	
-	^ relationship 
+	^ attributeDatabase
+		propertyRelationshipFor: propertyOrNameOne
+		with: propertyOrNameTwo
+		is: relationshipState
 ]

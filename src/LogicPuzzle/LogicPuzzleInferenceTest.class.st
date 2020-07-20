@@ -81,9 +81,9 @@ LogicPuzzleInferenceTest >> testDeduceTrueMatches [
 	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Tea' is: false ] raise: Error .
 	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Coffee' is: true ] raise: Error .
 	
-	self assert: ((database at: #Nationality , #Pet) relationOf: #Norwegian with: #Zebra) equals: true.
-	self assert: ((database at: #Nationality , #Beverage) relationOf: #Ukranian with: #Tea) equals: false.
-	self assert: ((database at: #Beverage , #Nationality) relationOf: #Ukranian with: #Coffee) equals: true.
+	self assert: ((database at: #Nationality , #Pet) relationshipOf: #Norwegian with: #Zebra) equals: true.
+	self assert: ((database at: #Nationality , #Beverage) relationshipOf: #Ukranian with: #Tea) equals: false.
+	self assert: ((database at: #Beverage , #Nationality) relationshipOf: #Ukranian with: #Coffee) equals: true.
 	
 	"Verify that the rows & columns of a matched association are set false:"
 	self shouldnt: [ (database at: #Nationality , #Beverage) deduceMatchedRelationships ] raise: Error .

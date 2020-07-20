@@ -41,13 +41,13 @@ LPPropertyConverter >> initializeWith: attributeOne with: attributeTwo [
 	pointToProperty := Dictionary new.
 	
 	"Arbitrarily choose Attribute One as 'x' or 'row':"
-	attributeOne properties withIndexDo: [ :property :index |
+	attributeOne propertySet asArray withIndexDo: [ :property :index |
 		tablePoint := Point x: index y: 0.
 		propertyToPoint add: property name -> tablePoint.
 		pointToProperty add: tablePoint -> property ].
 	
 	"Which chooses Attribute Two as 'y' or 'column':"
-	attributeTwo properties withIndexDo: [ :property :index |
+	attributeTwo propertySet asArray withIndexDo: [ :property :index |
 		tablePoint := Point x: 0 y: index.
 		propertyToPoint add: property name -> tablePoint.
 		pointToProperty add: tablePoint -> property ]

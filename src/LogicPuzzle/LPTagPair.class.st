@@ -41,7 +41,7 @@ LPTagPair >> relationship [
 
 	relationship ifNil: [ ^ nil ].
 		
-	^ relationship relationOf: tagOne with: tagTwo
+	^ relationship relationshipOf: tagOne with: tagTwo
 ]
 
 { #category : #accessing }
