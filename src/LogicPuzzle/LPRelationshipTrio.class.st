@@ -30,33 +30,11 @@ Class {
 }
 
 { #category : #'instance creation' }
-LPRelationshipTrio class >> newFrom: attributeTrio for: commonAttribute using: relationDictionary [
+LPRelationshipTrio class >> newFrom: attributeTrio for: commonAttribute using: attributeDatabase [
 	"Form an relationship trio from the given attributes."
-
-	| centerPair leftPair rightPair |
-	"Which attributes in the trio are not the common attribute?"
-	centerPair := attributeTrio
-		reject: [ :attribute | attribute = commonAttribute ].
-
-	"Form the other two possible attribute pairings as AttributePairs:"
-	leftPair := LPAttributePair
-		newWith: centerPair first
-		with: commonAttribute.
-		
-	rightPair := LPAttributePair
-		newWith: commonAttribute
-		with: centerPair second.
-
-	"And then turn the center pair into a AttributePair as well; 
-	the AttributePairs are keys into the Relationship dictionary."
-	centerPair := LPAttributePair newWith: centerPair.
-
-	"Now create an instance and fill in its instance variables:"
+	
 	^ self new
-		commonAttribute: commonAttribute;
-		leftRelationship: (relationDictionary at: leftPair);
-		rightRelationship: (relationDictionary at: rightPair);
-		centerRelationship: (relationDictionary at: centerPair);
+		initializeFrom: attributeTrio for: commonAttribute using: attributeDatabase;
 		yourself
 ]
 
@@ -66,18 +44,8 @@ LPRelationshipTrio >> centerRelationship [
 ]
 
 { #category : #accessing }
-LPRelationshipTrio >> centerRelationship: aRelationship [
-	centerRelationship := aRelationship
-]
-
-{ #category : #accessing }
 LPRelationshipTrio >> commonAttribute [
 	^ commonAttribute
-]
-
-{ #category : #accessing }
-LPRelationshipTrio >> commonAttribute: anAttribute [
-	commonAttribute := anAttribute
 ]
 
 { #category : #deductions }
@@ -118,24 +86,50 @@ LPRelationshipTrio >> inferRelationships [
 					self syncTruthTablesWith: leftTagPair with: rightTagPair ] ]
 ]
 
+{ #category : #initialization }
+LPRelationshipTrio >> initializeFrom: attributeTrio for: aCommonAttribute using: attributeDatabase [
+	"Form an relationship trio from the given attributes."
+
+	| leftKey centerKey rightKey relationshipDictionary |
+	commonAttribute := aCommonAttribute.
+	
+	"Collect both Attributes in the trio that are NOT the common Attribute:"
+	centerRelationship := attributeTrio
+		reject: [ :attribute | attribute = commonAttribute ].
+
+	"The key for the center relationship is made from the collected pair:"
+	centerKey := attributeDatabase 
+		attributeRelationshipKeyFor: centerRelationship first 
+		with: centerRelationship second.
+
+	"The left key uses Attribute one from the center, plus the common:"
+	leftKey := attributeDatabase 
+		attributeRelationshipKeyFor: centerRelationship first 
+		with: commonAttribute.
+		
+	"The right key uses the common, plus Attribute two from the center:"
+	rightKey := attributeDatabase 
+		attributeRelationshipKeyFor: commonAttribute
+		with: centerRelationship second.
+
+	"Now use the AttributeDatabase once more to reference the Relationship 
+	Dictionary to get each of the three Attribute Relationships:"
+	relationshipDictionary := attributeDatabase relationshipDictionary.
+	
+	"And set our relationships by looking up each of the three keys:"
+	leftRelationship := relationshipDictionary at: leftKey.
+	rightRelationship := relationshipDictionary at: rightKey.
+	centerRelationship := relationshipDictionary at: centerKey
+]
+
 { #category : #accessing }
 LPRelationshipTrio >> leftRelationship [
 	^ leftRelationship
 ]
 
 { #category : #accessing }
-LPRelationshipTrio >> leftRelationship: aRelationship [
-	leftRelationship := aRelationship
-]
-
-{ #category : #accessing }
 LPRelationshipTrio >> rightRelationship [
 	^ rightRelationship
-]
-
-{ #category : #accessing }
-LPRelationshipTrio >> rightRelationship: aRelationship [
-	rightRelationship := aRelationship
 ]
 
 { #category : #deductions }

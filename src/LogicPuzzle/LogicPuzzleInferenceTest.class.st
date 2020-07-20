@@ -77,9 +77,9 @@ LogicPuzzleInferenceTest >> testDeduceTrueMatches [
 	database := puzzle attributeDatabase relationshipDictionary.
 	
 	"Verify that relations set in the truth table are what we expect:"
-	self shouldnt: [ puzzle relationOfTag: #Norwegian withTag: #Zebra is: true ] raise: Error .
-	self shouldnt: [ puzzle relationOfTag: 'Ukrainian' withTag: 'Tea' is: false ] raise: Error .
-	self shouldnt: [ puzzle relationOfTag: 'Ukrainian' withTag: 'Coffee' is: true ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Norwegian with: #Zebra is: true ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Tea' is: false ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Coffee' is: true ] raise: Error .
 	
 	self assert: ((database at: #Nationality , #Pet) relationOf: #Norwegian with: #Zebra) equals: true.
 	self assert: ((database at: #Nationality , #Beverage) relationOf: #Ukranian with: #Tea) equals: false.
@@ -106,8 +106,8 @@ LogicPuzzleInferenceTest >> testDeduceTrueMatches [
 	self shouldnt: [ puzzle renderAssociation: relationship ] raise: Error .
 	Transcript crShow: relationship matrixString .
 	
-	self shouldnt: [ puzzle relationOfTag: 'Japanese' withTag: 'Tea' is: true ] raise: Error .
-	self shouldnt: [ puzzle relationOfTag: 'Norwegian' withTag: 'Water' is: false ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: 'Japanese' with: 'Tea' is: true ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: 'Norwegian' with: 'Water' is: false ] raise: Error .
 	
 	self shouldnt: [ (database at: #Nationality , #Beverage) deduceMatchedRelationships ] raise: Error .
 	self assert: (puzzle getAssociationOf: #Nationality with: #Beverage) isModified equals: true .

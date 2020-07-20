@@ -43,13 +43,13 @@ LPPropertyConverter >> initializeWith: attributeOne with: attributeTwo [
 	"Arbitrarily choose Attribute One as 'x' or 'row':"
 	attributeOne properties withIndexDo: [ :property :index |
 		tablePoint := Point x: index y: 0.
-		propertyToPoint add: property symbol -> tablePoint.
+		propertyToPoint add: property name -> tablePoint.
 		pointToProperty add: tablePoint -> property ].
 	
 	"Which chooses Attribute Two as 'y' or 'column':"
 	attributeTwo properties withIndexDo: [ :property :index |
 		tablePoint := Point x: 0 y: index.
-		propertyToPoint add: property symbol -> tablePoint.
+		propertyToPoint add: property name -> tablePoint.
 		pointToProperty add: tablePoint -> property ]
 ]
 
@@ -97,7 +97,7 @@ LPPropertyConverter >> propertyToPoint: aPropertyOrArray [
 LPPropertyConverter >> propertyToPointScalar: aPropertyScalar [
 	"In this method, we know we have a scalar Property argument."
 	
-	^ propertyToPoint at: aPropertyScalar symbol
+	^ propertyToPoint at: aPropertyScalar name
 ]
 
 { #category : #converting }

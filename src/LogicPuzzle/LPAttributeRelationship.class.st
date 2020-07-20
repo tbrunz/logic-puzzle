@@ -241,7 +241,7 @@ LPAttributeRelationship >> relationOf: propertyArray is: propertyRelationship [
 	"Set the truth table value for a pair of properties."
 
 	^ self
-		relationOf: propertyArray first
+		relationshipOf: propertyArray first
 		with: propertyArray second
 		is: propertyRelationship
 ]
@@ -260,7 +260,7 @@ LPAttributeRelationship >> relationOf: propertyOne with: propertyTwo [
 ]
 
 { #category : #relationship }
-LPAttributeRelationship >> relationOf: propertyOne with: propertyTwo is: propertyRelationship [
+LPAttributeRelationship >> relationshipOf: propertyOne with: propertyTwo is: propertyRelationship [
 	"Look up the truth table value for a pair of properties."
 
 	^ truthTable commitRelationship: propertyRelationship

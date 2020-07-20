@@ -37,7 +37,7 @@ LogicPuzzleVersion10CreationTest >> test002AttributeNaming [
 ]
 
 { #category : #tests }
-LogicPuzzleVersion10CreationTest >> test003SetAttributeTags [
+LogicPuzzleVersion10CreationTest >> test003SetAttributeProperties [
 	"Test validation of Trait tag arays when adding traits to a puzzle."
 	
 	| puzzle |

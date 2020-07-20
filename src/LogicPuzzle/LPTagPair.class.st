@@ -55,7 +55,7 @@ LPTagPair >> relationshipIs: aBoolean [
 
 	relationship ifNil: [ ^ nil ].
 		
-	^ relationship relationOf: tagOne with: tagTwo is: aBoolean
+	^ relationship relationshipOf: tagOne with: tagTwo is: aBoolean
 ]
 
 { #category : #accessing }

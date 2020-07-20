@@ -184,8 +184,8 @@ LPAttributeDatabase >> createAttributeRelationships [
 				with: attributeTwo.
 
 			"Finally, add the new relationship to our collection:"
-			relationships add: keyOne dictionaryKey -> relationship.
-			relationships add: keyTwo dictionaryKey -> relationship ] ].
+			relationships add: keyOne -> relationship.
+			relationships add: keyTwo -> relationship ] ].
 
 	^ relationships
 ]
@@ -223,7 +223,7 @@ LPAttributeDatabase >> createRelationshipTrios [
 						relationshipTrio := LPRelationshipTrio
 							newFrom: attributeTrio
 							for: commonAttribute
-							using: relationshipDictionary ].
+							using: self ].
 
 				"Finally, add the new relationship to our collection:"
 				relationTrioCollection add: relationshipTrio ] ] ].
@@ -319,7 +319,7 @@ LPAttributeDatabase >> validateExistingAttributeName: nameOrSymbol [
 	| attributeName |
 	attributeName := self validateName: nameOrSymbol.
 
-	attributeDictionary
+	^ attributeDictionary
 		at: attributeName
 		ifAbsent: [ self error: 'Unknown attribute name (' , attributeName , ')' ]
 ]
@@ -332,7 +332,7 @@ LPAttributeDatabase >> validateExistingPropertyName: nameOrSymbol [
 	| propertyName |
 	propertyName := self validateName: nameOrSymbol.
 
-	propertyDictionary
+	^ propertyDictionary
 		at: propertyName
 		ifAbsent: [ self error: 'Unknown property name (' , propertyName , ')' ]
 ]

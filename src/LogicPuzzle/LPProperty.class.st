@@ -21,17 +21,17 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'attribute',
-		'symbol'
+		'name'
 	],
 	#category : #'LogicPuzzle-Base'
 }
 
 { #category : #'instance creation' }
-LPProperty class >> newNamed: aSymbol ofAttribute: anAttribute [
+LPProperty class >> newNamed: aName ofAttribute: anAttribute [
 	"Called only after the arguments have been validated."
 
 	^ self new 
-		symbol: aSymbol;
+		name: aName;
 		attribute: anAttribute;
 		yourself
 ]
@@ -46,19 +46,19 @@ LPProperty >> attribute: anAttribute [
 	attribute := anAttribute 
 ]
 
+{ #category : #accessing }
+LPProperty >> name [
+	^ name
+]
+
+{ #category : #accessing }
+LPProperty >> name: aName [
+	name := aName
+]
+
 { #category : #printing }
 LPProperty >> printString [ 
 	"Render the property name as a string."
 	
-	^ symbol asString
-]
-
-{ #category : #accessing }
-LPProperty >> symbol [
-	^ symbol
-]
-
-{ #category : #accessing }
-LPProperty >> symbol: aSymbol [
-	symbol := aSymbol
+	^ name asString
 ]

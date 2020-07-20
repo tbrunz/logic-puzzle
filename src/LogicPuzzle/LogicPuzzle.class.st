@@ -45,10 +45,10 @@ Class {
 }
 
 { #category : #creating }
-LogicPuzzle >> addAttribute: attributeName withProperties: arrayOfTagNames [
-	"Create a new attribute and add to the puzzle attribute dictionary."
+LogicPuzzle >> addAttribute: attributeName withProperties: propertyNameSet [
+	"Create a new Attribute and add it to the puzzle attribute dictionary."
 	
-	attributeDatabase addAttribute: attributeName withProperties: arrayOfTagNames 
+	attributeDatabase addAttribute: attributeName withProperties: propertyNameSet 
 ]
 
 { #category : #inferencing }
@@ -77,7 +77,7 @@ LogicPuzzle >> initialize [
 	super initialize.
 	
 	"Create the expandable arrays to accumulate the set of 
-	Attributes and the set of Tags as the user provides them."
+	Attributes and their PropertySets as the user provides them."
 	attributeDatabase := LPAttributeDatabase new
 ]
 
@@ -98,7 +98,7 @@ LogicPuzzle >> primaryAttribute: attributeOrName [
 ]
 
 { #category : #lookup }
-LogicPuzzle >> relationOfTag: tagOrNameOne withTag: tagOrNameTwo [
+LogicPuzzle >> relationshipOf: tagOrNameOne with: tagOrNameTwo [
 	"Retrieve the relationship between the two tags."
 	
 	"THIS IS CODE UNDER DEVELOPMENT"
@@ -118,7 +118,7 @@ LogicPuzzle >> relationOfTag: tagOrNameOne withTag: tagOrNameTwo [
 ]
 
 { #category : #lookup }
-LogicPuzzle >> relationOfTag: tagOrNameOne withTag: tagOrNameTwo is: aBoolean [
+LogicPuzzle >> relationshipOf: tagOrNameOne with: tagOrNameTwo is: aBoolean [
 	"Set the relationship between the two tags."
 	
 	"THIS IS CODE UNDER DEVELOPMENT"
@@ -134,7 +134,7 @@ LogicPuzzle >> relationOfTag: tagOrNameOne withTag: tagOrNameTwo is: aBoolean [
 
 	relationship := attributeDatabase relationshipDictionary at: attributePair dictionaryKey.
 	
-	relationship relationOf: tagOne with: tagTwo is: aBoolean.
+	relationship relationshipOf: tagOne with: tagTwo is: aBoolean.
 	relationship isModified: true.
 	
 	^ relationship 
