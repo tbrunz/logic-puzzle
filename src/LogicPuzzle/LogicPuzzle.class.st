@@ -104,15 +104,28 @@ LogicPuzzle >> relationshipOf: propertyOrNameOne with: propertyOrNameTwo [
 	^ (attributeDatabase
 			propertyRelationshipFor: propertyOrNameOne
 			with: propertyOrNameTwo) 
-		relationshipState
+		relationshipState printString
 ]
 
 { #category : #lookup }
-LogicPuzzle >> relationshipOf: propertyOrNameOne with: propertyOrNameTwo is: relationshipState [
+LogicPuzzle >> relationshipOf: propertyOrNameOne with: propertyOrNameTwo is: relationship [
 	"Set the relationship between the two Properties."
+	
+	| relationshipState |
+	relationshipState := self stateNameToClass: relationship.
 
 	^ attributeDatabase
 		propertyRelationshipFor: propertyOrNameOne
 		with: propertyOrNameTwo
 		is: relationshipState
+]
+
+{ #category : #lookup }
+LogicPuzzle >> stateNameToClass: relationshipName [
+	"Validate & convert a text reference to a RelationshipState."
+	
+	| relationship |
+	relationship := attributeDatabase validateName: relationshipName.
+	
+	^ LPRelationshipState stateNameToClass: relationship 
 ]

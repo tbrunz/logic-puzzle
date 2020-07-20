@@ -34,3 +34,22 @@ LPRelationshipState class >> printString [
 LPRelationshipState class >> printSymbol [
 	^ self subclassResponsibility 
 ]
+
+{ #category : #lookup }
+LPRelationshipState class >> stateNameToClass: relationshipName [
+	"Convert a text reference to its RelationshipState subclass."
+	
+	| firstLetter |
+	firstLetter := (relationshipName at: 1) uppercase. 
+	
+	firstLetter = $M
+		ifTrue: [ ^ LPRelationshipMatched ].
+	
+	firstLetter = $E
+		ifTrue: [ ^ LPRelationshipExcluded ].
+	
+	firstLetter = $U
+		ifTrue: [ ^ LPRelationshipUnknown ].
+		
+	self error: 'Unknown relationship state (', relationshipName, ')'
+]
