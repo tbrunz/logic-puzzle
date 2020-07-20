@@ -90,6 +90,7 @@ LPAttributeRelationship >> collectMatchedRelationships [
 LPAttributeRelationship >> commitPropertyRelationship: propertyRelationship [
 	"Commit my argument to my TruthTable."
 	
+	isModified := true.
 	^ truthTable commitRelationship: propertyRelationship 
 ]
 

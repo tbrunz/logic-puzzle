@@ -70,7 +70,7 @@ LPAttributeDatabase >> analyzeRelationTrio: relationshipTrio [
 	"Analyze a relationship trio, making inferences."
 
 	relationshipTrio
-		isModified: false;
+		"isModified: false;"
 		inferRelationships.
 		
 	^ relationshipTrio
@@ -78,10 +78,10 @@ LPAttributeDatabase >> analyzeRelationTrio: relationshipTrio [
 
 { #category : #inferencing }
 LPAttributeDatabase >> analyzeRelationship: relationship [
-	"Analyze a relationship, making deductions for matches & exclusions."
+	"Analyze a relationship, deducing matches & exclusions."
 
 	relationship
-		isModified: false;
+		"isModified: false;"
 		deduceMatchedRelationships;
 		deduceExcludedRelationships.
 		

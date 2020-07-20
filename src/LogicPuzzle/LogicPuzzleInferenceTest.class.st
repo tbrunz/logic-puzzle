@@ -102,13 +102,14 @@ LogicPuzzleInferenceTest >> testDeduceMatches [
 	self shouldnt: [ (relationships at: #Nationality , #Pet) deduceMatchedRelationships ] raise: Error .
 	self assert: (relationships at: #Nationality , #Pet) isModified equals: true .
 
+self halt.
 	self shouldnt: [ (relationships at: #Nationality , #Beverage) renderRelationship ] raise: Error .
 	Transcript crShow: (relationships at: #Nationality , #Beverage) tableString .
 
 	self shouldnt: [ (relationships at: #Nationality , #Pet) renderRelationship ] raise: Error .
 	Transcript crShow: (relationships at: #Nationality , #Pet) tableString .
 	
-	self halt.
+self halt.
 	self shouldnt: [ puzzle deduceFalseMatchesOf: #Nationality with: #Beverage ] raise: Error .
 	self assert: (puzzle getAssociationOf: #Nationality with: #Beverage) isModified equals: true .
 	
