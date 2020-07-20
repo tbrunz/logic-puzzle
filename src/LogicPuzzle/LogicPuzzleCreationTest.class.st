@@ -148,21 +148,21 @@ LogicPuzzleCreationTest >> test007RelatingAttributes [
 	self shouldnt: [ puzzle addAttribute: #Beverage withProperties: #( #Water #Tea #Coffee ) ] raise: Error .
 	
 	"Can't make associations unless the set of associations has been created."
-	self should: [ puzzle relationshipOf: #Norwegian with: #Zebra is: LPRelationshipMatched ] raise: Error .
+	self should: [ puzzle relationshipOf: #Norwegian with: #Zebra is: #Matched ] raise: Error .
 	self assert: puzzle createRelationships relationshipDictionary size equals: 6 .
 	
 	"Reject traits that aren't known, and trait tags that aren't part of a given trait:"
-	self should: [ puzzle relationshipOf: #Swedish with: #Zebra is: LPRelationshipMatched ] raise: Error .
-	self should: [ puzzle relationshipOf: #Norwegian with: #Weasel is: LPRelationshipMatched ] raise: Error .
+	self should: [ puzzle relationshipOf: #Swedish with: #Zebra is: #Matched ] raise: Error .
+	self should: [ puzzle relationshipOf: #Norwegian with: #Weasel is: #matched ] raise: Error .
 	
 	"Reject any trait or tag name that isn't a string or symbol:"
-	self should: [ puzzle relationshipOf: 3 with: #Zebra is: LPRelationshipMatched ] raise: Error .
-	self should: [ puzzle relationshipOf: #Norwegian with: #('abc') is: LPRelationshipMatched ] raise: Error .
+	self should: [ puzzle relationshipOf: 3 with: #Zebra is: #Match ] raise: Error .
+	self should: [ puzzle relationshipOf: #Norwegian with: #('abc') is: #match ] raise: Error .
 	
-	puzzle relationshipOf: #Norwegian with: #Zebra is: LPRelationshipMatched .
+	puzzle relationshipOf: #Norwegian with: #Zebra is: #matched .
 	"Can refer to traits & their tags with strings or symbols:"
-	self shouldnt: [ puzzle relationshipOf: #Norwegian with: #Zebra is: LPRelationshipMatched ] raise: Error .
-	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Tea' is: LPRelationshipMatched ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Norwegian with: #Zebra is: #matched ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Tea' is: #matched ] raise: Error .
 ]
 
 { #category : #tests }
@@ -179,15 +179,15 @@ LogicPuzzleCreationTest >> test008AttributeRelations [
 	self assert: puzzle createRelationships relationshipDictionary size equals: 6 .
 
 	"Can refer to traits & their tags with strings or symbols:"
-	self shouldnt: [ puzzle relationshipOf: #Norwegian with: #Zebra is: LPRelationshipMatched ] raise: Error .
-	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Tea' is: LPRelationshipExcluded ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Norwegian with: #Zebra is: 'matched' ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Tea' is: 'excluded' ] raise: Error .
 
 	"Setting the same association a second time should not throw an error:"
-	self shouldnt: [ puzzle relationshipOf: #Norwegian with: #Zebra is: LPRelationshipExcluded ] raise: Error .
-	self shouldnt: [ puzzle relationshipOf: #Norwegian with: #Zebra is: LPRelationshipMatched ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Norwegian with: #Zebra is: 'excluded' ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Norwegian with: #Zebra is: 'matched' ] raise: Error .
 	
 	"Associations should report the value they were set with; unset associations should report nil:"
-	self assert: (puzzle relationshipOf: #Norwegian with: #Zebra) equals: LPRelationshipMatched .
-	self assert: (puzzle relationshipOf: #Ukrainian with: #Tea) equals: LPRelationshipExcluded .
-	self assert: (puzzle relationshipOf: #Japanese with: #Snails) equals: LPRelationshipUnknown .
+	self assert: (puzzle relationshipOf: #Norwegian with: #Zebra) equals: 'matched' .
+	self assert: (puzzle relationshipOf: #Ukrainian with: #Tea) equals: 'excluded' .
+	self assert: (puzzle relationshipOf: #Japanese with: #Snails) equals: 'unknown' .
 ]
