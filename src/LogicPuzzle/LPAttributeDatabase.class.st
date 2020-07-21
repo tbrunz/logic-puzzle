@@ -104,11 +104,11 @@ LPAttributeDatabase >> analyzeRelationships [
 					self haltOnCount: 30.
 					relationship isModified: false.
 					self analyzeRelationship: relationship ].
-				
+			"	
 			relationshipTrioCollection 
 				do: [ :relationshipTrio |
 					self analyzeRelationTrio: relationshipTrio ].
-				
+				"
 			relationshipDictionary 
 				do: [ :relationship | 
 					anyIsModified := anyIsModified or: [ relationship isModified ] ]

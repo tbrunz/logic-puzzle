@@ -172,11 +172,10 @@ LPAttributeRelationship >> excludeRelationshipFor: propertyOne with: propertyTwo
 		with: propertyTwo.
 		
 	"We must not change the state of a 'matched' relationship:"
-	propertyRelationship isMatched ifTrue: [ ^ propertyRelationship ].
+	(propertyRelationship isMatched or: [ propertyRelationship isExcluded ])
+		ifTrue: [ ^ propertyRelationship ].
 	
-	"Change an 'unknown' relationship to 'excluded'.  Note that this
-	logic will also perform the superfluous action of recommitting
-	an 'excluded' relationship back to the TruthTable."
+	"Change an 'unknown' relationship to 'excluded'."
 	^ truthTable commitRelationshipAsExcluded: propertyRelationship
 ]
 
