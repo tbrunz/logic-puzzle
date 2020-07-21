@@ -5,6 +5,80 @@ Class {
 }
 
 { #category : #tests }
+LogicPuzzleInferenceTest >> testAnalyzingRelationships [
+	"Test iterating over all associations, deducing true/false, until no modifications are made."
+	
+	| puzzle database relationships relshpNatBev relshpNatPet relshpBevPet |
+	puzzle := LogicPuzzle new .
+	
+	"Puzzle with 4 traits -> 4*3/2 = 6 associations:"
+	self shouldnt: [ puzzle addAttribute: #Nationality withProperties: #( #Norwegian #Japanese #Ukrainian #Englishman ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Pet withProperties: #( #Dog #Snails #Fox #Zebra ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Beverage withProperties: #( #Water #Milk #Tea #Coffee ) ] raise: Error .
+	
+	"Create the relationships for this puzzle:"
+	self shouldnt: [ puzzle createRelationships ] raise: Error .
+	database := puzzle attributeDatabase .
+	relationships := database relationshipDictionary.
+	
+	"Retrieve relationships created so we can inspect them:"
+	relshpNatBev := relationships at: #Nationality , #Beverage .
+	relshpNatPet := relationships at: #Nationality , #Pet .
+	relshpBevPet := relationships at: #Beverage , #Pet .
+	
+	"Make some relationship matches to test with:"
+	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Tea' is: #Excluded ] raise: Error .
+	
+	"Now test the features for this test:"
+	self shouldnt: [ database analyzeRelationships ] raise: Error .
+"	Transcript show: puzzle reportLog contents ."
+"	Transcript show: relshpNatBev stringRepresentation ."
+	
+	relshpNatBev renderRelationship .
+	Transcript crShow: relshpNatBev stringRepresentation .
+	
+	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Coffee' is: #Matched] raise: Error .
+	
+	database analyzeRelationships.
+	self shouldnt: [ database analyzeRelationships ] raise: Error .
+"	Transcript show: puzzle reportLog contents .
+"	
+self halt.
+
+	relshpNatBev renderRelationship .
+	Transcript crShow: relshpNatBev stringRepresentation .
+	
+	self shouldnt: [ puzzle relationshipOf: #Japanese with: #Tea is: #Matched ] raise: Error .	
+"	self assert: (puzzle relationshipOf: 'Ukrainian' with: 'Snails') equals: 'matched'."
+"	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Snails' is: 'matched' ] raise: Error ."
+	
+	self shouldnt: [ database analyzeRelationships ] raise: Error .
+"	Transcript show: puzzle reportLog contents .
+"	
+	relshpNatBev renderRelationship .
+	Transcript crShow: relshpNatBev stringRepresentation .
+	relshpNatPet renderRelationship .
+	Transcript crShow: relshpNatPet stringRepresentation .
+	relshpBevPet renderRelationship .
+	Transcript crShow: relshpBevPet stringRepresentation .
+	
+"	self assert: (puzzle relationshipOf: #Norwegian with: #Water) equals: 'excluded'."
+	
+	self shouldnt: [ database analyzeRelationships ] raise: Error .
+"	Transcript show: puzzle reportLog contents .
+"	
+	relshpNatBev renderRelationship .
+	Transcript crShow: relshpNatBev stringRepresentation .
+	relshpNatPet renderRelationship .
+	Transcript crShow: relshpNatPet stringRepresentation .
+	relshpBevPet renderRelationship .
+	Transcript crShow: relshpBevPet stringRepresentation .
+	
+	Transcript crShow: '------------------------------------'; cr 
+	
+]
+
+{ #category : #tests }
 LogicPuzzleInferenceTest >> testDeduceExclusions [
 	"Test that a matched relationship will produce row/column exclusions."
 	
@@ -141,65 +215,6 @@ LogicPuzzleInferenceTest >> testDeduceMatches [
 	self shouldnt: [ relationship deduceExcludedRelationships ] raise: Error .
 	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
 	Transcript crShow: relationship stringRepresentation .
-	
-	Transcript crShow: '------------------------------------'; cr 
-	
-]
-
-{ #category : #tests }
-LogicPuzzleInferenceTest >> testVettingAssociations [
-	"Test iterating over all associations, deducing true/false, until no modifications are made."
-	
-	| puzzle assnNatBev assnNatPet assnBevPet |
-	puzzle := LogicPuzzle new .
-	
-	"Puzzle with 4 traits -> 4*3/2 = 6 associations:"
-	self shouldnt: [ puzzle addAttribute: #Nationality withProperties: #( #Norwegian #Japanese #Ukrainian #Englishman ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #Pet withProperties: #( #Dog #Snails #Fox #Zebra ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #Beverage withProperties: #( #Water #Milk #Tea #Coffee ) ] raise: Error .
-	
-	"Create the set of associations:"
-	self shouldnt: [ puzzle createAssociations ] raise: Error .
-	
-	"Retrieve associations created:"
-	assnNatBev := puzzle getAssociationOf: #Nationality with: #Beverage .
-	assnNatPet := puzzle getAssociationOf: #Nationality with: #Pet .
-	assnBevPet := puzzle getAssociationOf: #Beverage with: #Pet .
-	
-	"Make some association matches to test with:"
-	self shouldnt: [ puzzle makeAssociation: 'Nationality' being: 'Ukrainian' matches: 'Beverage' being: 'Tea' be: false ] raise: Error .
-	self shouldnt: [ puzzle vetSetOfAssociations ] raise: Error .
-	Transcript show: puzzle reportLog contents .
-	self shouldnt: [ puzzle renderAssociation: assnNatBev ] raise: Error .
-	Transcript crShow: assnNatBev matrixString .
-	
-	self shouldnt: [ puzzle makeAssociation: 'Nationality' being: 'Ukrainian' matches: 'Beverage' being: 'Coffee' be: true ] raise: Error .
-	self shouldnt: [ puzzle vetSetOfAssociations ] raise: Error .
-	Transcript show: puzzle reportLog contents .
-	self shouldnt: [ puzzle renderAssociation: assnNatBev ] raise: Error .
-	Transcript crShow: assnNatBev matrixString .
-	
-	self shouldnt: [ puzzle makeAssociation: 'Nationality' being: 'Japanese' matches: 'Beverage' being: 'Tea' be: true ] raise: Error .
-	self shouldnt: [ puzzle makeAssociation: 'Nationality' being: 'Ukrainian' matches: 'Pet' being: 'Snails' be: true ] raise: Error .
-	
-	self shouldnt: [ puzzle vetSetOfAssociations ] raise: Error .
-	Transcript show: puzzle reportLog contents .
-	self shouldnt: [ puzzle renderAssociation: assnNatBev ] raise: Error .
-	self shouldnt: [ puzzle renderAssociation: assnNatPet ] raise: Error .
-	self shouldnt: [ puzzle renderAssociation: assnBevPet ] raise: Error .
-	Transcript crShow: assnNatBev matrixString .
-	Transcript crShow: assnNatPet matrixString .
-	Transcript crShow: assnBevPet matrixString .
-	
-	self shouldnt: [ puzzle makeAssociation: 'Nationality' being: 'Norwegian' matches: 'Beverage' being: 'Water' be: false ] raise: Error .
-	self shouldnt: [ puzzle vetSetOfAssociations ] raise: Error .
-	Transcript show: puzzle reportLog contents .
-	self shouldnt: [ puzzle renderAssociation: assnNatBev ] raise: Error .
-	self shouldnt: [ puzzle renderAssociation: assnNatPet ] raise: Error .
-	self shouldnt: [ puzzle renderAssociation: assnBevPet ] raise: Error .
-	Transcript crShow: assnNatBev matrixString .
-	Transcript crShow: assnNatPet matrixString .
-	Transcript crShow: assnBevPet matrixString .
 	
 	Transcript crShow: '------------------------------------'; cr 
 	

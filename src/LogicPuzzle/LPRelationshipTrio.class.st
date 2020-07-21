@@ -49,18 +49,18 @@ LPRelationshipTrio >> commonAttribute [
 ]
 
 { #category : #deductions }
-LPRelationshipTrio >> duplicateTruthTableState: tagPairOne with: tagPairTwo [
-	"One tag pair relation is nil, one is non-nil; 
-	Make the nil state relationship mirror the non-nil state."
+LPRelationshipTrio >> duplicateTruthTableState: propertyRelationshipOne with: propertyRelationshipTwo [
+	"One PropertyRelationship is 'unknown', one is not 'unknown'; 
+	Make the 'unknown' relationship state mirror the other state."
 
 	| stateOne stateTwo |
-	stateOne := tagPairOne relationship.
-	stateTwo := tagPairTwo relationship.
+	stateOne := propertyRelationshipOne relationshipState.
+	stateTwo := propertyRelationshipTwo relationshipState.
 
 	"Test either state to decide which direction to copy."
-	stateOne
-		ifNil: [ tagPairOne relationshipIs: stateTwo ]
-		ifNotNil: [ tagPairTwo relationshipIs: stateOne ]
+	(stateOne = LPRelationshipUnknown) 
+		ifTrue: [ propertyRelationshipOne relationshipState: stateTwo ]
+		ifFalse: [ propertyRelationshipTwo relationshipState: stateOne ]
 ]
 
 { #category : #deductions }
@@ -68,22 +68,24 @@ LPRelationshipTrio >> inferRelationships [
 	"Use the matches in the center attribute relation to infer 
 	relations between the other two attribute relationships."
 
-	| leftTagPair rightTagPair |
+	| leftPropertyRelationship rightPropertyRelationship |
 	"We can only infer associated relationship for matched pairs."
-	centerRelationship matchedRelationships
-		do: [ :pair | 
+	centerRelationship collectMatchedRelationships
+		do: [ :relationship | 
 			"Walk the tags for the attribute common to left & right:"
 			commonAttribute propertySet
-				do: [ :tag | 
-					leftTagPair := LPTagPair
+				do: [ :property | 
+					leftPropertyRelationship := LPPropertyRelationship 
 						newFor: leftRelationship
-						with: pair tagOne
-						with: tag.
-					rightTagPair := LPTagPair
+						with: relationship propertyOne 
+						with: property.
+					rightPropertyRelationship := LPPropertyRelationship 
 						newFor: rightRelationship
-						with: tag
-						with: pair tagTwo.
-					self syncTruthTablesWith: leftTagPair with: rightTagPair ] ]
+						with: property
+						with: relationship propertyTwo.
+					self 
+						syncTruthTablesWith: leftPropertyRelationship 
+						with: rightPropertyRelationship ] ]
 ]
 
 { #category : #initialization }
@@ -133,28 +135,30 @@ LPRelationshipTrio >> rightRelationship [
 ]
 
 { #category : #deductions }
-LPRelationshipTrio >> syncTruthTablesWith: tagPairOne with: tagPairTwo [
-	"Compare the states of two TagPairs related by a common attribute.
+LPRelationshipTrio >> syncTruthTablesWith: propertyRelationshipOne with: propertyRelationshipTwo [
+	"Compare states of two PropertyRelationships related by a common attribute.
 	Returns 'nil' if both states are the same: Nothing to do.
 	Returns 'true' if either relationship was changed.
 	Returns 'false' if a consistency error was detected."
 
 	| stateOne stateTwo |
-	stateOne := tagPairOne relationship.
-	stateTwo := tagPairTwo relationship.
+	stateOne := propertyRelationshipOne relationshipState.
+	stateTwo := propertyRelationshipTwo relationshipState.
 
 	"If the two states match, they're consistent, but there's also 
 	nothing to do here; return 'nil' to indicate 'nothing done'."
 	stateOne = stateTwo
 		ifTrue: [ ^ nil ].
 
-	"If only one state is 'nil', replace it with the other state, 
+	"If only one state is 'unknown', replace it with the other state, 
 	then return 'true' to indicate that a state change occurred."
-	(stateOne isNil xor: stateTwo isNil)
-		ifTrue: [ self duplicateTruthTableState: tagPairOne with: tagPairTwo.
+	(stateOne = LPRelationshipUnknown xor: [ stateTwo = LPRelationshipUnknown ])
+		ifTrue: [ self 
+			duplicateTruthTableState: propertyRelationshipOne 
+			with: propertyRelationshipTwo.
 			^ true ].
 
-	"Two non-nil states that differ is a consistency error;
+	"Two non-excluded states that differ is a consistency error;
 	return 'false' to indicate this situation."
 	^ false
 ]

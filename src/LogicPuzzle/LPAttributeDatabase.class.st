@@ -101,12 +101,13 @@ LPAttributeDatabase >> analyzeRelationships [
 			
 			relationshipDictionary 
 				do: [ :relationship | 
+					self haltOnCount: 30.
 					relationship isModified: false.
 					self analyzeRelationship: relationship ].
 				
 			relationshipTrioCollection 
-				do: [ :relationTrio |
-					self analyzeRelationTrio: relationTrio ].
+				do: [ :relationshipTrio |
+					self analyzeRelationTrio: relationshipTrio ].
 				
 			relationshipDictionary 
 				do: [ :relationship | 
