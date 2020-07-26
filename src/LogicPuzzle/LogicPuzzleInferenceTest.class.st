@@ -5,84 +5,7 @@ Class {
 }
 
 { #category : #tests }
-LogicPuzzleInferenceTest >> test001DeduceMatches [
-	"Test that row or column of N-1 exclusions will produce row/column matches."
-	
-	| puzzle database relationships relationship |
-	puzzle := LogicPuzzle new .
-	
-	"Puzzle with 4 Attributes -> 4*3/2 = 6 relationship combinations = 12 permutations:"
-	self shouldnt: [ puzzle addAttribute: #Nationality withProperties: #( #Norwegian #Japanese #Ukrainian #Englishman ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #Pet withProperties: #( #Dog #Snails #Fox #Zebra ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #Beverage withProperties: #( #Water #Milk #Tea #Coffee ) ] raise: Error .
-	
-	"Create the relationships for this puzzle:"
-	self shouldnt: [ puzzle createRelationships ] raise: Error .
-	database := puzzle attributeDatabase .
-	relationships := database relationshipDictionary.
-	
-	"Make some relationships to test with:"
-	self shouldnt: [ puzzle relationshipOf: #Norwegian with: #Zebra is: #Matched ] raise: Error .
-	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Tea' is: #Excluded ] raise: Error .
-	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Coffee' is: #Matched] raise: Error .
-	
-	"Verify that relations set in the truth table are what we expect:"
-	self assert: (puzzle relationshipOf: #Norwegian with: #Zebra) equals: 'matched'.
-	self assert: (puzzle relationshipOf: #Ukrainian with: #Tea) equals: 'excluded'.
-	self assert: (puzzle relationshipOf: #Ukrainian with: #Coffee) equals: 'matched'.
-	
-	"Verify that the rows & columns of a matched relationship are set to excluded:"
-	self shouldnt: [ (relationships at: #Nationality , #Beverage) deduceMatchedRelationships ] raise: Error .
-	self assert: (relationships at: #Beverage , #Nationality) isModified equals: true .
-
-	self shouldnt: [ (relationships at: #Nationality , #Pet) deduceMatchedRelationships ] raise: Error .
-	self assert: (relationships at: #Nationality , #Pet) isModified equals: true .
-
-	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
-	Transcript crShow: relationship stringRepresentation .
-
-	(relationship := relationships at: #Nationality , #Pet) renderRelationship .
-	Transcript crShow: relationship stringRepresentation .
-	
-	self shouldnt: [ (relationships at: #Nationality , #Beverage) deduceExcludedRelationships ] raise: Error .
-	self assert: (relationships at: #Nationality , #Beverage) isModified equals: true .
-
-	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
-	Transcript crShow: relationship stringRepresentation .
-	
-	self shouldnt: [ puzzle relationshipOf: #Japanese with: #Tea is: #Matched ] raise: Error .
-	self shouldnt: [ puzzle relationshipOf: 'Norwegian' with: 'Water' is: #Excluded ] raise: Error .
-	
-	self shouldnt: [ (relationships at: #Nationality , #Beverage) deduceMatchedRelationships ] raise: Error .
-	self assert: (relationships at: #Nationality , #Beverage) isModified equals: true .
-
-	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
-	Transcript crShow: relationship stringRepresentation .
-
-	
-	"Test for deducing relationship matches:"
-	self shouldnt: [ relationship deduceMatchedRelationships ] raise: Error .
-	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
-	Transcript crShow: relationship stringRepresentation .
-	
-	self shouldnt: [ relationship deduceExcludedRelationships ] raise: Error .
-	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
-	Transcript crShow: relationship stringRepresentation .
-	
-	self shouldnt: [ relationship deduceMatchedRelationships ] raise: Error .
-	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
-	Transcript crShow: relationship stringRepresentation .
-	
-	self shouldnt: [ relationship deduceExcludedRelationships ] raise: Error .
-	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
-	Transcript crShow: relationship stringRepresentation .
-	
-	Transcript crShow: '------------------------------------'; cr 
-	
-]
-
-{ #category : #tests }
-LogicPuzzleInferenceTest >> test002DeduceExclusions [
+LogicPuzzleInferenceTest >> test001DeduceExclusions [
 	"Test that a matched relationship will produce row/column exclusions."
 	
 	| puzzle relationship database relationships |
@@ -97,6 +20,8 @@ LogicPuzzleInferenceTest >> test002DeduceExclusions [
 	self shouldnt: [ puzzle createRelationships ] raise: Error .
 	database := puzzle attributeDatabase .
 	relationships := database relationshipDictionary.
+	
+	Transcript crShow: '------------------------------------'; cr.
 	
 	"Make some relationships to test with:"
 	self shouldnt: [ puzzle relationshipOf: #Norwegian with: #Zebra is: #Matched ] raise: Error .
@@ -118,8 +43,6 @@ LogicPuzzleInferenceTest >> test002DeduceExclusions [
 	Transcript crShow: relationship stringRepresentation .
 
 	"Verify again for another association pair:"
-	(relationships at: #Nationality , #Beverage) deduceExcludedRelationships.
-	
 	self shouldnt: [ (relationships at: #Nationality , #Beverage) deduceExcludedRelationships ] raise: Error .
 	self assert: (relationships at: #Nationality , #Beverage) isModified equals: true .
 	
@@ -147,7 +70,136 @@ LogicPuzzleInferenceTest >> test002DeduceExclusions [
 ]
 
 { #category : #tests }
-LogicPuzzleInferenceTest >> test003AnalyzingRelationships [
+LogicPuzzleInferenceTest >> test002DeduceMatches [
+	"Test that row or column of N-1 exclusions will produce row/column matches."
+	
+	| puzzle database relationships relationship |
+	puzzle := LogicPuzzle new .
+	
+	"Puzzle with 4 Attributes -> 4*3/2 = 6 relationship combinations = 12 permutations:"
+	self shouldnt: [ puzzle addAttribute: #Nationality withProperties: #( #Norwegian #Japanese #Ukrainian #Englishman ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Pet withProperties: #( #Dog #Snails #Fox #Zebra ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Beverage withProperties: #( #Water #Milk #Tea #Coffee ) ] raise: Error .
+	
+	"Create the relationships for this puzzle:"
+	self shouldnt: [ puzzle createRelationships ] raise: Error .
+	database := puzzle attributeDatabase .
+	relationships := database relationshipDictionary.
+	
+	Transcript crShow: '------------------------------------'; cr.
+	
+	"Make some relationships to test with:"
+	self shouldnt: [ puzzle relationshipOf: #Norwegian with: #Zebra is: #Matched ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Tea' is: #Excluded ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Coffee' is: #Matched] raise: Error .
+	
+	"Verify that relations set in the truth table are what we expect:"
+	self assert: (puzzle relationshipOf: #Norwegian with: #Zebra) equals: 'matched'.
+	self assert: (puzzle relationshipOf: #Ukrainian with: #Tea) equals: 'excluded'.
+	self assert: (puzzle relationshipOf: #Ukrainian with: #Coffee) equals: 'matched'.
+	
+	"Verify that the rows & columns of a matched relationship are set to excluded:"
+	self shouldnt: [ (relationships at: #Nationality , #Beverage) deduceMatchedRelationships ] raise: Error .
+	self assert: (relationships at: #Beverage , #Nationality) isModified equals: true .
+	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
+	Transcript crShow: relationship stringRepresentation .
+
+	self shouldnt: [ (relationships at: #Nationality , #Pet) deduceMatchedRelationships ] raise: Error .
+	self assert: (relationships at: #Nationality , #Pet) isModified equals: true .
+	(relationship := relationships at: #Nationality , #Pet) renderRelationship .
+	Transcript crShow: relationship stringRepresentation .
+	
+	self shouldnt: [ (relationships at: #Nationality , #Beverage) deduceExcludedRelationships ] raise: Error .
+	self assert: (relationships at: #Nationality , #Beverage) isModified equals: true .
+	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
+	Transcript crShow: relationship stringRepresentation .
+	
+	self shouldnt: [ puzzle relationshipOf: #Japanese with: #Tea is: #Matched ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: 'Norwegian' with: 'Water' is: #Excluded ] raise: Error .
+	
+	self shouldnt: [ (relationships at: #Nationality , #Beverage) deduceMatchedRelationships ] raise: Error .
+	self assert: (relationships at: #Nationality , #Beverage) isModified equals: true .
+	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
+	Transcript crShow: relationship stringRepresentation .
+
+	
+	"Test for deducing relationship matches; these should progressively fill in the Truth Table:"
+	self shouldnt: [ relationship deduceMatchedRelationships ] raise: Error .
+	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
+	Transcript crShow: relationship stringRepresentation .
+	
+	self shouldnt: [ relationship deduceExcludedRelationships ] raise: Error .
+	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
+	Transcript crShow: relationship stringRepresentation .
+	
+	self shouldnt: [ relationship deduceMatchedRelationships ] raise: Error .
+	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
+	Transcript crShow: relationship stringRepresentation .
+	
+	self shouldnt: [ relationship deduceExcludedRelationships ] raise: Error .
+	(relationship := relationships at: #Nationality , #Beverage) renderRelationship .
+	Transcript crShow: relationship stringRepresentation .
+	
+	Transcript crShow: '------------------------------------'; cr 
+	
+]
+
+{ #category : #tests }
+LogicPuzzleInferenceTest >> test003TrapInconsistencies [
+	"Test that a matched relationship will produce row/column exclusions."
+	
+	| puzzle relationship database relationships relshpNatBev relshpNatPet |
+	puzzle := LogicPuzzle new .
+	
+	"Puzzle with 3 Attributes -> 3*2/2 = 3 relationship combinations = 6 permutations:"
+	self shouldnt: [ puzzle addAttribute: #Nationality withProperties: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Pet withProperties: #( #Snails #Fox #Zebra ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Beverage withProperties: #( #Water #Tea #Coffee ) ] raise: Error .
+	
+	"Create the relationships for this puzzle:"
+	self shouldnt: [ puzzle createRelationships ] raise: Error .
+	database := puzzle attributeDatabase .
+	relationships := database relationshipDictionary.
+	
+	"Retrieve relationships created so we can inspect them:"
+	relshpNatBev := relationships at: #Nationality , #Beverage .
+	relshpNatPet := relationships at: #Nationality , #Pet .
+	
+	Transcript crShow: '------------------------------------'; cr.
+	
+	"Attempt to create multiple matches for a Property:"
+	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Tea' is: #Matched ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Coffee' is: #Matched] raise: Error .
+
+	self shouldnt: [ relshpNatBev deduceExcludedRelationships ] raise: Error .
+	self assert: relshpNatBev isModified equals: true .
+	self assert: relshpNatBev isInconsistent equals: true .
+	
+	relshpNatBev renderRelationship .
+	Transcript crShow: relshpNatBev stringRepresentation .
+
+	
+	"Attempt to create multiple exclusions for a Property:"
+	self shouldnt: [ puzzle relationshipOf: #Norwegian with: #Zebra is: #Matched ] raise: Error .
+	self assert: (puzzle relationshipOf: #Norwegian with: #Zebra) equals: 'matched'.
+	
+	self shouldnt: [ puzzle relationshipOf: #Ukrainian with: #Zebra is: #Excluded ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Ukrainian with: #Snails is: #Excluded ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Ukrainian with: #Fox is: #Excluded ] raise: Error .
+	
+	self shouldnt: [ relshpNatPet deduceMatchedRelationships ] raise: Error .
+	self assert: relshpNatPet isModified equals: true .
+	self assert: relshpNatPet isInconsistent equals: true .
+
+	relshpNatPet renderRelationship .
+	Transcript crShow: relshpNatPet stringRepresentation .
+	
+	Transcript crShow: '------------------------------------'; cr 
+	
+]
+
+{ #category : #tests }
+LogicPuzzleInferenceTest >> test004AnalyzeRelationships [
 	"Test iterating over all associations, deducing true/false, until no modifications are made."
 	
 	| puzzle database relationships relshpNatBev relshpNatPet relshpBevPet |
@@ -167,6 +219,8 @@ LogicPuzzleInferenceTest >> test003AnalyzingRelationships [
 	relshpNatBev := relationships at: #Nationality , #Beverage .
 	relshpNatPet := relationships at: #Nationality , #Pet .
 	relshpBevPet := relationships at: #Beverage , #Pet .
+	
+	Transcript crShow: '------------------------------------'; cr.
 	
 	"Make some relationship matches to test with:"
 	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Tea' is: #Excluded ] raise: Error .
@@ -219,7 +273,7 @@ database analyzeRelationships.
 ]
 
 { #category : #tests }
-LogicPuzzleInferenceTest >> test004ZebraPuzzle [
+LogicPuzzleInferenceTest >> test005ZebraPuzzle [
 	"Test the Zebra Puzzle."
 	
 	| puzzle database relationships relshpNatBev relshpNatPet relshpBevPet relshpNatSmk relshpNatCol relshpNatSeq relshpBevSmk relshpBevCol relshpBevSeq relshpPetSmk relshpPetCol relshpPetSeq relshpSmkCol relshpSmkSeq relshpColSeq |
