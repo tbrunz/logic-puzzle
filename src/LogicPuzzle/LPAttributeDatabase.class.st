@@ -187,6 +187,13 @@ LPAttributeDatabase >> attributeRelationshipKeyFor: attributeOne with: attribute
 	self error: 'Attempt to make relationship key with duplicate attributes'
 ]
 
+{ #category : #lookup }
+LPAttributeDatabase >> attributeRelationships [
+	"Create a set of all AttributeRelationships."
+	
+	^ relationshipDictionary asSet
+]
+
 { #category : #creating }
 LPAttributeDatabase >> createAttributeRelationships [
 	"Walk the Attributes set to form every pair-wise permutation."
@@ -473,7 +480,7 @@ LPAttributeDatabase >> renderAllRelationships [
 	"Render all the AttributeRelationships into a string for display."
 	
 	^ String streamContents: [ :stream | 
-		relationshipDictionary do: [ :attributeRelationship | 
+		self attributeRelationships do: [ :attributeRelationship | 
 			stream nextPutAll: attributeRelationship renderRelationship ] ]
 ]
 
