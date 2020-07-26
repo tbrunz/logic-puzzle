@@ -180,6 +180,7 @@ LogicPuzzleInferenceTest >> test003AnalyzingRelationships [
 	relshpNatBev renderRelationship .
 	Transcript crShow: relshpNatBev stringRepresentation .
 
+database analyzeRelationships.
 	self shouldnt: [ database analyzeRelationships ] raise: Error .
 	relshpNatBev renderRelationship .
 	Transcript crShow: relshpNatBev stringRepresentation .

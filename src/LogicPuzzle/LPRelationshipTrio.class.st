@@ -50,8 +50,8 @@ LPRelationshipTrio >> commonAttribute [
 
 { #category : #deductions }
 LPRelationshipTrio >> duplicateTruthTableState: propertyRelationshipOne with: propertyRelationshipTwo [
-	"One PropertyRelationship is 'unknown', one is not 'unknown'; 
-	Make the 'unknown' relationship state mirror the other state."
+	"One PropertyRelationship is 'unknown', one is 'matched' or 'excluded'; 
+	Make the 'unknown' relationship state the same as the other state."
 
 	| stateOne stateTwo |
 	stateOne := propertyRelationshipOne relationshipState.
@@ -65,14 +65,14 @@ LPRelationshipTrio >> duplicateTruthTableState: propertyRelationshipOne with: pr
 
 { #category : #deductions }
 LPRelationshipTrio >> inferRelationships [
-	"Use the matches in the center attribute relation to infer 
-	relations between the other two attribute relationships."
+	"Use the matches in the center attribute relationship to infer 
+	relationships between the other two attribute relationships."
 
 	| leftPropertyRelationship rightPropertyRelationship |
-	"We can only infer associated relationship for matched pairs."
+	"We can only infer associated relationships for matched Properties."
 	centerRelationship collectMatchedRelationships
 		do: [ :relationship | 
-			"Walk the tags for the attribute common to left & right:"
+			"Walk the Properties for the Attribute common to left & right:"
 			commonAttribute propertySet
 				do: [ :property | 
 					leftPropertyRelationship := LPPropertyRelationship 
@@ -84,8 +84,9 @@ LPRelationshipTrio >> inferRelationships [
 						with: property
 						with: relationship propertyTwo.
 					self 
-						syncTruthTablesWith: leftPropertyRelationship 
-						with: rightPropertyRelationship ] ]
+						syncTruthTablesFor: centerRelationship 
+							with: leftPropertyRelationship 
+							with: rightPropertyRelationship ] ]
 ]
 
 { #category : #initialization }
@@ -135,11 +136,8 @@ LPRelationshipTrio >> rightRelationship [
 ]
 
 { #category : #deductions }
-LPRelationshipTrio >> syncTruthTablesWith: propertyRelationshipOne with: propertyRelationshipTwo [
-	"Compare states of two PropertyRelationships related by a common attribute.
-	Returns 'nil' if both states are the same: Nothing to do.
-	Returns 'true' if either relationship was changed.
-	Returns 'false' if a consistency error was detected."
+LPRelationshipTrio >> syncTruthTablesFor: attributeRelationship with: propertyRelationshipOne with: propertyRelationshipTwo [
+	"Compare states of two PropertyRelationships related by a common Attribute."
 
 	| stateOne stateTwo |
 	stateOne := propertyRelationshipOne relationshipState.
@@ -148,17 +146,17 @@ LPRelationshipTrio >> syncTruthTablesWith: propertyRelationshipOne with: propert
 	"If the two states match, they're consistent, but there's also 
 	nothing to do here; return 'nil' to indicate 'nothing done'."
 	stateOne = stateTwo
-		ifTrue: [ ^ nil ].
+		ifTrue: [ ^ self ].
 
 	"If only one state is 'unknown', replace it with the other state, 
-	then return 'true' to indicate that a state change occurred."
+	then return 'true' to indicate that its state was modified."
 	(stateOne = LPRelationshipUnknown xor: [ stateTwo = LPRelationshipUnknown ])
 		ifTrue: [ self 
 			duplicateTruthTableState: propertyRelationshipOne 
 			with: propertyRelationshipTwo.
-			^ true ].
+			attributeRelationship isModified: true ].
 
 	"Two non-excluded states that differ is a consistency error;
 	return 'false' to indicate this situation."
-	^ false
+	attributeRelationship isInconsistent: true
 ]

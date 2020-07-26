@@ -70,10 +70,8 @@ LPAttributeDatabase >> addAttribute: stringOrSymbol withProperties: arrayOrSetOf
 LPAttributeDatabase >> analyzeRelationTrio: relationshipTrio [
 	"Analyze a relationship trio, making inferences."
 
-	relationshipTrio
-		"isModified: false;"
-		inferRelationships.
-		
+	relationshipTrio inferRelationships.
+	
 	^ relationshipTrio
 ]
 
@@ -82,7 +80,6 @@ LPAttributeDatabase >> analyzeRelationship: relationship [
 	"Analyze a relationship, deducing matches & exclusions."
 
 	relationship
-		"isModified: false;"
 		deduceMatchedRelationships;
 		deduceExcludedRelationships.
 		
