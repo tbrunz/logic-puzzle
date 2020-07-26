@@ -216,3 +216,100 @@ LogicPuzzleInferenceTest >> test003AnalyzingRelationships [
 	Transcript crShow: '------------------------------------'; cr 
 	
 ]
+
+{ #category : #tests }
+LogicPuzzleInferenceTest >> test004ZebraPuzzle [
+	"Test the Zebra Puzzle."
+	
+	| puzzle database relationships relshpNatBev relshpNatPet relshpBevPet relshpNatSmk relshpNatCol relshpNatSeq relshpBevSmk relshpBevCol relshpBevSeq relshpPetSmk relshpPetCol relshpPetSeq relshpSmkCol relshpSmkSeq relshpColSeq |
+	puzzle := LogicPuzzle new .
+	
+	"Puzzle with 6 Attributes -> 6*5/2 = 15 relationship combinations = 30 permutations:"
+	self shouldnt: [ puzzle addAttribute: #Nationality withProperties: #( #Norwegian #Japanese #Englishman #Ukrainian #Spaniard ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Pet withProperties: #( #Dog #Horse #Snails #Fox #Zebra ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Beverage withProperties: #( #Water #OrangeJuice #Milk #Tea #Coffee ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Smokes withProperties: #( #Kools #LuckyStrike #Parliaments #OldGold #Chesterfields ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #HouseColor withProperties: #( #Yellow #Blue #Red #Ivory #Green ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Sequence withProperties: #( #One #Two #Three #Four #Five ) ] raise: Error .
+	
+	"Create the relationships for this puzzle:"
+	self shouldnt: [ puzzle createRelationships ] raise: Error .
+	database := puzzle attributeDatabase .
+	relationships := database relationshipDictionary.
+	
+	"Make some relationship matches from the Zebra Puzzle:"
+	self shouldnt: [ puzzle relationshipOf: #Englishman with: #Red is: #Matched ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Spaniard with: #Dog is: #Matched ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Coffee with: #Green is: #Matched ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Ukrainian with: #Tea is: #Matched ] raise: Error .
+	
+	self shouldnt: [ puzzle relationshipOf: #Green with: #One is: #Excluded ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Ivory with: #Five is: #Excluded ] raise: Error .
+	
+	self shouldnt: [ puzzle relationshipOf: #OldGold with: #Snails is: #Matched ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Kools with: #Yellow is: #Matched ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Milk with: #Three is: #Matched ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Norwegian with: #One is: #Matched ] raise: Error .
+	
+	self shouldnt: [ puzzle relationshipOf: #Chesterfields with: #Fox is: #Excluded ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Kools with: #Horse is: #Excluded ] raise: Error .
+	
+	self shouldnt: [ puzzle relationshipOf: #LuckyStrike with: #OrangeJuice is: #Matched ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Japanese with: #Parliaments is: #Matched ] raise: Error .
+	
+	self shouldnt: [ puzzle relationshipOf: #Norwegian with: #Blue is: #Excluded ] raise: Error .
+	
+	"Retrieve relationships created so we can inspect them:"
+	relshpNatBev := relationships at: #Nationality , #Beverage .
+	relshpNatPet := relationships at: #Nationality , #Pet .
+	relshpNatSmk := relationships at: #Nationality , #Smokes.
+	relshpNatCol := relationships at: #Nationality , #HouseColor.
+	relshpNatSeq := relationships at: #Nationality , #Sequence.
+	relshpBevPet := relationships at: #Beverage , #Pet .
+	relshpBevSmk := relationships at: #Beverage , #Smokes.
+	relshpBevCol := relationships at: #Beverage , #HouseColor.
+	relshpBevSeq := relationships at: #Beverage , #Sequence.
+	relshpPetSmk := relationships at: #Pet , #Smokes.
+	relshpPetCol := relationships at: #Pet , #HouseColor.
+	relshpPetSeq := relationships at: #Pet , #Sequence.
+	relshpSmkCol := relationships at: #Smokes , #HouseColor.
+	relshpSmkSeq := relationships at: #Smokes , #Sequence.
+	relshpColSeq := relationships at: #HouseColor , #Sequence.
+	
+	Transcript crShow: '------------------------------------'; cr.
+	
+	self shouldnt: [ database analyzeRelationships ] raise: Error .
+	relshpNatBev renderRelationship .
+	Transcript crShow: relshpNatBev stringRepresentation .
+	relshpNatPet renderRelationship .
+	Transcript crShow: relshpNatPet stringRepresentation .
+	relshpNatSmk renderRelationship .
+	Transcript crShow: relshpNatSmk stringRepresentation .
+	relshpNatCol renderRelationship .
+	Transcript crShow: relshpNatCol stringRepresentation .
+	relshpNatSeq renderRelationship .
+	Transcript crShow: relshpNatSeq stringRepresentation .
+	relshpBevPet renderRelationship .
+	Transcript crShow: relshpBevPet stringRepresentation .
+	relshpBevSmk renderRelationship .
+	Transcript crShow: relshpBevSmk stringRepresentation .
+	relshpBevCol renderRelationship .
+	Transcript crShow: relshpBevCol stringRepresentation .
+	relshpBevSeq renderRelationship .
+	Transcript crShow: relshpBevSeq stringRepresentation .
+	relshpPetSmk renderRelationship .
+	Transcript crShow: relshpPetSmk stringRepresentation .
+	relshpPetCol renderRelationship .
+	Transcript crShow: relshpPetCol stringRepresentation .
+	relshpPetSeq renderRelationship .
+	Transcript crShow: relshpPetSeq stringRepresentation .
+	relshpSmkCol renderRelationship .
+	Transcript crShow: relshpSmkCol stringRepresentation .
+	relshpSmkSeq renderRelationship .
+	Transcript crShow: relshpSmkSeq stringRepresentation .
+	relshpColSeq renderRelationship .
+	Transcript crShow: relshpColSeq stringRepresentation .
+	
+	Transcript crShow: '------------------------------------'; cr 
+	
+]
