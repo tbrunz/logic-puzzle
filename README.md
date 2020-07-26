@@ -37,6 +37,6 @@ and smoke different brands of American cigarettes. One other thing: in statement
  -- Life International, December 17, 1962
  ```
  
- This project is a Pharo application that will assist in keeping track of all the associations involving the 
- various traits, as well as all the logical deductions and inferences that can be made, consistent with the 
- constraints listed.  The app is being developed in 64-bit Pharo 8.
+ This project is a Pharo application that will assist in keeping track of all the relationships involving the 
+ various attributes, as well as all the logical deductions and inferences that can be made, consistent with 
+ the  constraints listed.  The app is being developed in 64-bit Pharo 8.
