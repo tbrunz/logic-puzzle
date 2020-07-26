@@ -120,11 +120,11 @@ LPAttributeRelationship >> deduceExcludedRelationships [
 	self collectMatchedRelationships
 		do: [ :relationship | 
 			propertyOne := relationship propertyOne.
-			attributeTwo propertySet do: [ :property |
+			relationship propertyTwo attribute propertySet do: [ :property |
 				self excludeRelationshipFor: propertyOne with: property ].
 			
 			propertyTwo := relationship propertyTwo.
-			attributeOne propertySet do: [ :property |
+			relationship propertyOne attribute propertySet do: [ :property |
 				self excludeRelationshipFor: property with: propertyTwo ] ]
 ]
 
@@ -179,10 +179,7 @@ LPAttributeRelationship >> excludeRelationshipFor: propertyOne with: propertyTwo
 		with: propertyTwo.
 	
 	"Change 'unknown' relationships to 'excluded'; leave others alone."
-	propertyRelationship isUnknown 
-		ifTrue: [ ^ truthTable commitRelationshipAsExcluded: propertyRelationship ].
-	
-	^ propertyRelationship
+	^ truthTable commitRelationshipAsExcluded: propertyRelationship
 ]
 
 { #category : #lookup }

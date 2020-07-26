@@ -98,22 +98,26 @@ LPAttributeDatabase >> analyzeRelationships [
 
 	"Loop through all relationships until no modifications detected:"
 	[ anyIsModified ]
-		whileTrue: [ anyIsModified := false.
-			
+		whileTrue: [ 			
 			relationshipDictionary 
 				do: [ :relationship | 
-					self haltOnCount: 30.
 					relationship isModified: false.
 					self analyzeRelationship: relationship ].
 			"	
 			relationshipTrioCollection 
 				do: [ :relationshipTrio |
-					self analyzeRelationTrio: relationshipTrio ].
-				"
+					self analyzeRelationTrio: relationshipTrio ]."
+				
+			anyIsModified := false.
 			relationshipDictionary 
 				do: [ :relationship | 
-					anyIsModified := anyIsModified or: [ relationship isModified ] ]
-			] 
+					relationship isInconsistent ifTrue: [ ^ false ].
+					anyIsModified := anyIsModified or: [ relationship isModified ] ].
+				
+			self haltOnCount: 50
+			].
+		
+		^ true
 ]
 
 { #category : #accessing }

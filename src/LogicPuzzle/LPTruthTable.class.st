@@ -57,6 +57,10 @@ LPTruthTable >> commitRelationship: aPropertyRelationship [
 LPTruthTable >> commitRelationshipAsExcluded: aPropertyRelationship [
 	"Change the PropertyRelationship in the TruthTable to 'excluded'."
 
+	"Is the relationiship 'unknown'?  Can't change it otherwise."
+	aPropertyRelationship isUnknown
+		ifFalse: [ ^ aPropertyRelationship ].
+		
 	^ self commitRelationship: 
 		(aPropertyRelationship relationshipState: LPRelationshipExcluded)
 ]
@@ -64,6 +68,10 @@ LPTruthTable >> commitRelationshipAsExcluded: aPropertyRelationship [
 { #category : #updating }
 LPTruthTable >> commitRelationshipAsMatched: aPropertyRelationship [
 	"Change the PropertyRelationship in the TruthTable to 'matched'."
+
+	"Is the relationiship 'unknown'?  Can't change it otherwise."
+	aPropertyRelationship isUnknown
+		ifFalse: [ ^ aPropertyRelationship ].
 
 	^ self commitRelationship: 
 		(aPropertyRelationship relationshipState: LPRelationshipMatched)
