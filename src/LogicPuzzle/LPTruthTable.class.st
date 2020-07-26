@@ -57,22 +57,16 @@ LPTruthTable >> commitRelationship: aPropertyRelationship [
 LPTruthTable >> commitRelationshipAsExcluded: aPropertyRelationship [
 	"Change the PropertyRelationship in the TruthTable to 'excluded'."
 
-	| propertyRelationship |
-	propertyRelationship := aPropertyRelationship.
-	propertyRelationship relationshipState: LPRelationshipExcluded.
-
-	^ self commitRelationship: propertyRelationship
+	^ self commitRelationship: 
+		(aPropertyRelationship relationshipState: LPRelationshipExcluded)
 ]
 
 { #category : #updating }
 LPTruthTable >> commitRelationshipAsMatched: aPropertyRelationship [
 	"Change the PropertyRelationship in the TruthTable to 'matched'."
 
-	| propertyRelationship |
-	propertyRelationship := aPropertyRelationship.
-	propertyRelationship relationshipState: LPRelationshipMatched.
-
-	^ self commitRelationship: propertyRelationship
+	^ self commitRelationship: 
+		(aPropertyRelationship relationshipState: LPRelationshipMatched)
 ]
 
 { #category : #lookup }

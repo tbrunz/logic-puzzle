@@ -17,8 +17,8 @@ Class {
 	#name : #LPPropertyConverter,
 	#superclass : #Object,
 	#instVars : [
-		'propertyToPoint',
-		'pointToProperty'
+		'propertyNameToPoint',
+		'pointToPropertyInstance'
 	],
 	#category : #'LogicPuzzle-Helpers'
 }
@@ -37,20 +37,20 @@ LPPropertyConverter >> initializeWith: attributeOne with: attributeTwo [
 	"Create the custom conversion dictionaries."
 	
 	| tablePoint |
-	propertyToPoint := Dictionary new.
-	pointToProperty := Dictionary new.
+	propertyNameToPoint := Dictionary new.
+	pointToPropertyInstance := Dictionary new.
 	
-	"Arbitrarily choose Attribute One as 'x' or 'row':"
+	"Use Attribute One as 'x' or 'row':"
 	attributeOne propertySet asArray withIndexDo: [ :property :index |
 		tablePoint := Point x: index y: 0.
-		propertyToPoint add: property name -> tablePoint.
-		pointToProperty add: tablePoint -> property ].
+		propertyNameToPoint add: property name -> tablePoint.
+		pointToPropertyInstance add: tablePoint -> property ].
 	
-	"Which chooses Attribute Two as 'y' or 'column':"
+	"And use Attribute Two as 'y' or 'column':"
 	attributeTwo propertySet asArray withIndexDo: [ :property :index |
 		tablePoint := Point x: 0 y: index.
-		propertyToPoint add: property name -> tablePoint.
-		pointToProperty add: tablePoint -> property ]
+		propertyNameToPoint add: property name -> tablePoint.
+		pointToPropertyInstance add: tablePoint -> property ]
 ]
 
 { #category : #converting }
@@ -66,12 +66,12 @@ LPPropertyConverter >> pointToProperty: aPoint [
 	"If the 'x' component is a valid Array index, create a new 
 	Point with it, then use that as a key to get its Property:"
 	pointX > 0
-		ifTrue: [ propertyOne := pointToProperty at: pointX @ 0 ].
+		ifTrue: [ propertyOne := pointToPropertyInstance at: pointX @ 0 ].
 		
 	"If the 'y' component is a valid Array index, create a new 
 	Point with it, then use that as a key to get its Property:"
 	pointY > 0
-		ifTrue: [ propertyTwo := pointToProperty at: 0 @ pointY ].
+		ifTrue: [ propertyTwo := pointToPropertyInstance at: 0 @ pointY ].
 	
 	"Now revisit our assumption that one or the other Point 
 	component is invalid, i.e., less than 1.  If either one is, 
@@ -88,18 +88,23 @@ LPPropertyConverter >> pointToProperty: aPoint [
 { #category : #converting }
 LPPropertyConverter >> propertyToPoint: aPropertyOrArray [
 	"Convert the Property into a Point."
-	
+
 	aPropertyOrArray class isArray
 		ifFalse: [ ^ self propertyToPointScalar: aPropertyOrArray ].
-		
-	^ self propertyToPointWith: aPropertyOrArray first with: aPropertyOrArray second
+
+	^ self
+		propertyToPointWith: aPropertyOrArray first
+		with: aPropertyOrArray second
 ]
 
 { #category : #converting }
-LPPropertyConverter >> propertyToPointScalar: aPropertyScalar [
-	"In this method, we know we have a scalar Property argument."
+LPPropertyConverter >> propertyToPointScalar: propertyOrName [
+	"We might be given a Property instance, or a name as a key."
 	
-	^ propertyToPoint at: aPropertyScalar name
+	propertyOrName class = LPProperty 
+		ifTrue: [ ^ propertyNameToPoint at: propertyOrName name ].
+			
+	^ propertyNameToPoint at: propertyOrName
 ]
 
 { #category : #converting }

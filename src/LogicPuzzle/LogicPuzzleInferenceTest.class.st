@@ -63,7 +63,7 @@ LogicPuzzleInferenceTest >> testAnalyzingRelationships [
 	self shouldnt: [ database analyzeRelationships ] raise: Error .
 "	Transcript show: puzzle reportLog contents .
 "	
-self halt.
+"self halt."
 
 	relshpNatBev renderRelationship .
 	Transcript crShow: relshpNatBev stringRepresentation .
@@ -72,7 +72,7 @@ self halt.
 	relshpBevPet renderRelationship .
 	Transcript crShow: relshpBevPet stringRepresentation .
 
-self halt.
+"self halt."
 	
 "	self assert: (puzzle relationshipOf: #Norwegian with: #Water) equals: 'excluded'."
 	

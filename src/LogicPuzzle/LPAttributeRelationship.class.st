@@ -86,6 +86,21 @@ LPAttributeRelationship >> collectMatchedRelationships [
 	^ matchedRelationships
 ]
 
+{ #category : #deductions }
+LPAttributeRelationship >> commitMatchedRelationshipIn: propertyRelationships [
+	"For each attribute that has N-1 'excludes', we have a match."
+
+	| unknownRelationships matchedRelationships |
+	unknownRelationships := propertyRelationships
+		collect: [ :propertyRelationship | propertyRelationship isUnknown ].
+
+	matchedRelationships := propertyRelationships
+		collect: [ :propertyRelationship | propertyRelationship isMatched ].
+
+	(unknownRelationships size = 1 and: [ matchedRelationships isEmpty ])
+		ifTrue: [ unknownRelationships first commitAsMatched ]
+]
+
 { #category : #lookup }
 LPAttributeRelationship >> commitPropertyRelationship: propertyRelationship [
 	"Commit my argument to my TruthTable."
@@ -117,7 +132,7 @@ LPAttributeRelationship >> deduceExcludedRelationships [
 LPAttributeRelationship >> deduceMatchedRelationships [
 	"For each attribute that has N-1 'excludes', we have a match."
 
-	| nonExcludedRelationships |
+	| propertyRelationships |
 	"Don't bother if the TruthTable is not consistent:"
 	truthTable validateTruthTable
 		ifFalse: [ ^ isInconsistent := true ].
@@ -132,30 +147,22 @@ LPAttributeRelationship >> deduceMatchedRelationships [
 	Start by holding Properties of Attribute one constant:"
 	attributeOne propertySet
 		do: [ :propertyOne | 
-			nonExcludedRelationships := attributeTwo propertySet
-				collect: [ :propertyTwo | 
-					truthTable 
+			propertyRelationships := attributeTwo propertySet
+				collect:
+					[ :propertyTwo | truthTable 
 						fetchRelationshipFor: propertyOne 
-						with: propertyTwo ]
-				thenReject: [ :propertyRelationship | 
-					propertyRelationship isExcluded ].
-				
-			nonExcludedRelationships size = 1
-				ifTrue: [ nonExcludedRelationships anyOne commitAsMatched ] ].
+						with: propertyTwo ].
+			self commitMatchedRelationshipIn: propertyRelationships ].
 
 	"Now do the same by holding Properties of Attribute two constant:"
 	attributeTwo propertySet
 		do: [ :propertyTwo | 
-			nonExcludedRelationships := attributeOne propertySet
-				collect: [ :propertyOne | 
-					truthTable 
+			propertyRelationships := attributeOne propertySet
+				collect:
+					[ :propertyOne | truthTable 
 						fetchRelationshipFor: propertyOne 
-						with: propertyTwo ]
-				thenReject: [ :propertyRelationship | 
-					propertyRelationship isExcluded ].
-				
-			nonExcludedRelationships size = 1
-				ifTrue: [ nonExcludedRelationships anyOne commitAsMatched ] ]
+						with: propertyTwo ].
+			self commitMatchedRelationshipIn: propertyRelationships ]
 ]
 
 { #category : #deductions }
@@ -170,13 +177,12 @@ LPAttributeRelationship >> excludeRelationshipFor: propertyOne with: propertyTwo
 	propertyRelationship := truthTable
 		fetchRelationshipFor: propertyOne
 		with: propertyTwo.
-		
-	"We must not change the state of a 'matched' relationship:"
-	(propertyRelationship isMatched or: [ propertyRelationship isExcluded ])
-		ifTrue: [ ^ propertyRelationship ].
 	
-	"Change an 'unknown' relationship to 'excluded'."
-	^ truthTable commitRelationshipAsExcluded: propertyRelationship
+	"Change 'unknown' relationships to 'excluded'; leave others alone."
+	propertyRelationship isUnknown 
+		ifTrue: [ ^ truthTable commitRelationshipAsExcluded: propertyRelationship ].
+	
+	^ propertyRelationship
 ]
 
 { #category : #lookup }
