@@ -173,38 +173,25 @@ LogicPuzzleInferenceTest >> test003AnalyzingRelationships [
 	
 	"Now test the features for this test:"
 	self shouldnt: [ database analyzeRelationships ] raise: Error .
-"	Transcript show: puzzle reportLog contents ."
-"	Transcript show: relshpNatBev stringRepresentation ."
-	
 	relshpNatBev renderRelationship .
 	Transcript crShow: relshpNatBev stringRepresentation .
 
 	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Coffee' is: #Matched] raise: Error .
-	
 	relshpNatBev renderRelationship .
 	Transcript crShow: relshpNatBev stringRepresentation .
-	
-"self halt."
 
-	database analyzeRelationships.
 	self shouldnt: [ database analyzeRelationships ] raise: Error .
-"	Transcript show: puzzle reportLog contents .
-"	
 	relshpNatBev renderRelationship .
 	Transcript crShow: relshpNatBev stringRepresentation .
 	
 	self shouldnt: [ puzzle relationshipOf: #Japanese with: #Tea is: #Matched ] raise: Error .	
-"	self assert: (puzzle relationshipOf: 'Ukrainian' with: 'Snails') equals: 'matched'."
-"	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Snails' is: 'matched' ] raise: Error ."
-
 	relshpNatBev renderRelationship .
 	Transcript crShow: relshpNatBev stringRepresentation .
 
-	self shouldnt: [ database analyzeRelationships ] raise: Error .
-"	Transcript show: puzzle reportLog contents .
-"	
-"self halt."
-
+	self assert: (puzzle relationshipOf: 'Ukrainian' with: 'Snails') equals: 'unknown'.
+	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Snails' is: 'matched' ] raise: Error .
+	
+	self shouldnt: [ database analyzeRelationships ] raise: Error .	
 	relshpNatBev renderRelationship .
 	Transcript crShow: relshpNatBev stringRepresentation .
 	relshpNatPet renderRelationship .
@@ -212,13 +199,13 @@ LogicPuzzleInferenceTest >> test003AnalyzingRelationships [
 	relshpBevPet renderRelationship .
 	Transcript crShow: relshpBevPet stringRepresentation .
 
-"self halt."
 	
-"	self assert: (puzzle relationshipOf: #Norwegian with: #Water) equals: 'excluded'."
+	self assert: (puzzle relationshipOf: #Norwegian with: #Water) equals: 'unknown'.
+	self shouldnt: [ puzzle relationshipOf: 'Norwegian' with: 'Water' is: 'excluded' ] raise: Error .
+	relshpNatBev renderRelationship .
+	Transcript crShow: relshpNatBev stringRepresentation .
 	
 	self shouldnt: [ database analyzeRelationships ] raise: Error .
-"	Transcript show: puzzle reportLog contents .
-"	
 	relshpNatBev renderRelationship .
 	Transcript crShow: relshpNatBev stringRepresentation .
 	relshpNatPet renderRelationship .

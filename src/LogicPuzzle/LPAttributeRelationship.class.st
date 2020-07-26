@@ -92,13 +92,13 @@ LPAttributeRelationship >> commitMatchedRelationshipIn: propertyRelationships [
 
 	| unknownRelationships matchedRelationships |
 	unknownRelationships := propertyRelationships
-		collect: [ :propertyRelationship | propertyRelationship isUnknown ].
+		select: [ :propertyRelationship | propertyRelationship isUnknown ].
 
 	matchedRelationships := propertyRelationships
-		collect: [ :propertyRelationship | propertyRelationship isMatched ].
+		select: [ :propertyRelationship | propertyRelationship isMatched ].
 
 	(unknownRelationships size = 1 and: [ matchedRelationships isEmpty ])
-		ifTrue: [ unknownRelationships first commitAsMatched ]
+		ifTrue: [ unknownRelationships anyOne commitAsMatched ]
 ]
 
 { #category : #lookup }

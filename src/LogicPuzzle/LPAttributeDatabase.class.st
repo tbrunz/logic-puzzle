@@ -112,9 +112,7 @@ LPAttributeDatabase >> analyzeRelationships [
 			relationshipDictionary 
 				do: [ :relationship | 
 					relationship isInconsistent ifTrue: [ ^ false ].
-					anyIsModified := anyIsModified or: [ relationship isModified ] ].
-				
-			self haltOnCount: 50
+					anyIsModified := anyIsModified or: [ relationship isModified ] ]
 			].
 		
 		^ true
