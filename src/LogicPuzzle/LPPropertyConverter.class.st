@@ -57,19 +57,21 @@ LPPropertyConverter >> initializeWith: attributeOne with: attributeTwo [
 LPPropertyConverter >> pointToProperty: aPoint [
 	"Convert the Point into a Property or Property array."
 
-	| propertyOne propertyTwo |
+	| propertyOne propertyTwo pointX pointY |
 	"Start with the assumption that we have a degenerate Point:"
 	propertyOne := propertyTwo := nil.
+	pointX := aPoint x.
+	pointY := aPoint y.
 	
 	"If the 'x' component is a valid Array index, create a new 
 	Point with it, then use that as a key to get its Property:"
-	aPoint x > 0
-		ifTrue: [ propertyOne := pointToProperty at: aPoint x @ 0 ].
+	pointX > 0
+		ifTrue: [ propertyOne := pointToProperty at: pointX @ 0 ].
 		
 	"If the 'y' component is a valid Array index, create a new 
 	Point with it, then use that as a key to get its Property:"
-	aPoint y > 0
-		ifTrue: [ propertyOne := pointToProperty at: aPoint x @ 0 ].
+	pointY > 0
+		ifTrue: [ propertyTwo := pointToProperty at: 0 @ pointY ].
 	
 	"Now revisit our assumption that one or the other Point 
 	component is invalid, i.e., less than 1.  If either one is, 
@@ -103,11 +105,7 @@ LPPropertyConverter >> propertyToPointScalar: aPropertyScalar [
 { #category : #converting }
 LPPropertyConverter >> propertyToPointWith: propertyOne with: propertyTwo [
 	"Convert the pair of Properties into a Point."
-	
-	| pointOne pointTwo |
-		
-	pointOne := self propertyToPointScalar: propertyOne.
-	pointTwo := self propertyToPointScalar: propertyTwo.
-	
-	^ pointOne + pointTwo
+
+	^ (self propertyToPointScalar: propertyOne)
+		+ (self propertyToPointScalar: propertyTwo)
 ]
