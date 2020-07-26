@@ -359,6 +359,25 @@ LogicPuzzleInferenceTest >> test006ZebraPuzzle [
 	
 	self shouldnt: [ puzzle relationshipOf: #Norwegian with: #Blue is: #Excluded ] raise: Error .
 	
+	"Inferred from the first pass at the puzzle:"
+	self shouldnt: [ puzzle relationshipOf: #Ivory with: #Two is: #Excluded ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Blue with: #Two is: #Matched ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Ivory with: #One is: #Excluded ] raise: Error .
+	
+	self shouldnt: [ puzzle relationshipOf: #Horse with: #Two is: #Matched ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Yellow with: #Horse is: #Excluded ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Water with: #Horse is: #Excluded ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Norwegian with: #Horse is: #Excluded ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Kools with: #Horse is: #Excluded ] raise: Error .
+	
+	"Test for inconsistency:  #Green = #Four produces an inconsistency."
+	self shouldnt: [ puzzle relationshipOf: #Green with: #Five is: #Matched ] raise: Error .
+	"Ergo, #Ivory must be #Four:"
+	self shouldnt: [ puzzle relationshipOf: #Ivory with: #Four is: #Matched ] raise: Error .
+	"And #Fox must be #One:"
+	self shouldnt: [ puzzle relationshipOf: #Fox with: #One is: #Matched ] raise: Error .
+	
+	
 	"Retrieve relationships created so we can inspect them:"
 	relshpNatBev := relationships at: #Nationality , #Beverage .
 	relshpNatPet := relationships at: #Nationality , #Pet .
@@ -379,6 +398,7 @@ LogicPuzzleInferenceTest >> test006ZebraPuzzle [
 	Transcript crShow: '------------------------------------'; cr.
 	
 	self shouldnt: [ database analyzeRelationships ] raise: Error .
+	
 	relshpNatBev renderRelationship .
 	Transcript crShow: relshpNatBev stringRepresentation .
 	relshpNatPet renderRelationship .
@@ -409,6 +429,22 @@ LogicPuzzleInferenceTest >> test006ZebraPuzzle [
 	Transcript crShow: relshpSmkSeq stringRepresentation .
 	relshpColSeq renderRelationship .
 	Transcript crShow: relshpColSeq stringRepresentation .
+	
+	self assert: (relshpNatBev isInconsistent) equals: false.
+	self assert: (relshpNatPet isInconsistent) equals: false.
+	self assert: (relshpNatSmk isInconsistent) equals: false.
+	self assert: (relshpNatCol isInconsistent) equals: false.
+	self assert: (relshpNatSeq isInconsistent) equals: false.
+	self assert: (relshpBevPet isInconsistent) equals: false.
+	self assert: (relshpBevSmk isInconsistent) equals: false.
+	self assert: (relshpBevCol isInconsistent) equals: false.
+	self assert: (relshpBevSeq isInconsistent) equals: false.
+	self assert: (relshpPetSmk isInconsistent) equals: false.
+	self assert: (relshpPetCol isInconsistent) equals: false.
+	self assert: (relshpPetSeq isInconsistent) equals: false.
+	self assert: (relshpSmkCol isInconsistent) equals: false.
+	self assert: (relshpSmkSeq isInconsistent) equals: false.
+	self assert: (relshpColSeq isInconsistent) equals: false.
 	
 	Transcript crShow: '------------------------------------'; cr 
 	

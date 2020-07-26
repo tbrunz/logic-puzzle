@@ -62,6 +62,14 @@ LPAttributeRelationship >> attributeTwo [
 	^ attributeTwo
 ]
 
+{ #category : #reporting }
+LPAttributeRelationship >> checkConsistency [
+	"Check the consistency of the TruthTable."
+	
+	truthTable validateTruthTable 
+		ifFalse: [ isInconsistent := true ]
+]
+
 { #category : #deductions }
 LPAttributeRelationship >> collectMatchedRelationships [
 	"Scan the truth table to find all the 'matched' relationships."

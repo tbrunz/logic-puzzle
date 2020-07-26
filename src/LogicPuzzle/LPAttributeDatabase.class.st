@@ -108,6 +108,7 @@ LPAttributeDatabase >> analyzeRelationships [
 			anyIsModified := false.
 			relationshipDictionary 
 				do: [ :relationship | 
+					relationship checkConsistency.
 					relationship isInconsistent ifTrue: [ ^ false ].
 					anyIsModified := anyIsModified or: [ relationship isModified ] ]
 			].
