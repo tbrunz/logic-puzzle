@@ -215,6 +215,11 @@ LPAttributeRelationship >> isInconsistent [
 ]
 
 { #category : #accessing }
+LPAttributeRelationship >> isInconsistent: aBoolean [
+	^ isInconsistent := aBoolean
+]
+
+{ #category : #accessing }
 LPAttributeRelationship >> isModified [
 	^ isModified
 ]

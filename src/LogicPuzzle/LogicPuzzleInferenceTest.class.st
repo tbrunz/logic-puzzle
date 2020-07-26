@@ -273,7 +273,52 @@ database analyzeRelationships.
 ]
 
 { #category : #tests }
-LogicPuzzleInferenceTest >> test005ZebraPuzzle [
+LogicPuzzleInferenceTest >> test005Inferencing [
+	"Test RelationshipTrio inferences."
+	
+	| puzzle database relationships relshpNatCol relshpNatPet relshpPetCol |
+	puzzle := LogicPuzzle new .
+	
+	"Puzzle with 6 Attributes -> 6*5/2 = 15 relationship combinations = 30 permutations:"
+	self shouldnt: [ puzzle addAttribute: #Nationality withProperties: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #Pet withProperties: #( #Dog #Fox #Zebra ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #HouseColor withProperties: #( #Yellow #Blue #Red ) ] raise: Error .
+	
+	"Create the relationships for this puzzle:"
+	self shouldnt: [ puzzle createRelationships ] raise: Error .
+	database := puzzle attributeDatabase .
+	relationships := database relationshipDictionary.
+	
+	"Make some relationship matches from the Zebra Puzzle:"
+	self shouldnt: [ puzzle relationshipOf: #Ukrainian with: #Fox is: #Matched ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Japanese with: #Red is: #Matched ] raise: Error .
+	self shouldnt: [ puzzle relationshipOf: #Zebra with: #Yellow is: #Matched ] raise: Error .
+	
+	"Retrieve relationships created so we can inspect them:"
+	relshpNatPet := relationships at: #Nationality , #Pet .
+	relshpNatCol := relationships at: #Nationality , #HouseColor.
+	relshpPetCol := relationships at: #Pet , #HouseColor.
+	
+	Transcript crShow: '------------------------------------'; cr.
+
+	self shouldnt: [ database analyzeRelationships ] raise: Error .
+	self assert: relshpNatPet isInconsistent equals: false .	
+	self assert: relshpNatCol isInconsistent equals: false .	
+	self assert: relshpPetCol isInconsistent equals: false .	
+	
+	relshpNatPet renderRelationship .
+	Transcript crShow: relshpNatPet stringRepresentation .
+	relshpNatCol renderRelationship .
+	Transcript crShow: relshpNatCol stringRepresentation .
+	relshpPetCol renderRelationship .
+	Transcript crShow: relshpPetCol stringRepresentation .
+	
+	Transcript crShow: '------------------------------------'; cr 
+	
+]
+
+{ #category : #tests }
+LogicPuzzleInferenceTest >> test006ZebraPuzzle [
 	"Test the Zebra Puzzle."
 	
 	| puzzle database relationships relshpNatBev relshpNatPet relshpBevPet relshpNatSmk relshpNatCol relshpNatSeq relshpBevSmk relshpBevCol relshpBevSeq relshpPetSmk relshpPetCol relshpPetSeq relshpSmkCol relshpSmkSeq relshpColSeq |

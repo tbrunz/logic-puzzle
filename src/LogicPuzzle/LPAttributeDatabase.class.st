@@ -104,7 +104,7 @@ LPAttributeDatabase >> analyzeRelationships [
 			relationshipTrioCollection 
 				do: [ :relationshipTrio |
 					self analyzeRelationTrio: relationshipTrio ].
-				
+			
 			anyIsModified := false.
 			relationshipDictionary 
 				do: [ :relationship | 
@@ -230,7 +230,7 @@ LPAttributeDatabase >> createAttributeRelationships [
 LPAttributeDatabase >> createRelationshipTrios [
 	"Form combinations of Attributes taken 3 at a time."
 
-	| attributeArray relationTrioCollection |
+	| attributeArray relationTrioCollection attributeTrio |
 	"We need a new dictionary and we need the Attribute dictionary as an array."
 	relationTrioCollection := OrderedCollection new.
 	attributeArray := attributeDictionary asArray.
@@ -247,22 +247,23 @@ LPAttributeDatabase >> createRelationshipTrios [
 
 			"Step through the remaining Attributes in the array to make a trio:"
 			middleIndex + 1 to: attributeArray size do: [ :innerIndex | 
-				| attributeThree attributeTrio relationshipTrio |
+				| attributeThree |
 				attributeThree := attributeArray at: innerIndex.
 
 				"Create a trio combo, then cycle through it to make RelationshipTrios:"
-				attributeTrio := {attributeOne. attributeTwo. attributeThree}.
+				attributeTrio := { attributeOne . attributeTwo . attributeThree }.
+				"attributeTrio := Array with: attributeOne with: attributeTwo with: attributeThree."
 
-				"Cycle through the trio, making each Attribute the common Attribute:"
+				"Cycle through the Attribute trio, making a new RelationshipTrio 
+				from the set, but with each Attribute in turn being the common 
+				Attribute; collect the resulting new relationships:"
 				attributeTrio
 					do: [ :commonAttribute | 
-						relationshipTrio := LPRelationshipTrio
-							newFrom: attributeTrio
-							for: commonAttribute
-							using: self ].
-
-				"Finally, add the new relationship to our collection:"
-				relationTrioCollection add: relationshipTrio ] ] ].
+						relationTrioCollection 
+							add: (LPRelationshipTrio
+								newFrom: attributeTrio
+								for: commonAttribute
+								using: self) ] ] ] ].
 	
 	^ relationTrioCollection
 ]

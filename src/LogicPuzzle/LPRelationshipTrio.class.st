@@ -59,8 +59,8 @@ LPRelationshipTrio >> duplicateTruthTableState: propertyRelationshipOne with: pr
 
 	"Test either state to decide which direction to copy."
 	(stateOne = LPRelationshipUnknown) 
-		ifTrue: [ propertyRelationshipOne relationshipState: stateTwo ]
-		ifFalse: [ propertyRelationshipTwo relationshipState: stateOne ]
+		ifTrue: [ propertyRelationshipOne relationshipState: stateTwo; commit ]
+		ifFalse: [ propertyRelationshipTwo relationshipState: stateOne; commit ]
 ]
 
 { #category : #deductions }
@@ -75,14 +75,16 @@ LPRelationshipTrio >> inferRelationships [
 			"Walk the Properties for the Attribute common to left & right:"
 			commonAttribute propertySet
 				do: [ :property | 
-					leftPropertyRelationship := LPPropertyRelationship 
+					leftPropertyRelationship := (LPPropertyRelationship 
 						newFor: leftRelationship
 						with: relationship propertyOne 
-						with: property.
-					rightPropertyRelationship := LPPropertyRelationship 
+						with: property) fetch.
+						
+					rightPropertyRelationship := (LPPropertyRelationship 
 						newFor: rightRelationship
 						with: property
-						with: relationship propertyTwo.
+						with: relationship propertyTwo) fetch.
+					
 					self 
 						syncTruthTablesFor: centerRelationship 
 							with: leftPropertyRelationship 
@@ -142,21 +144,17 @@ LPRelationshipTrio >> syncTruthTablesFor: attributeRelationship with: propertyRe
 	| stateOne stateTwo |
 	stateOne := propertyRelationshipOne relationshipState.
 	stateTwo := propertyRelationshipTwo relationshipState.
-
+	
 	"If the two states match, they're consistent, but there's also 
 	nothing to do here; return 'nil' to indicate 'nothing done'."
 	stateOne = stateTwo
 		ifTrue: [ ^ self ].
 
-	"If only one state is 'unknown', replace it with the other state, 
-	then return 'true' to indicate that its state was modified."
+	"If only one state is 'unknown', replace it with the other state;
+	But two non-excluded states that differ is an inconsistency error:"
 	(stateOne = LPRelationshipUnknown xor: [ stateTwo = LPRelationshipUnknown ])
+		ifFalse: [ attributeRelationship isInconsistent: true ]
 		ifTrue: [ self 
 			duplicateTruthTableState: propertyRelationshipOne 
-			with: propertyRelationshipTwo.
-			attributeRelationship isModified: true ].
-
-	"Two non-excluded states that differ is a consistency error;
-	return 'false' to indicate this situation."
-	attributeRelationship isInconsistent: true
+			with: propertyRelationshipTwo ]
 ]
