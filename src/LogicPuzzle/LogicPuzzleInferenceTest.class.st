@@ -321,7 +321,7 @@ LogicPuzzleInferenceTest >> test005Inferencing [
 LogicPuzzleInferenceTest >> test006ZebraPuzzle [
 	"Test the Zebra Puzzle."
 	
-	| puzzle database relationships relshpNatBev relshpNatPet relshpBevPet relshpNatSmk relshpNatCol relshpNatSeq relshpBevSmk relshpBevCol relshpBevSeq relshpPetSmk relshpPetCol relshpPetSeq relshpSmkCol relshpSmkSeq relshpColSeq |
+	| puzzle database relationships displayString relshpNatBev relshpNatPet relshpBevPet relshpNatSmk relshpNatCol relshpNatSeq relshpBevSmk relshpBevCol relshpBevSeq relshpPetSmk relshpPetCol relshpPetSeq relshpSmkCol relshpSmkSeq relshpColSeq |
 	puzzle := LogicPuzzle new .
 	
 	"Puzzle with 6 Attributes -> 6*5/2 = 15 relationship combinations = 30 permutations:"
@@ -371,11 +371,21 @@ LogicPuzzleInferenceTest >> test006ZebraPuzzle [
 	self shouldnt: [ puzzle relationshipOf: #Kools with: #Horse is: #Excluded ] raise: Error .
 	
 	"Test for inconsistency:  #Green = #Four produces an inconsistency."
+"	self shouldnt: [ puzzle relationshipOf: #Green with: #Four is: #Matched ] raise: Error ."
 	self shouldnt: [ puzzle relationshipOf: #Green with: #Five is: #Matched ] raise: Error .
-	"Ergo, #Ivory must be #Four:"
 	self shouldnt: [ puzzle relationshipOf: #Ivory with: #Four is: #Matched ] raise: Error .
 	"And #Fox must be #One:"
 	self shouldnt: [ puzzle relationshipOf: #Fox with: #One is: #Matched ] raise: Error .
+	
+	Transcript crShow: '------------------------------------'; cr.
+	
+	self shouldnt: [ database analyzeRelationships ] raise: Error .
+	
+	displayString := puzzle renderAllRelationships .
+	Transcript crShow: displayString.
+	
+	database listInconsistencies 
+		ifNotEmpty: [ Transcript crShow: 'Puzzle is inconsistent!'; cr ].
 	
 	
 	"Retrieve relationships created so we can inspect them:"
@@ -395,41 +405,7 @@ LogicPuzzleInferenceTest >> test006ZebraPuzzle [
 	relshpSmkSeq := relationships at: #Smokes , #Sequence.
 	relshpColSeq := relationships at: #HouseColor , #Sequence.
 	
-	Transcript crShow: '------------------------------------'; cr.
-	
-	self shouldnt: [ database analyzeRelationships ] raise: Error .
-	
-	relshpNatBev renderRelationship .
-	Transcript crShow: relshpNatBev stringRepresentation .
-	relshpNatPet renderRelationship .
-	Transcript crShow: relshpNatPet stringRepresentation .
-	relshpNatSmk renderRelationship .
-	Transcript crShow: relshpNatSmk stringRepresentation .
-	relshpNatCol renderRelationship .
-	Transcript crShow: relshpNatCol stringRepresentation .
-	relshpNatSeq renderRelationship .
-	Transcript crShow: relshpNatSeq stringRepresentation .
-	relshpBevPet renderRelationship .
-	Transcript crShow: relshpBevPet stringRepresentation .
-	relshpBevSmk renderRelationship .
-	Transcript crShow: relshpBevSmk stringRepresentation .
-	relshpBevCol renderRelationship .
-	Transcript crShow: relshpBevCol stringRepresentation .
-	relshpBevSeq renderRelationship .
-	Transcript crShow: relshpBevSeq stringRepresentation .
-	relshpPetSmk renderRelationship .
-	Transcript crShow: relshpPetSmk stringRepresentation .
-	relshpPetCol renderRelationship .
-	Transcript crShow: relshpPetCol stringRepresentation .
-	relshpPetSeq renderRelationship .
-	Transcript crShow: relshpPetSeq stringRepresentation .
-	relshpSmkCol renderRelationship .
-	Transcript crShow: relshpSmkCol stringRepresentation .
-	relshpSmkSeq renderRelationship .
-	Transcript crShow: relshpSmkSeq stringRepresentation .
-	relshpColSeq renderRelationship .
-	Transcript crShow: relshpColSeq stringRepresentation .
-	
+	"Test that every AttributeRelationship is consistent:"
 	self assert: (relshpNatBev isInconsistent) equals: false.
 	self assert: (relshpNatPet isInconsistent) equals: false.
 	self assert: (relshpNatSmk isInconsistent) equals: false.

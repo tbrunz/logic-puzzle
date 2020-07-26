@@ -20,19 +20,21 @@ Examples:
 
 	zebraPuzzle := LogicPuzzle new.
 	
-	zebraPuzzle addAttribute: #Nationality withTags: #( #Norwegian 
-		#Japanese #Ukrainian #Englishman #Spaniard ).
+	zebraPuzzle 
+		addAttribute: #Nationality 
+		withProperties: #( #Norwegian #Japanese #Ukrainian #Englishman #Spaniard ).
 	
-	zebraPuzzle addAttribute: #Pet withTags: #( #Dog #Horse #Snails #Fox #Zebra ).
+	zebraPuzzle 
+		addAttribute: #Pet 
+		withProperties: #( #Dog #Horse #Snails #Fox #Zebra ).
 	
 	zebraPuzzle createRelationships.
-	--> 15 relationships created
 	
 	zebraPuzzle primaryAttribute: #Nationality.
 	
-	zebraPuzzle relationOf: #Spaniard with: #Snails is: true.
+	zebraPuzzle relationOf: #Spaniard with: #Snails is: #Matched.
 	
-	zebraPuzzle printRelationship: #Nationality vs: #Pet .
+	string := zebraPuzzle renderRelationshipOf: #Nationality with: #Pet .
 "
 Class {
 	#name : #LogicPuzzle,
@@ -113,6 +115,22 @@ LogicPuzzle >> relationshipOf: propertyOrNameOne with: propertyOrNameTwo is: rel
 		propertyRelationshipFor: propertyOrNameOne
 		with: propertyOrNameTwo
 		is: relationshipState
+]
+
+{ #category : #reporting }
+LogicPuzzle >> renderAllRelationships [
+	"Render arr AttributeRelationship as a string for display."
+	
+	^ attributeDatabase renderAllRelationships
+]
+
+{ #category : #reporting }
+LogicPuzzle >> renderRelationshipOf: attributeOrNameOne with: attributeOrNameTwo [
+	"Render an AttributeRelationship into a string for display."
+	
+	^ attributeDatabase 
+		renderRelationshipOf: attributeOrNameOne 
+		with: attributeOrNameTwo
 ]
 
 { #category : #lookup }

@@ -300,6 +300,14 @@ LPAttributeDatabase >> initialize [
 ]
 
 { #category : #reporting }
+LPAttributeDatabase >> listInconsistencies [
+	"Create a report of AttributeRelationships that are inconsistent."
+	
+	^ relationshipDictionary select: [ :attributeRelationship | 
+		attributeRelationship isInconsistent ]
+]
+
+{ #category : #reporting }
 LPAttributeDatabase >> listProperties [
 	"Create a report listing the Attribute Properties."
 
@@ -458,6 +466,28 @@ LPAttributeDatabase >> relationshipDictionary [
 { #category : #accessing }
 LPAttributeDatabase >> relationshipTrioCollection [
 	^ relationshipTrioCollection
+]
+
+{ #category : #reporting }
+LPAttributeDatabase >> renderAllRelationships [
+	"Render all the AttributeRelationships into a string for display."
+	
+	^ String streamContents: [ :stream | 
+		relationshipDictionary do: [ :attributeRelationship | 
+			stream nextPutAll: attributeRelationship renderRelationship ] ]
+]
+
+{ #category : #reporting }
+LPAttributeDatabase >> renderRelationshipOf: attributeOrNameOne with: attributeOrNameTwo [
+	"Render an AttributeRelationship into a string for display."
+	
+	| attributeOne attributeTwo attributeRelationship |
+	attributeOne := self validateExistingAttributeName: attributeOrNameOne.
+	attributeTwo := self validateExistingAttributeName: attributeOrNameTwo.
+	
+	attributeRelationship := self attributeRelationshipFor: attributeOne with: attributeTwo.
+	
+	^ attributeRelationship renderRelationship
 ]
 
 { #category : #validation }

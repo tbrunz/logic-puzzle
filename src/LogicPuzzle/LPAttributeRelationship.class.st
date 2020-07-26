@@ -309,7 +309,7 @@ LPAttributeRelationship >> relationshipOf: propertyOne with: propertyTwo is: aRe
 LPAttributeRelationship >> renderRelationship [
 	"Render the truth table of a relationship."
 
-	displayString :=
+	^ displayString :=
 			(String
 				streamContents: [ :stream | 
 					stream cr.
