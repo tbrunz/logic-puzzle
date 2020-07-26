@@ -23,6 +23,7 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'minNumberOfAttributes',
+		'primaryAttribute',
 		'attributeDictionary',
 		'relationshipDictionary',
 		'minNumberOfProperties',
@@ -297,6 +298,74 @@ LPAttributeDatabase >> initialize [
 	minNumberOfProperties := 2
 ]
 
+{ #category : #reporting }
+LPAttributeDatabase >> listProperties [
+	"Create a report listing the Attribute Properties."
+
+	^ String
+		streamContents: [ :stream | 
+			"Create a header/title for the report:"
+			stream
+				nextPutAll: 'List of puzzle attribute properties:';
+				cr;
+				cr.
+
+			"Add the name of the primary attribute:"
+			stream
+				nextPutAll: 'Primary Attribute: ';
+				nextPutAll: (self primaryAttribute ifNil: [ '*Not set*' ]);
+				cr;
+				cr.
+
+			"Display a list of all the Attributes:"
+			attributeDictionary 
+				keysAndValuesDo: [ :name :attributeRelationship | 
+					"Put the trait name on one line:"
+					stream
+						print: name;
+						nextPut: $:;
+						cr.
+
+					"Then list its tags, indented, on separate lines:"
+					attributeRelationship propertySet 
+						do: [ :property | 
+							stream
+								tab;
+								print: property name;
+								cr ].
+					stream cr ] ]
+]
+
+{ #category : #reporting }
+LPAttributeDatabase >> listRelationships [
+	"Create a report listing the Attribute Relationships."
+
+	^ String
+		streamContents: [ :stream | 
+			"Create a header/title for the report:"
+			stream
+				nextPutAll: 'List of puzzle attribute relationships:';
+				cr;
+				cr.
+
+			"Display a list of all the relationships:"
+			attributeDictionary 
+				keysAndValuesDo: [ :name :attributeRelationship | 
+					"Put the relationship name on one line:"
+					stream
+						nextPutAll: name asString;
+						nextPut: $:;
+						cr.
+
+					"Then display its Truth Table, indented:"
+					attributeRelationship renderRelationship.
+					stream
+						tab;
+						nextPutAll: attributeRelationship displayString;
+						cr; cr ].
+					stream cr ] 
+]
+
 { #category : #accessing }
 LPAttributeDatabase >> minNumberOfAttributes [
 	^ minNumberOfAttributes
@@ -305,6 +374,18 @@ LPAttributeDatabase >> minNumberOfAttributes [
 { #category : #accessing }
 LPAttributeDatabase >> minNumberOfProperties [
 	^ minNumberOfProperties
+]
+
+{ #category : #accessing }
+LPAttributeDatabase >> primaryAttribute [
+	^ primaryAttribute
+]
+
+{ #category : #accessing }
+LPAttributeDatabase >> primaryAttribute: anAttribute [
+	"Validate the argument to look up the attribute to set as primary."
+
+	primaryAttribute := self validateExistingAttributeName: anAttribute
 ]
 
 { #category : #accessing }

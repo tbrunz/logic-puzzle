@@ -20,7 +20,7 @@ Class {
 		'propertyToPoint',
 		'pointToProperty'
 	],
-	#category : #'LogicPuzzle-Relationships'
+	#category : #'LogicPuzzle-Helpers'
 }
 
 { #category : #'instance creation' }

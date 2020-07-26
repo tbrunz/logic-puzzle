@@ -196,14 +196,14 @@ LPAttributeRelationship >> initializeWith: firstAttribute with: secondAttribute 
 
 	attributeOne := firstAttribute.
 	attributeTwo := secondAttribute.
-	
-	truthTable := LPTruthTable newWith: self.
 		
 	displayString := ''.
 	
 	isModified := false.
 	hasNewMatches := false.
-	isInconsistent := false
+	isInconsistent := false.
+	
+	truthTable := LPTruthTable newWith: self
 ]
 
 { #category : #accessing }

@@ -83,18 +83,13 @@ LogicPuzzle >> initialize [
 
 { #category : #accessing }
 LogicPuzzle >> primaryAttribute [
-	^ primaryAttribute
+	^ attributeDatabase primaryAttribute
 ]
 
 { #category : #accessing }
 LogicPuzzle >> primaryAttribute: attributeOrName [
-	"Validate the argument to look up the attribute to set as primary."
 	
-	| attributeName |
-	
-	attributeName := attributeDatabase validateName: attributeOrName.
-	
-	^ primaryAttribute := attributeDatabase attributeDictionary at: attributeName
+	^ attributeDatabase primaryAttribute: attributeOrName 
 ]
 
 { #category : #lookup }

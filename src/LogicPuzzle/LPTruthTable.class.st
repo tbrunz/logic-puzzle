@@ -24,7 +24,7 @@ Class {
 		'truthTable',
 		'propertyConverter'
 	],
-	#category : #'LogicPuzzle-Relationships'
+	#category : #'LogicPuzzle-Helpers'
 }
 
 { #category : #'instance creation' }
@@ -106,45 +106,36 @@ LPTruthTable >> fetchRelationshipStateFor: propertyOne with: propertyTwo [
 ]
 
 { #category : #initialization }
-LPTruthTable >> initializeTruthTable [
-	"Create and fill our TruthTable with 'unknown' PropertyRelationships."
+LPTruthTable >> initializeWith: anAttributeRelationship [
+	"Generate our PropertyConverter instance and fill our TruthTable."
 
-	| attributeOne attributeTwo initialPropertyRelationship |
+	| attributeOne attributeTwo |
+	attributeRelationship := anAttributeRelationship.
+	
 	attributeOne := attributeRelationship attributeOne.
 	attributeTwo := attributeRelationship attributeTwo.
+
+	"Build us a customized PropertyConverter:"
+	propertyConverter := LPPropertyConverter
+		newWith:  attributeOne
+		with:  attributeTwo.
 
 	"Both of our Attributes have Property sets of the same size;
 	Array2D objects are square matrices of a given size:"
 	truthTable := Array2D new: attributeOne propertySet size.
 	
-	"Fill all our cells with Unknown-type PropertyRelationships:"
+	"Initialize the TruthTable, by filling all its cells with 
+	new PropertyRelationships, which will have 'unknown' state:"
 	attributeOne propertySet
 		do: [ :propertyOne | 
 			attributeTwo propertySet
 				do: [ :propertyTwo | 
-					initialPropertyRelationship := LPPropertyRelationship
-						newFor: attributeRelationship
-						with: propertyOne
-						with: propertyTwo.
-						
-					self commitRelationship: initialPropertyRelationship ] ]
-]
-
-{ #category : #initialization }
-LPTruthTable >> initializeWith: anAttributeRelationship [
-	"Generate our PropertyConverter instance and fill our TruthTable."
-
-	"Remember who our boss is:"
-	attributeRelationship := anAttributeRelationship.
-
-	"Build us a customized PropertyConverter:"
-	propertyConverter := LPPropertyConverter
-		newWith: attributeRelationship attributeOne
-		with: attributeRelationship attributeTwo.
-	
-	"Build us an initialized TruthTable, which must be done last, 
-	because it depends on the PropertyConverter we just created:"
-	self initializeTruthTable
+					self commitRelationship: 
+						(LPPropertyRelationship
+							newFor: attributeRelationship
+							with: propertyOne
+							with: propertyTwo)  ] ]
+					
 ]
 
 { #category : #validating }

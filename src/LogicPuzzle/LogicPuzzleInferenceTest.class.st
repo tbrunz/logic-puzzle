@@ -42,7 +42,7 @@ LogicPuzzleInferenceTest >> testAnalyzingRelationships [
 	relshpNatBev renderRelationship .
 	Transcript crShow: relshpNatBev stringRepresentation .
 	
-self halt.
+"self halt."
 
 	database analyzeRelationships.
 	self shouldnt: [ database analyzeRelationships ] raise: Error .
@@ -54,8 +54,11 @@ self halt.
 	self shouldnt: [ puzzle relationshipOf: #Japanese with: #Tea is: #Matched ] raise: Error .	
 "	self assert: (puzzle relationshipOf: 'Ukrainian' with: 'Snails') equals: 'matched'."
 "	self shouldnt: [ puzzle relationshipOf: 'Ukrainian' with: 'Snails' is: 'matched' ] raise: Error ."
+
+	relshpNatBev renderRelationship .
+	Transcript crShow: relshpNatBev stringRepresentation .
 	
-self halt.
+"self halt."
 
 	self shouldnt: [ database analyzeRelationships ] raise: Error .
 "	Transcript show: puzzle reportLog contents .

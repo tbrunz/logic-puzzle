@@ -79,7 +79,7 @@ LPPropertyRelationship >> initializeFor: anAttributeRelationship With: firstProp
 
 	attributeRelationship := anAttributeRelationship.
 	
-	"Ensure that the Property order matches to Attribute order:"
+	"Ensure that the Property order matches the Attribute order:"
 	firstProperty attribute = attributeRelationship attributeOne
 		ifTrue: [ 
 			propertyOne := firstProperty.
