@@ -1,17 +1,17 @@
 "
-I represent a tag that acts as a value for an attribute of the 
-subjects of a logic puzzle. 
+I represent a Property that acts as a value for an Attribute of 
+the subjects of a logic puzzle. 
 
-The attributes in a logic puzzle have names, 
+The Attributes in a logic puzzle have names, 
 e.g., #Nationality, #Color, #Sequence. 
 
-For each of these attributes, I define one of its tags. 
+For each of these Attributes, I define one of its PRoperties. 
 e.g., #( #Yellow, #Blue, #Red ), or #( #1, #2, #3 ). 
 
-I can return the attribute I belong to. 
+I can return the Attribute I belong to. 
 
-I can also return a boolean that indicates if a given attribute 
-is my attribute or not.
+I can also return a boolean that indicates if a given Attribute 
+is my Attribute or not.
 
 A logic puzzle contains many instances of me, as I am the focus 
 of all elements of a puzzle.

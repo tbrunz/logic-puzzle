@@ -1,22 +1,24 @@
 "
-I represent a database of traits and tags that describe the subjects 
-of a logic puzzle. 
+I represent a database of Attributes and Properties that describe 
+the subjects of a logic puzzle. 
 
-The traits I keep track of have a name, 
+The Attributes I keep track of have a name, 
 e.g., #Nationality, #Color, #Sequence. 
 
-So do the tags I keep track of, 
+So do the Properties I keep track of, 
 e.g., #( #Yellow, #Blue, #Red ), or #( #1, #2, #3 ). 
 
-Given a trait or trait name, I can return the array of its tags.
-Given a tag or tag name, I can return the trait that it belongs to.
+Given an Attribute or Attribute name, I can return the set of 
+its Properties.  Given a Property or Property name, I can return 
+the Attribute that it belongs to.
 
-As the above implies, every tag must be distinct, independent of trait.
+As the above implies, every Property must be distinct, independent 
+of Attribute.
 
-Every trait must have the same number of tags.
+Every Attribute must have the same number of Properties.
 
 A logic puzzle contains one instance of me, and uses me to relate 
-tags & traits.
+Properties and Attributes.
 "
 Class {
 	#name : #LPAttributeDatabase,
@@ -40,11 +42,11 @@ LPAttributeDatabase >> addAttribute: stringOrSymbol withProperties: arrayOrSetOf
 	| attributeName propertyNames attribute propertySet |
 	"Validate all the name tokens as String/Symbol and covert them to symbols;
 	Ensure that the array of Attribute Properties has the required number of 
-	Properties, and if provided as a collection or array, convert to a Set:"
+	Properties, and if provided as a collection or array, convert it to a Set:"
 	attributeName := self validateName: stringOrSymbol.
 	propertyNames := self validateNewPropertySet: arrayOrSetOfstringOrSymbol.
 
-	"Create the Attribute, name it; we'll insert its PropertySet shortly:"
+	"Create the Attribute and name it; we'll insert its PropertySet shortly:"
 	attribute := LPAttribute newNamed: attributeName propertySet: nil.
 
 	"Create a PropertySet from the set of Property names, 
@@ -88,7 +90,8 @@ LPAttributeDatabase >> analyzeRelationship: relationship [
 
 { #category : #inferencing }
 LPAttributeDatabase >> analyzeRelationships [
-	"Walk the set of relationships, analyzing, until no modifications are made."
+	"Walk the set of relationships, analyzing, until no modifications 
+	have been made to any of the Attribute Relationships."
 
 	| anyIsModified |
 	anyIsModified := true.
@@ -109,6 +112,7 @@ LPAttributeDatabase >> analyzeRelationships [
 			relationshipDictionary 
 				do: [ :relationship | 
 					relationship checkConsistency.
+					
 					relationship isInconsistent ifTrue: [ ^ false ].
 					anyIsModified := anyIsModified or: [ relationship isModified ] ]
 			].
@@ -196,24 +200,24 @@ LPAttributeDatabase >> attributeRelationships [
 
 { #category : #creating }
 LPAttributeDatabase >> createAttributeRelationships [
-	"Walk the Attributes set to form every pair-wise permutation."
+	"Walk the Attributes set to form every pair-wise combination."
 	
 	| attributeArray relationships |
-	"We need a new dictionary and we need the Attribute dictionary as an array."
+	"We need the Attribute dictionary as an array for indexing."
 	relationships := Dictionary new.
 	attributeArray := attributeDictionary asArray.
 
-	"Step through C(n,2) = every combination of attributes taken 2 at a time:"
+	"Step through C(n,2) = every combination of Attributes taken 2 at a time:"
 	1 to: attributeArray size - 1 do: [ :outerIndex | 
 		| attributeOne keyOne |
 		attributeOne := attributeArray at: outerIndex.
 
-		"Step through the remaining attributes to pair with this one:"
+		"Step through the remaining Attributes to pair up with this one:"
 		outerIndex + 1 to: attributeArray size do: [ :innerIndex | 
 			| attributeTwo keyTwo relationship |
 			attributeTwo := attributeArray at: innerIndex.
 
-			"Form a pair of keys from the attribute pair for accessing the new 
+			"Form a pair of keys from the Attribute pair for accessing the new 
 			relationship. Why two keys? To eliminate ordering issues."
 			keyOne := self 
 				attributeRelationshipKeyFor: attributeOne 
@@ -222,12 +226,13 @@ LPAttributeDatabase >> createAttributeRelationships [
 				attributeRelationshipKeyFor: attributeTwo 
 				with: attributeOne.
 			
-			"Make the relationship between the attributes:"
+			"Create a new relationship between the Attributes:"
 			relationship := LPAttributeRelationship 
 				newWith: attributeOne 
 				with: attributeTwo.
 
-			"Finally, add the new relationship to our collection:"
+			"Finally, add the new relationship to our collection.
+			We add the same relationship, keyed both ways:"
 			relationships add: keyOne -> relationship.
 			relationships add: keyTwo -> relationship ] ].
 
@@ -239,7 +244,7 @@ LPAttributeDatabase >> createRelationshipTrios [
 	"Form combinations of Attributes taken 3 at a time."
 
 	| attributeArray relationTrioCollection attributeTrio |
-	"We need a new dictionary and we need the Attribute dictionary as an array."
+	"We need the Attribute dictionary as an array, for indexing."
 	relationTrioCollection := OrderedCollection new.
 	attributeArray := attributeDictionary asArray.
 
@@ -260,10 +265,9 @@ LPAttributeDatabase >> createRelationshipTrios [
 
 				"Create a trio combo, then cycle through it to make RelationshipTrios:"
 				attributeTrio := { attributeOne . attributeTwo . attributeThree }.
-				"attributeTrio := Array with: attributeOne with: attributeTwo with: attributeThree."
 
 				"Cycle through the Attribute trio, making a new RelationshipTrio 
-				from the set, but with each Attribute in turn being the common 
+				from the set, but with each Attribute in turn being the 'common' 
 				Attribute; collect the resulting new relationships:"
 				attributeTrio
 					do: [ :commonAttribute | 
@@ -278,7 +282,7 @@ LPAttributeDatabase >> createRelationshipTrios [
 
 { #category : #creating }
 LPAttributeDatabase >> createRelationships [
-	"Crunch the set of attributes to create the relationships."
+	"Crunch the set of Attributes to create the relationships."
 
 	"Create all the pair-wise permutations of attributes, making 
 	a dictionary that points to unique pair-wise combinations:"
@@ -286,8 +290,6 @@ LPAttributeDatabase >> createRelationships [
 
 	"Create all the combinations of attributes taken 3 at time:"
 	relationshipTrioCollection := self createRelationshipTrios
-
-	"Now do something useful..."
 ]
 
 { #category : #initialization }
@@ -296,8 +298,8 @@ LPAttributeDatabase >> initialize [
 
 	super initialize.
 	
-	"Create the expandable arrays to accumulate the set of 
-	Attributes and the set of Tags as the user provides them."
+	"Create the expandable arrays to accumulate the set of 	Attributes 
+	and the set of Properties as the user provides them to us."
 	attributeDictionary := Dictionary new.
 	propertyDictionary := Dictionary new.
 
@@ -326,7 +328,7 @@ LPAttributeDatabase >> listProperties [
 				cr;
 				cr.
 
-			"Add the name of the primary attribute:"
+			"Add the name of the Primary Attribute:"
 			stream
 				nextPutAll: 'Primary Attribute: ';
 				nextPutAll: (self primaryAttribute ifNil: [ '*Not set*' ]);
@@ -336,13 +338,13 @@ LPAttributeDatabase >> listProperties [
 			"Display a list of all the Attributes:"
 			attributeDictionary 
 				keysAndValuesDo: [ :name :attributeRelationship | 
-					"Put the trait name on one line:"
+					"Put the Attribute name on one line:"
 					stream
 						print: name;
 						nextPut: $:;
 						cr.
 
-					"Then list its tags, indented, on separate lines:"
+					"Then list its Properties, indented, on separate lines:"
 					attributeRelationship propertySet 
 						do: [ :property | 
 							stream
@@ -364,8 +366,8 @@ LPAttributeDatabase >> listRelationships [
 				cr;
 				cr.
 
-			"Display a list of all the relationships:"
-			attributeDictionary 
+			"Display a list of all the Attribute Relationships:"
+			relationshipDictionary 
 				keysAndValuesDo: [ :name :attributeRelationship | 
 					"Put the relationship name on one line:"
 					stream
@@ -430,6 +432,8 @@ LPAttributeDatabase >> propertyRelationshipFor: propertyOrNameOne with: property
 	propertyOne := self validateExistingPropertyName: propertyOrNameOne.
 	propertyTwo := self validateExistingPropertyName: propertyOrNameTwo.
 
+	"Look up the relationship between the Attributes, then ask that 
+	relationship to tell us the state between the specific Properties:"
 	^ (self
 			attributeRelationshipFor: propertyOne attribute
 			with: propertyTwo attribute)
@@ -445,6 +449,8 @@ LPAttributeDatabase >> propertyRelationshipFor: propertyOrNameOne with: property
 	propertyOne := self validateExistingPropertyName: propertyOrNameOne.
 	propertyTwo := self validateExistingPropertyName: propertyOrNameTwo.
 
+	"Look up the relationship between the Attributes, then ask that 
+	relationship to set the state between the specific Properties:"
 	^ (self
 			attributeRelationshipFor: propertyOne attribute
 			with: propertyTwo attribute)
@@ -455,7 +461,7 @@ LPAttributeDatabase >> propertyRelationshipFor: propertyOrNameOne with: property
 
 { #category : #lookup }
 LPAttributeDatabase >> propertySetOfAttribute: attributeOrName [
-	"Respond with the array of Properties of the given Attribute/name."
+	"Respond with the set of Properties of the given Attribute/name."
 
 	"You could just ask the Attribute itself for its PropertySet..."
 	attributeOrName class = LPAttribute
@@ -487,13 +493,17 @@ LPAttributeDatabase >> renderAllRelationships [
 { #category : #reporting }
 LPAttributeDatabase >> renderRelationshipOf: attributeOrNameOne with: attributeOrNameTwo [
 	"Render an AttributeRelationship into a string for display."
-	
+
 	| attributeOne attributeTwo attributeRelationship |
-	attributeOne := self validateExistingAttributeName: attributeOrNameOne.
-	attributeTwo := self validateExistingAttributeName: attributeOrNameTwo.
-	
-	attributeRelationship := self attributeRelationshipFor: attributeOne with: attributeTwo.
-	
+	attributeOne := self
+		validateExistingAttributeName: attributeOrNameOne.
+	attributeTwo := self
+		validateExistingAttributeName: attributeOrNameTwo.
+		
+	attributeRelationship := self
+		attributeRelationshipFor: attributeOne
+		with: attributeTwo.
+		
 	^ attributeRelationship renderRelationship
 ]
 

@@ -4,17 +4,17 @@ constraint satisfaction problem.
 
 I create puzzle instances and define their top-level behavior.
 
-I keep a dictionary of my subject attributes; attributes are comprised 
-of multiple tags. 
+I keep a dictionary of my subject Attributes; Attributes are comprised 
+of multiple Properties. 
 
-I know how to inspect & verify my set of attributes, and how to create 
-sets of relationships among them. 
+I know how to inspect & verify my set of Attributes, and how to create 
+sets of Relationships among them. 
 
-I keep a dictionary of attribute relationships; I know how to print 
+I keep a dictionary of Attribute Relationships; I know how to print 
 them, vet them, and modify them. 
 
-I keep a dictionary of relationship truth tables; each table contains 
-the true/false details of attribute relationships.
+I keep a dictionary of relationship Truth Tables; each table contains 
+the true/false details of Attribute Relationships.
 
 Examples:
 
@@ -34,7 +34,7 @@ Examples:
 	
 	zebraPuzzle relationOf: #Spaniard with: #Snails is: #Matched.
 	
-	string := zebraPuzzle renderRelationshipOf: #Nationality with: #Pet .
+	string := zebraPuzzle renderRelationshipOf: #Nationality with: #Pet.
 "
 Class {
 	#name : #LogicPuzzle,
@@ -78,8 +78,6 @@ LogicPuzzle >> initialize [
 
 	super initialize.
 	
-	"Create the expandable arrays to accumulate the set of 
-	Attributes and their PropertySets as the user provides them."
 	attributeDatabase := LPAttributeDatabase new
 ]
 
@@ -111,6 +109,7 @@ LogicPuzzle >> relationshipOf: propertyOrNameOne with: propertyOrNameTwo is: rel
 	| relationshipState |
 	relationshipState := self stateNameToClass: relationship.
 
+	"Setting a Property Relationship returns the relationship."
 	^ attributeDatabase
 		propertyRelationshipFor: propertyOrNameOne
 		with: propertyOrNameTwo

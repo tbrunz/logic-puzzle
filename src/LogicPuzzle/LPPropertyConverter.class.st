@@ -89,6 +89,7 @@ LPPropertyConverter >> pointToProperty: aPoint [
 LPPropertyConverter >> propertyToPoint: aPropertyOrArray [
 	"Convert the Property into a Point."
 
+	"We accept either a scalar or a 2-place Array of Property:"
 	aPropertyOrArray class isArray
 		ifFalse: [ ^ self propertyToPointScalar: aPropertyOrArray ].
 
@@ -101,6 +102,8 @@ LPPropertyConverter >> propertyToPoint: aPropertyOrArray [
 LPPropertyConverter >> propertyToPointScalar: propertyOrName [
 	"We might be given a Property instance, or a name as a key."
 	
+	"The conversion dictionary is keyed with a symbol, NOT with a 
+	Property; if we're given a Property, use its name symbol:"
 	propertyOrName class = LPProperty 
 		ifTrue: [ ^ propertyNameToPoint at: propertyOrName name ].
 			
@@ -111,6 +114,9 @@ LPPropertyConverter >> propertyToPointScalar: propertyOrName [
 LPPropertyConverter >> propertyToPointWith: propertyOne with: propertyTwo [
 	"Convert the pair of Properties into a Point."
 
+	"The Properties of two Attributes in an Attribute Relationship
+	are orthogonal; therefore one Property will convert to (x@0) and 
+	the other will convert to (0@y).  Therefore, they can be added:"
 	^ (self propertyToPointScalar: propertyOne)
 		+ (self propertyToPointScalar: propertyTwo)
 ]

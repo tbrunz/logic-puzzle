@@ -43,10 +43,10 @@ LPZebraPuzzle >> solveTheZebraPuzzle [
 		addAttribute: #Sequence
 		withProperties: #(#One #Two #Three #Four #Five).
 
-	"Create the relationships:"
+	"Create the relationships among the Attributes:"
 	puzzle createRelationships.
 
-	"Make relationship matches from the Zebra Puzzle list:"
+	"Make relationship matches from the Zebra Puzzle rules:"
 	puzzle relationshipOf: #Englishman with: #Red is: #Matched.
 	puzzle relationshipOf: #Spaniard with: #Dog is: #Matched.
 	puzzle relationshipOf: #Coffee with: #Green is: #Matched.
@@ -79,8 +79,9 @@ LPZebraPuzzle >> solveTheZebraPuzzle [
 	puzzle relationshipOf: #Green with: #Five is: #Matched.
 	puzzle relationshipOf: #Ivory with: #Four is: #Matched.
 
-	"And therefore #Fox must be #One:"
+	"Last (human) inference: #Fox must be #One:"
 	puzzle relationshipOf: #Fox with: #One is: #Matched.
+
 
 	"Make a pair of temps for ease of analysis & inspection:"
 	database := puzzle attributeDatabase.

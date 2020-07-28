@@ -26,7 +26,11 @@ modifications and when I detect inconsistencies.
 
 A Logic Puzzle contains C(m,2) instances of me (where 'm' is 
 the number of Attributes in the puzzle; the ordering of my 
-Attributes is irrelevant).
+Attributes is irrelevant).  But since the order of attributes 
+is important for how my truth table is stored, the dictionary 
+that holds my instances has twice as many elements; half its 
+elements are for (a,b) ordering, and the other half are for 
+(b,a) ordering, but both point to the (a,b) Relationship.
 "
 Class {
 	#name : #LPAttributeRelationship,
@@ -66,6 +70,7 @@ LPAttributeRelationship >> attributeTwo [
 LPAttributeRelationship >> checkConsistency [
 	"Check the consistency of the TruthTable."
 	
+	"Note: I don't return anything useful."
 	truthTable validateTruthTable 
 		ifFalse: [ isInconsistent := true ]
 ]
@@ -96,7 +101,9 @@ LPAttributeRelationship >> collectMatchedRelationships [
 
 { #category : #deductions }
 LPAttributeRelationship >> commitMatchedRelationshipIn: propertyRelationships [
-	"For each attribute that has N-1 'excludes', we have a match."
+	"The Property Relationship in the given collection represent an entire 
+	row or column in the Truth Table; if it contains N-1 'excludes' and 1 
+	'unknown', we detect a match; commit the 'unknown' as being 'matched'."
 
 	| unknownRelationships matchedRelationships |
 	unknownRelationships := propertyRelationships
@@ -105,6 +112,7 @@ LPAttributeRelationship >> commitMatchedRelationshipIn: propertyRelationships [
 	matchedRelationships := propertyRelationships
 		select: [ :propertyRelationship | propertyRelationship isMatched ].
 
+	"We have a *set*, so use 'anyOne' to get the only element:"
 	(unknownRelationships size = 1 and: [ matchedRelationships isEmpty ])
 		ifTrue: [ unknownRelationships anyOne commitAsMatched ]
 ]
@@ -138,7 +146,9 @@ LPAttributeRelationship >> deduceExcludedRelationships [
 
 { #category : #deductions }
 LPAttributeRelationship >> deduceMatchedRelationships [
-	"For each attribute that has N-1 'excludes', we have a match."
+	"For each Attribute that has N-1 'excludes' and 1 'unknown', 
+	along either axis, we detect a match; in this case, commit 
+	the 'unknown' cell as being 'matched'."
 
 	| propertyRelationships |
 	"Don't bother if the TruthTable is not consistent:"
@@ -147,12 +157,11 @@ LPAttributeRelationship >> deduceMatchedRelationships [
 
 	"Walk each Attribute Property, holding the Property constant 
 	while collecting the PropertyRelationships for all Properties 
-	of the other Attribute.  Then reject those relationships with 
-	a state of 'excluded'.  If what remains is one relationship
-	and that relationship is 'unknown', then we deduce it must be 
-	a match.  
+	of the other Attribute.  Then send the resulting collection 
+	off to be analyzed for 'N-1 excludes + 1 unknown'.  We need 
+	to do this along one axis, then along the other axis."
 	
-	Start by holding Properties of Attribute one constant:"
+	"Start by holding Properties of Attribute one constant:"
 	attributeOne propertySet
 		do: [ :propertyOne | 
 			propertyRelationships := attributeTwo propertySet
@@ -248,7 +257,7 @@ LPAttributeRelationship >> matchedRelationshipOf: propertyOne with: propertyTwo 
 		fetchRelationshipFor: propertyOne
 		with: propertyTwo.
 	
-	"Only keep matched relationships; there's no meaningful return."
+	"Return only matched Property Relationships."
 	propertyRelationship isMatched
 		ifFalse: [ ^ nil ].
 			
@@ -307,7 +316,7 @@ LPAttributeRelationship >> relationshipOf: propertyOne with: propertyTwo is: aRe
 
 { #category : #reporting }
 LPAttributeRelationship >> renderRelationship [
-	"Render the truth table of a relationship."
+	"Render the truth table of an Attribute Relationship."
 
 	^ displayString :=
 			(String

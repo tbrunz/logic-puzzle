@@ -6,16 +6,12 @@ I know how to conduct inference analyses using my trio of
 Relationships, using the set of 'true' matches in one of them 
 ('center') to propagate known relations between the other two.  
 I can have these Relationships update themselves accordingly, 
-and track when I have them make modifications and when the detect 
-logical inconsistencies.
+and track when I have them make modifications and when they 
+detect logical inconsistencies.
 
 A logic puzzle contains (m-2)*C(m,2) or 3*C(m,3) instances of me, 
 (where 'm' is the number of attributes in the puzzle), in the form 
-of a dictionary keyed by an AttributePair.  And since the ordering 
-of attributes is important for how my truth table is stored, my 
-dictionary has twice as many elements; half its elements are for 
-(a,b) ordering, and half are for (b,a) ordering, but both point to 
-the (a,b) Relationship.
+of a dictionary keyed by an AttributePair. 
 "
 Class {
 	#name : #LPRelationshipTrio,
@@ -51,13 +47,13 @@ LPRelationshipTrio >> commonAttribute [
 { #category : #deductions }
 LPRelationshipTrio >> duplicateTruthTableState: propertyRelationshipOne with: propertyRelationshipTwo [
 	"One PropertyRelationship is 'unknown', one is 'matched' or 'excluded'; 
-	Make the 'unknown' relationship state the same as the other state."
+	Change the 'unknown' relationship state to be the same as the other state."
 
 	| stateOne stateTwo |
 	stateOne := propertyRelationshipOne relationshipState.
 	stateTwo := propertyRelationshipTwo relationshipState.
 
-	"Test either state to decide which direction to copy."
+	"Test either state to decide which direction to copy; commit the results."
 	(stateOne = LPRelationshipUnknown) 
 		ifTrue: [ propertyRelationshipOne relationshipState: stateTwo; commit ]
 		ifFalse: [ propertyRelationshipTwo relationshipState: stateOne; commit ]
@@ -65,8 +61,8 @@ LPRelationshipTrio >> duplicateTruthTableState: propertyRelationshipOne with: pr
 
 { #category : #deductions }
 LPRelationshipTrio >> inferRelationships [
-	"Use the matches in the center attribute relationship to infer 
-	relationships between the other two attribute relationships."
+	"Use the matches in the center Attribute Relationship to infer 
+	relationships between the other two Attribute Relationships."
 
 	| leftPropertyRelationship rightPropertyRelationship |
 	"We can only infer associated relationships for matched Properties."

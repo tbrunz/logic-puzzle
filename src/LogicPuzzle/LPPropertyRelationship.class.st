@@ -8,8 +8,9 @@ e.g., #Nationality, #Color, #Sequence.
 Each of these Attributes defines a set of Properties. 
 e.g., #( #Yellow, #Blue, #Red ), or #( #1, #2, #3 ). 
 
-I hold the Relationship State between my two properties, and I 
-know the Attribute Relationship I belong to.
+I hold the Relationship State between my two properties, which 
+may be 'matched', 'excluded', or 'unknown'.  and I know the 
+Attribute Relationship I belong to.
 
 I can therefore update my Attribute Relationship with myself, 
 or request that my Attribute Relationship update me with its 

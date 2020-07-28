@@ -42,11 +42,11 @@ LPTruthTable >> commitRelationship: aPropertyRelationship [
 
 	| tablePoint |
 	"Corvert the property pair into a Point that can be used
-	as a pair of indices into the truth table:"
+	as a pair of indices into the truth table where I'm located:"
 	tablePoint := propertyConverter
 		propertyToPointWith: aPropertyRelationship propertyOne
 		with: aPropertyRelationship propertyTwo.
-		
+	
 	^ truthTable
 		at: tablePoint x
 		at: tablePoint y
@@ -57,10 +57,11 @@ LPTruthTable >> commitRelationship: aPropertyRelationship [
 LPTruthTable >> commitRelationshipAsExcluded: aPropertyRelationship [
 	"Change the PropertyRelationship in the TruthTable to 'excluded'."
 
-	"Is the relationiship 'unknown'?  Can't change it otherwise."
+	"Is the relationiship 'unknown'?  Cannot change it otherwise!"
 	aPropertyRelationship isUnknown
 		ifFalse: [ ^ aPropertyRelationship ].
-		
+	
+	"The response to a 'commit' message is to return what was committed:"
 	^ self commitRelationship: 
 		(aPropertyRelationship relationshipState: LPRelationshipExcluded)
 ]
@@ -69,10 +70,11 @@ LPTruthTable >> commitRelationshipAsExcluded: aPropertyRelationship [
 LPTruthTable >> commitRelationshipAsMatched: aPropertyRelationship [
 	"Change the PropertyRelationship in the TruthTable to 'matched'."
 
-	"Is the relationiship 'unknown'?  Can't change it otherwise."
+	"Is the relationiship 'unknown'?  Cannot change it otherwise!"
 	aPropertyRelationship isUnknown
 		ifFalse: [ ^ aPropertyRelationship ].
 
+	"The response to a 'commit' message is to return what was committed:"
 	^ self commitRelationship: 
 		(aPropertyRelationship relationshipState: LPRelationshipMatched)
 ]
@@ -91,8 +93,8 @@ LPTruthTable >> fetchRelationshipFor: propertyOne with: propertyTwo [
 	"Return a PropertyRelationship from the TruthTable."
 
 	| tablePoint |
-	"Corvert the property pair into a Point that can be used
-	as a pair of indices into the truth table:"
+	"Corvert the pair of Properties into a Point that can 
+	be used as a pair of indices into the truth table:"
 	tablePoint := propertyConverter
 		propertyToPointWith: propertyOne with: propertyTwo.
 		

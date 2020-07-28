@@ -1,15 +1,16 @@
 "
-I represent an attribute used to describe the subjects of a logic puzzle. 
+I represent an Attribute used to describe the subjects of a logic 
+puzzle. 
 
-The attributes I keep track of have a name, 
+The Attributes I keep track of have a name, 
 e.g., #Nationality, #Color, #Sequence. 
 
-Each attribute has a set of tags defined for it. 
+Each Attribute has a set of Properties defined for it. 
 e.g., #( #Yellow, #Blue, #Red ), or #( #1, #2, #3 ). 
 
-I can return my array of tags, or one of my tags, given its name.
-I can also return a boolean that indicates if a given tag is one 
-of my tags or not.
+I can return my set of Properties, or one of my Properties, given 
+its name.  I can also return a boolean that indicates if a given 
+Property is one of my Properties or not.
 
 A logic puzzle contains many instances of me, as I am the focus 
 of all elements of a puzzle.
