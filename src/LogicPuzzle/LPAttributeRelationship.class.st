@@ -42,7 +42,8 @@ Class {
 		'attributeOne',
 		'attributeTwo',
 		'hasNewMatches',
-		'displayString'
+		'displayString',
+		'setOfMatches'
 	],
 	#category : #'LogicPuzzle-Relationships'
 }
@@ -123,6 +124,9 @@ LPAttributeRelationship >> commitPropertyRelationship: propertyRelationship [
 	"Commit my argument to my TruthTable."
 	
 	isModified := true.
+	propertyRelationship relationshipState = LPRelationshipMatched 
+		ifTrue: [ setOfMatches add: propertyRelationship ].
+		
 	^ truthTable commitRelationship: propertyRelationship 
 ]
 
@@ -131,10 +135,14 @@ LPAttributeRelationship >> deduceExcludedRelationships [
 	"For each 'matched' Property pairing, mark the exclusions."
 
 	| propertyOne propertyTwo |
+	"Don't bother if the TruthTable is not consistent:"
+	truthTable validateTruthTable
+		ifFalse: [ ^ isInconsistent := true ].
+		
 	"Obtain a list of all 'matches', walk each of their attributes, 
 	with the opposing Property held constant in turn, and set each 
 	pair that isn't the 'matched' coordinates to 'excluded'."
-	self collectMatchedRelationships
+	setOfMatches 
 		do: [ :relationship | 
 			propertyOne := relationship propertyOne.
 			relationship propertyTwo attribute propertySet do: [ :property |
@@ -223,6 +231,8 @@ LPAttributeRelationship >> initializeWith: firstAttribute with: secondAttribute 
 	isModified := false.
 	hasNewMatches := false.
 	isInconsistent := false.
+	
+	setOfMatches := OrderedCollection new.
 	
 	truthTable := LPTruthTable newWith: self
 ]
@@ -345,6 +355,11 @@ LPAttributeRelationship >> renderRelationship [
 							space;
 							nextPutAll: propertyOne name ]. 
 					stream cr ])
+]
+
+{ #category : #accessing }
+LPAttributeRelationship >> setOfMatches [
+	^ setOfMatches
 ]
 
 { #category : #accessing }

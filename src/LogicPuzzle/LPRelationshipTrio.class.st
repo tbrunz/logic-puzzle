@@ -66,7 +66,7 @@ LPRelationshipTrio >> inferRelationships [
 
 	| leftPropertyRelationship rightPropertyRelationship |
 	"We can only infer associated relationships for matched Properties."
-	centerRelationship collectMatchedRelationships
+	centerRelationship setOfMatches 
 		do: [ :relationship | 
 			"Walk the Properties for the Attribute common to left & right:"
 			commonAttribute propertySet
