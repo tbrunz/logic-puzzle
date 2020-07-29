@@ -82,7 +82,8 @@ LPAttributeRelationship >> collectMatchedRelationships [
 	| matchedRelationships propertyRelationship |
 	matchedRelationships := OrderedCollection new.
 
-	"Don't bother if the TruthTable is not consistent:"
+	"Don't bother if the TruthTable is not consistent; otherwise, 
+	walk each set of Properties, and add them if they're a 'match':"
 	truthTable validateTruthTable
 		ifFalse: [ isInconsistent := true ]
 		ifTrue: [ "Walk each set of properties, and add them if they're a 'match':"

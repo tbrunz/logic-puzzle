@@ -1,6 +1,6 @@
 "
-I represent the state of a relationship between two Attribute 
-Properties of the subjects of a Logic Puzzle. 
+I represent the abstract state of a relationship between two 
+Attribute Properties of the subjects of a Logic Puzzle. 
 
 The Attributes in a Logic Puzzle have names, 
 e.g., #Nationality, #Color, #Sequence. 
