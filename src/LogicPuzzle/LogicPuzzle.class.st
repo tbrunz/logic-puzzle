@@ -11,10 +11,12 @@ I know how to inspect & verify my set of Attributes, and how to create
 sets of Relationships among them. 
 
 I keep a dictionary of Attribute Relationships; I know how to print 
-them, vet them, and modify them. 
+them, vet them, and modify them.  These relationships represent cases 
+where Attribute Properties are 'matched', 'excluded', or 'unknown'.
 
-I keep a dictionary of relationship Truth Tables; each table contains 
-the true/false details of Attribute Relationships.
+Most importantly, I know how to analyze the relationships to make 
+deductions and inferences, ultimately turning 'unknown' relationships 
+into 'matched' and 'excluded' relationships.
 
 Examples:
 
