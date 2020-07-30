@@ -39,30 +39,20 @@ Class {
 LPAttributeDatabase >> addAttribute: stringOrSymbol withProperties: arrayOrSetOfstringOrSymbol [
 	"Create a new Attribute from a given symbol & set of Property names."
 
-	| attributeName propertyNames attribute propertySet |
+	| attribute |
 	"Validate all the name tokens as String/Symbol and covert them to symbols;
 	Ensure that the array of Attribute Properties has the required number of 
-	Properties, and if provided as a collection or array, convert it to a Set:"
-	attributeName := self validateName: stringOrSymbol.
-	propertyNames := self validateNewPropertySet: arrayOrSetOfstringOrSymbol.
-
-	"Create the Attribute and name it; we'll insert its PropertySet shortly:"
-	attribute := LPAttribute newNamed: attributeName propertySet: nil.
-
-	"Create a PropertySet from the set of Property names, 
-	inserting the owning Attribute into each:"
-	propertySet := propertyNames
-		collect: [ :propertyName | 
-			LPProperty newNamed: propertyName ofAttribute: attribute ].
-
-	"Now plug the actual PropertySet into the Attribute:"
-	attribute propertySet: propertySet.
+	Properties, and if provided as a collection or array, convert it to a Set.
+	Then create the Attribute from the validate name set:"
+	attribute := LPAttribute 
+		newNamed: (self validateName: stringOrSymbol)
+		withPropertyNames: (self validateNewPropertySet: arrayOrSetOfstringOrSymbol).
 
 	"Add the Attribute to the Attributes dictionary:"
 	attributeDictionary add: attribute name -> attribute.
 
 	"Add the Properties in the PropertySet to the Properties dictionary:"
-	propertySet do: [ :property | 
+	attribute propertySet do: [ :property | 
 		propertyDictionary add: property name -> property ].
 	
 	^ attribute

@@ -26,13 +26,26 @@ Class {
 }
 
 { #category : #'instance creation' }
-LPAttribute class >> newNamed: aName propertySet: aPropertySet [
+LPAttribute class >> newNamed: aName withPropertyNames: propertyNames [
 	"Create a new attribute object; the name must already be validated."
 
 	^ self new 
-		name: aName;
-		propertySet: aPropertySet;
+		initializeAs: aName with: propertyNames;
 		yourself
+]
+
+{ #category : #initialization }
+LPAttribute >> initializeAs: attributeName with: propertyNames [
+	"Create the attribute and its Property set."
+
+	"The names provided must already be vetted."
+	name := attributeName.
+	
+	"Create a PropertySet from the set of Property names, 
+	inserting the owning Attribute into each:"
+	propertySet := propertyNames
+		collect: [ :propertyName | 
+			LPProperty newNamed: propertyName ofAttribute: self ]
 ]
 
 { #category : #accessing }
