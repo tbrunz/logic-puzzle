@@ -194,8 +194,8 @@ LPAttributeDatabase >> createAttributeRelationships [
 	
 	| attributeArray relationships |
 	"We need the Attribute dictionary as an array for indexing."
-	relationships := Dictionary new.
 	attributeArray := attributeDictionary asArray.
+	relationships := Dictionary new.
 
 	"Step through C(n,2) = every combination of Attributes taken 2 at a time:"
 	1 to: attributeArray size - 1 do: [ :outerIndex | 
@@ -235,8 +235,8 @@ LPAttributeDatabase >> createRelationshipTrios [
 
 	| attributeArray relationTrioCollection attributeTrio |
 	"We need the Attribute dictionary as an array, for indexing."
-	relationTrioCollection := OrderedCollection new.
 	attributeArray := attributeDictionary asArray.
+	relationTrioCollection := OrderedCollection new.
 
 	"Step through C(n,3) = every combination of Attributes taken 3 at a time:"
 	1 to: attributeArray size - 2 do: [ :outerIndex | 

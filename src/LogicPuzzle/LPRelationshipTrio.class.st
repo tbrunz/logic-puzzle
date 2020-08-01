@@ -140,17 +140,19 @@ LPRelationshipTrio >> syncTruthTablesFor: attributeRelationship with: propertyRe
 	| stateOne stateTwo |
 	stateOne := propertyRelationshipOne relationshipState.
 	stateTwo := propertyRelationshipTwo relationshipState.
-	
-	"If the two states match, they're consistent, but there's also 
-	nothing to do here; return 'nil' to indicate 'nothing done'."
+
+	"If the two states match, they're consistent, which is good... 
+	but there's also nothing to do here, so just return."
 	stateOne = stateTwo
 		ifTrue: [ ^ self ].
 
-	"If only one state is 'unknown', replace it with the other state;
-	But two non-excluded states that differ is an inconsistency error:"
-	(stateOne = LPRelationshipUnknown xor: [ stateTwo = LPRelationshipUnknown ])
+	"If only one state is 'unknown', we replace it with the other state;
+	But two 'non-unknown' states that differ is an inconsistency error:"
+	(stateOne = LPRelationshipUnknown
+		xor: [ stateTwo = LPRelationshipUnknown ])
+		
 		ifFalse: [ attributeRelationship isInconsistent: true ]
-		ifTrue: [ self 
-			duplicateTruthTableState: propertyRelationshipOne 
-			with: propertyRelationshipTwo ]
+		ifTrue: [ self
+				duplicateTruthTableState: propertyRelationshipOne
+				with: propertyRelationshipTwo ]
 ]
