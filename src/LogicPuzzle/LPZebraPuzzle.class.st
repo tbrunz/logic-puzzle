@@ -1,22 +1,37 @@
 "
 I solve the famous Zebra Puzzle...
 
+Start by creating the puzzle, entering 
+most of the provided rules, and making 
+a pass at what we have so far:
+
 LPZebraPuzzle new 
 	firstPassOnTheZebraPuzzle.
+
+Examining the output, we can infer and 
+add more rules, then make another pass:
 
 LPZebraPuzzle new 
 	secondPassOnTheZebraPuzzle.
 
+On this next pass, we make a guess...
+
 LPZebraPuzzle new 
 	thirdPassOnTheZebraPuzzle.
+	
+Note that this third pass reveals an 
+inconsistency caused by our 'guess',
+so we change to the other possibility:
 
 LPZebraPuzzle new 
 	fourthPassOnTheZebraPuzzle.
 
+One last inference is needed:
+
 LPZebraPuzzle new 
 	solveTheZebraPuzzle.
 	
-The solution appears on the Transcript.
+The solutions appear on the Transcript.
 
 "
 Class {
@@ -30,26 +45,6 @@ Class {
 
 { #category : #displaying }
 LPZebraPuzzle >> displaySolutionState [
-	"Display the solution state for the relationships on the Transcript:"
-	
-	Transcript
-		crShow: '------------------------------------';
-		cr.
-
-	Transcript crShow: puzzle renderAllRelationships.
-	
-	puzzle attributeDatabase listInconsistencies
-		ifNotEmpty: [ Transcript
-				crShow: 'Puzzle is inconsistent!';
-				cr ].
-			
-	Transcript
-		crShow: '------------------------------------';
-		cr
-]
-
-{ #category : #displaying }
-LPZebraPuzzle >> displaySolutionState: puzzle [
 	"Display the solution state for the relationships on the Transcript:"
 	
 	Transcript
@@ -98,7 +93,7 @@ LPZebraPuzzle >> firstPassOnTheZebraPuzzle [
 	puzzle createRelationships.
 	
 	"Display the newly-created truth tables:"
-	self displaySolutionState: puzzle.
+	self displaySolutionState.
 
 	"Make relationship matches from the Zebra Puzzle rules:"
 	puzzle relationshipOf: #Englishman with: #Red is: #Matched.
@@ -119,7 +114,7 @@ LPZebraPuzzle >> firstPassOnTheZebraPuzzle [
 
 	"Analyze the data we have entered so far:"
 	puzzle attributeDatabase analyzeRelationships.
-	self displaySolutionState: puzzle
+	self displaySolutionState
 	
 	"Now examine the results on the Transcript and add more rules."
 ]
@@ -250,7 +245,7 @@ LPZebraPuzzle >> secondPassOnTheZebraPuzzle [
 
 	"Again, analyze the data we have entered so far:"
 	puzzle attributeDatabase analyzeRelationships.
-	self displaySolutionState: puzzle
+	self displaySolutionState
 	
 	"Now examine the results on the Transcript and add more rules."
 ]
