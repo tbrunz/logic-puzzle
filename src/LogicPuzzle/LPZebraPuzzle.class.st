@@ -13,22 +13,17 @@ Class {
 	#category : #'LogicPuzzle-Base'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #displaying }
 LPZebraPuzzle >> displaySolutionState: puzzle [
 	"Display the solution state for the relationships on the Transcript:"
-	
-	| database displayString |
-	"Make a temp for ease of analysis & inspection:"
-	database := puzzle attributeDatabase.
 	
 	Transcript
 		crShow: '------------------------------------';
 		cr.
-		
-	displayString := puzzle renderAllRelationships.
-	Transcript crShow: displayString.
+
+	Transcript crShow: puzzle renderAllRelationships.
 	
-	database listInconsistencies
+	puzzle attributeDatabase listInconsistencies
 		ifNotEmpty: [ Transcript
 				crShow: 'Puzzle is inconsistent!';
 				cr ].
@@ -38,7 +33,7 @@ LPZebraPuzzle >> displaySolutionState: puzzle [
 		cr
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #examples }
 LPZebraPuzzle >> solveTheZebraPuzzle [
 	"This is the solution to the Zebra Puzzle.
 	Note that multiple analysis passes were made 
