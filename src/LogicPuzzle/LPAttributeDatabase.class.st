@@ -63,7 +63,7 @@ LPAttributeDatabase >> analyzeRelationTrio: relationshipTrio [
 	"Analyze a relationship trio, making inferences."
 
 	relationshipTrio inferRelationships.
-	
+
 	^ relationshipTrio
 ]
 
