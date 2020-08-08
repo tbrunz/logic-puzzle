@@ -1,46 +1,22 @@
 Class {
 	#name : #LogicPuzzleCreationTest,
 	#superclass : #TestCase,
+	#instVars : [
+		'puzzle'
+	],
 	#category : #'LogicPuzzle-Tests'
 }
 
-{ #category : #tests }
-LogicPuzzleCreationTest >> test001CreateLogicPuzzle [
-	"Test behavior of the Logic Puzzle constructor."
-	
-	self shouldnt: [ LogicPuzzle new ] raise: Error
-]
+{ #category : #running }
+LogicPuzzleCreationTest >> setUp [
+	"Hooks that subclasses may override to define the fixture of test."
 
-{ #category : #tests }
-LogicPuzzleCreationTest >> test002AttributeNaming [
-	"Test validation of attribute names when adding attributes to a puzzle."
-	
-	| puzzle |
-	puzzle := LogicPuzzle new .
-	
-	"Attribute names must be either a non-empty string or a symbol:"
-	self should: [ puzzle addAttribute: 1 withProperties: #( mn no op ) ] raise: Error .
-	self should: [ puzzle addAttribute: #( 1 2 3 ) withProperties: #( pq qr rs ) ] raise: Error .
-	self should: [ puzzle addAttribute: '' withProperties: #( st tu uv ) ] raise: Error .
-	self should: [ puzzle addAttribute: #( 'abc' ) withProperties: #( vw wx xy ) ] raise: Error .
-	
-	"A string or symbol is allowed (since strings are cast to symbols):"
-	self shouldnt: [ puzzle addAttribute: 'uvw' withProperties: #( abc def ghi ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #xyz withProperties: #( jkl mno pqr ) ] raise: Error .
-	
-	"A string or symbol containing or entirely spaces, is allowed:"
-	self shouldnt: [ puzzle addAttribute: 'abc xyz' withProperties: #( ab bc cd ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #'xyz abc' withProperties: #( de ef fg ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: '   ' withProperties: #( gh hi ij ) ] raise: Error .
-	self shouldnt: [ puzzle addAttribute: #' ' withProperties: #( jk kl lm ) ] raise: Error .
+	puzzle := LogicPuzzle new
 ]
 
 { #category : #tests }
 LogicPuzzleCreationTest >> test003SetAttributeProperties [
 	"Test validation of attribute tag arays when adding attributes to a puzzle."
-	
-	| puzzle |
-	puzzle := LogicPuzzle new .
 	
 	"Attribute tags argument must be an array:"
 	self should: [ puzzle addAttribute: 'abc' withProperties: 'xyz' ] raise: Error .
@@ -63,10 +39,7 @@ LogicPuzzleCreationTest >> test003SetAttributeProperties [
 { #category : #tests }
 LogicPuzzleCreationTest >> test004AddAttributesToPuzzle [
 	"Test adding attributes to a puzzle."
-	
-	| puzzle |
-	puzzle := LogicPuzzle new .
-	
+		
 	"Adding attributes with 3 tags should be accepted:"
 	self shouldnt: [ puzzle addAttribute: #Nationality withProperties: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
 	self shouldnt: [ puzzle addAttribute: #Pet withProperties: #( #Snails #Fox #Zebra ) ] raise: Error .
@@ -85,10 +58,7 @@ LogicPuzzleCreationTest >> test004AddAttributesToPuzzle [
 { #category : #tests }
 LogicPuzzleCreationTest >> test005SetPrimaryAttribute [
 	"Test setting a primary attribute."
-	
-	| puzzle |
-	puzzle := LogicPuzzle new .
-	
+
 	puzzle addAttribute: #Nationality withProperties: #( #Norwegian #Japanese #Ukrainian #Englishman #Spaniard ) .
 	puzzle addAttribute: #Pet withProperties: #( #Dog #Horse #Snails #Fox #Zebra ) .
 	
@@ -109,8 +79,6 @@ LogicPuzzleCreationTest >> test005SetPrimaryAttribute [
 LogicPuzzleCreationTest >> test006CreateRelationships [
 	"Test creating attribute relationships for a puzzle."
 	
-	| puzzle |
-	puzzle := LogicPuzzle new .
 	
 	"Puzzle with 3 traits -> 3*2/2 = 3 relationship pair combinations = 6 permutations:"
 	self shouldnt: [ puzzle addAttribute: #Nationality withProperties: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
@@ -139,9 +107,6 @@ LogicPuzzleCreationTest >> test006CreateRelationships [
 LogicPuzzleCreationTest >> test007RelatingAttributes [
 	"Test validating, assigning, and detecting attribute relationships."
 	
-	| puzzle |
-	puzzle := LogicPuzzle new .
-	
 	"Puzzle with 3 traits -> 3*2/2 = 3 associations:"
 	self shouldnt: [ puzzle addAttribute: #Nationality withProperties: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
 	self shouldnt: [ puzzle addAttribute: #Pet withProperties: #( #Snails #Fox #Zebra ) ] raise: Error .
@@ -169,9 +134,6 @@ LogicPuzzleCreationTest >> test007RelatingAttributes [
 LogicPuzzleCreationTest >> test008AttributeRelations [
 	"Test that relating attributes results in expected truth table values."
 	
-	| puzzle |
-	puzzle := LogicPuzzle new .
-	
 	"Puzzle with 3 traits -> 3*2/2 = 3 relationship pair combinations = 6 permutations:"
 	self shouldnt: [ puzzle addAttribute: #Nationality withProperties: #( #Norwegian #Japanese #Ukrainian ) ] raise: Error .
 	self shouldnt: [ puzzle addAttribute: #Pet withProperties: #( #Snails #Fox #Zebra ) ] raise: Error .
@@ -190,4 +152,33 @@ LogicPuzzleCreationTest >> test008AttributeRelations [
 	self assert: (puzzle relationshipOf: #Norwegian with: #Zebra) equals: 'matched' .
 	self assert: (puzzle relationshipOf: #Ukrainian with: #Tea) equals: 'excluded' .
 	self assert: (puzzle relationshipOf: #Japanese with: #Snails) equals: 'unknown' .
+]
+
+{ #category : #tests }
+LogicPuzzleCreationTest >> testAttributeNamesMustBestringOrSymbol [
+	self should: [ puzzle addAttribute: 1 withProperties: #( mn no op ) ] raise: Error .
+	self should: [ puzzle addAttribute: #( 1 2 3 ) withProperties: #( pq qr rs ) ] raise: Error .
+	self should: [ puzzle addAttribute: '' withProperties: #( st tu uv ) ] raise: Error .
+	self should: [ puzzle addAttribute: #( 'abc' ) withProperties: #( vw wx xy ) ] raise: Error .
+	
+	
+]
+
+{ #category : #tests }
+LogicPuzzleCreationTest >> testAttributesNameCanBeStringOrSymbol [
+
+	self shouldnt: [ puzzle addAttribute: 'uvw' withProperties: #( abc def ghi ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #xyz withProperties: #( jkl mno pqr ) ] raise: Error .
+	
+
+]
+
+{ #category : #tests }
+LogicPuzzleCreationTest >> testAttributesNameCanContainSpace [
+	
+	"A string or symbol containing or entirely spaces, is allowed:"
+	self shouldnt: [ puzzle addAttribute: 'abc xyz' withProperties: #( ab bc cd ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #'xyz abc' withProperties: #( de ef fg ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: '   ' withProperties: #( gh hi ij ) ] raise: Error .
+	self shouldnt: [ puzzle addAttribute: #' ' withProperties: #( jk kl lm ) ] raise: Error .
 ]
