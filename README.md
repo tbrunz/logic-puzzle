@@ -40,3 +40,5 @@ and smoke different brands of American cigarettes. One other thing: in statement
  This project is a Pharo application that will assist in keeping track of all the relationships involving the 
  various attributes, as well as all the logical deductions and inferences that can be made, consistent with 
  the  constraints listed.  The app is being developed in 64-bit Pharo 8.
+
+The wiki for this repo has an explanation of the algorithms used to solve these puzzles.
